@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaTimes } from 'react-icons/fa';
+import { API_URL } from '../config';
 import './ProfessorModal.css';
 
 const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
@@ -36,7 +37,7 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
     // Fetch programs
     const fetchPrograms = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/programs');
+        const response = await fetch(`${API_URL}/api/programs`);
         const data = await response.json();
         setPrograms(data);
         setFilteredPrograms(data);
@@ -48,7 +49,7 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
     // Fetch disciplines
     const fetchDisciplines = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/disciplines');
+        const response = await fetch(`${API_URL}/api/disciplines`);
         const data = await response.json();
         setDisciplines(data);
         setFilteredDisciplines(data);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { API_URL } from '../config';
 import { FaPlus, FaSignOutAlt, FaEdit, FaTrash, FaCopy, FaEye } from 'react-icons/fa';
 import ProfessorModal from './ProfessorModal';
 import './SyllabusList.css';
@@ -29,7 +30,7 @@ const SyllabusList = () => {
       if (programaSearch) params.programa = programaSearch;
       if (disciplinaSearch) params.disciplina = disciplinaSearch;
 
-      const response = await axios.get('http://localhost:5001/api/syllabi', {
+      const response = await axios.get(`${API_URL}/api/syllabi`, {
         params,
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -41,7 +42,7 @@ const SyllabusList = () => {
 
   const fetchPendingRequests = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/requests', {
+      const response = await axios.get(`${API_URL}/api/requests`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingRequests(response.data);
@@ -55,8 +56,8 @@ const SyllabusList = () => {
     const loadData = async () => {
       try {
         const [programsRes, disciplinesRes] = await Promise.all([
-          axios.get('http://localhost:5001/api/programs'),
-          axios.get('http://localhost:5001/api/disciplines')
+          axios.get(`${API_URL}/api/programs`),
+          axios.get(`${API_URL}/api/disciplines`)
         ]);
         setPrograms(programsRes.data);
         setDisciplines(disciplinesRes.data);
@@ -112,7 +113,7 @@ const SyllabusList = () => {
     if (!window.confirm('Tem certeza que deseja deletar este syllabus?')) return;
 
     try {
-      await axios.delete(`http://localhost:5001/api/syllabi/${id}`, {
+      await axios.delete(`${API_URL}/api/syllabi/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchSyllabi();
@@ -131,7 +132,7 @@ const SyllabusList = () => {
       const syllabusData = { ...syllabus };
       delete syllabusData.id;
       
-      await axios.post('http://localhost:5001/api/syllabi', syllabusData, {
+      await axios.post(`${API_URL}/api/syllabi`, syllabusData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchSyllabi();
@@ -150,7 +151,7 @@ const SyllabusList = () => {
   const handleAddProfessor = async (professorData) => {
     try {
       // Send request to backend
-      await axios.post('http://localhost:5001/api/requests', {
+      await axios.post(`${API_URL}/api/requests`, {
         professor_nome: professorData.professores,
         professor_email: '', // We'll need to get this from the user
         curso: professorData.curso,
@@ -169,7 +170,7 @@ const SyllabusList = () => {
 
   const handleView = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/syllabi/${id}`, {
+      const response = await axios.get(`${API_URL}/api/syllabi/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const syllabus = response.data;
@@ -218,7 +219,7 @@ const SyllabusList = () => {
                   onClick={async () => {
                     try {
                       // Update request status to accepted
-                      await axios.put(`http://localhost:5001/api/requests/${request.id}/accept`, {}, {
+                      await axios.put(`${API_URL}/api/requests/${request.id}/accept`, {}, {
                         headers: { Authorization: `Bearer ${token}` }
                       });
                       

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { API_URL } from '../config';
 import { FaArrowLeft, FaFilePdf } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
@@ -132,7 +133,7 @@ const SyllabusForm = () => {
 
   const fetchPrograms = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/programs');
+      const response = await axios.get(`${API_URL}/api/programs`);
       setPrograms(response.data);
     } catch (err) {
       console.error('Erro ao buscar programas:', err);
@@ -141,7 +142,7 @@ const SyllabusForm = () => {
 
   const fetchSyllabus = async () => {
     try {
-      const response = await axios.get(`http://localhost:5001/api/syllabi/${id}`, {
+      const response = await axios.get(`${API_URL}/api/syllabi/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -191,7 +192,7 @@ const SyllabusForm = () => {
       try {
         const programaNome = newFormData.curso || newFormData.programa;
         if (programaNome) {
-          const response = await axios.get('http://localhost:5001/api/disciplines', {
+          const response = await axios.get(`${API_URL}/api/disciplines`, {
             params: { programa: programaNome }
           });
           const filtered = response.data.filter(d =>
@@ -201,7 +202,7 @@ const SyllabusForm = () => {
           setShowDisciplineDropdown(value.length > 0 && filtered.length > 0);
         } else {
           // Se não há programa selecionado, buscar todas
-          const response = await axios.get('http://localhost:5001/api/disciplines');
+          const response = await axios.get(`${API_URL}/api/disciplines`);
           const filtered = response.data.filter(d =>
             d.nome.toLowerCase().includes(value.toLowerCase())
           );
@@ -309,13 +310,13 @@ const SyllabusForm = () => {
     try {
       if (isEditing) {
         await axios.put(
-          `http://localhost:5001/api/syllabi/${id}`,
+          `${API_URL}/api/syllabi/${id}`,
           dataToSubmit,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          'http://localhost:5001/api/syllabi',
+          `${API_URL}/api/syllabi`,
           dataToSubmit,
           { headers: { Authorization: `Bearer ${token}` } }
         );

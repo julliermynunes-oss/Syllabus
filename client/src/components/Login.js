@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { API_URL } from '../config';
 import './Login.css';
 
 const Login = () => {
@@ -46,7 +47,7 @@ const Login = () => {
     try {
       const endpoint = isLogin ? '/api/login' : '/api/register';
       const response = await axios.post(
-        `http://localhost:5001${endpoint}`,
+        `${API_URL}${endpoint}`,
         isLogin
           ? { email: formData.email, senha: formData.senha }
           : {
