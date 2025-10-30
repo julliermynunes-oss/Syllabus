@@ -143,19 +143,7 @@ const SyllabusList = () => {
     }
   };
 
-  // Reatribuir syllabi órfãos para o usuário atual (botão temporário)
-  const handleClaimOrphans = async () => {
-    try {
-      const resp = await axios.post(`${API_URL}/api/maintenance/claim-orphans`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert(`Syllabi reatribuídos: ${resp.data.updated}`);
-      fetchSyllabi();
-    } catch (err) {
-      console.error('Erro ao reatribuir syllabi:', err);
-      alert('Erro ao reatribuir syllabi órfãos');
-    }
-  };
+  // (reatribuição removida do UI)
 
   const handleLogout = () => {
     logout();
