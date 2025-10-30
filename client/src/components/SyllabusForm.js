@@ -55,6 +55,18 @@ const SyllabusForm = () => {
     "5º", "6º", "7º", "8º"
   ];
 
+  // Opções fixas de Departamentos (fornecidas pelo usuário)
+  const departamentoOptions = [
+    'FSJ - Fundamentos Sociais e Jurídicos da Administração',
+    'GEP - Departamento de Gestão Pública',
+    'CFC - Contabilidade, Finanças e Controle',
+    'POI - Administração da Produção e de Operações',
+    'TDS - Technology and Data Science (Tecnologia e Ciência de Dados)',
+    'MKT - Marketing',
+    'ADM - Administração Geral e Recursos Humanos',
+    'PAE - Planejamento e Análise Econômica aplicados à Administração',
+  ];
+
   // Opções para Coordenadores
   const coordenadorOptions = [
     "Renato Guimarães Ferreira",
@@ -504,7 +516,10 @@ const SyllabusForm = () => {
             </div>
           </div>
 
-          <div className="form-field">
+        </div>
+
+        <div className="form-row">
+          <div className="form-field" style={{ gridColumn: '1 / -1' }}>
             <label>Linha:</label>
             <input
               type="text"
@@ -548,13 +563,16 @@ const SyllabusForm = () => {
         <div className="form-row">
           <div className="form-field">
             <label>Departamento:</label>
-            <input
-              type="text"
+            <select
               name="departamento"
               value={formData.departamento}
               onChange={handleInputChange}
-              placeholder="Digite o departamento ..."
-            />
+            >
+              <option value="">Selecione o Departamento</option>
+              {departamentoOptions.map((dep, idx) => (
+                <option key={idx} value={dep}>{dep}</option>
+              ))}
+            </select>
           </div>
 
           <div className="form-field">
