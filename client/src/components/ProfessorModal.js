@@ -17,7 +17,7 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
   const [showProgramDropdown, setShowProgramDropdown] = useState(false);
   const [showDisciplineDropdown, setShowDisciplineDropdown] = useState(false);
 
-  // Gera opções de Semestre/Ano
+  // Gera opções de Semestre/Ano (formato numérico: 1/2026, 2/2026)
   const gerarOpcoesSemestreAno = () => {
     const opcoes = [];
     const anos = [];
@@ -25,8 +25,8 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
       anos.push(ano);
     }
     anos.forEach(ano => {
-      opcoes.push(`Primeiro/${ano}`);
-      opcoes.push(`Segundo/${ano}`);
+      opcoes.push(`1/${ano}`);
+      opcoes.push(`2/${ano}`);
     });
     return opcoes;
   };

@@ -16,26 +16,43 @@ const SyllabusForm = () => {
   const location = useLocation();
   const isEditing = !!id;
 
-  // Função para gerar opções de semestre/ano
+  // Normalizadores para compatibilidade retroativa
+  const normalizeSemestreAno = (value) => {
+    if (!value) return value;
+    if (value.startsWith('Primeiro/')) return value.replace('Primeiro/', '1/');
+    if (value.startsWith('Segundo/')) return value.replace('Segundo/', '2/');
+    return value;
+  };
+
+  const normalizeSemCurricular = (value) => {
+    if (!value) return value;
+    const map = {
+      'Primeiro': '1º', 'Segundo': '2º', 'Terceiro': '3º', 'Quarto': '4º',
+      'Quinto': '5º', 'Sexto': '6º', 'Sétimo': '7º', 'Setimo': '7º', 'Oitavo': '8º'
+    };
+    return map[value] || value;
+  };
+
+  // Função para gerar opções de semestre/ano (formato numérico: 1/2026, 2/2026)
   const generateSemestreAnoOptions = () => {
     const options = [];
     const startYear = 2026;
     const yearsAhead = 10; // Gera opções para os próximos 10 anos
-    
+
     for (let year = startYear; year <= startYear + yearsAhead; year++) {
-      options.push(`Primeiro/${year}`);
-      options.push(`Segundo/${year}`);
+      options.push(`1/${year}`);
+      options.push(`2/${year}`);
     }
-    
+
     return options;
   };
 
   const semestreAnoOptions = generateSemestreAnoOptions();
 
-  // Opções para Semestre Curricular
+  // Opções para Semestre Curricular (formato numérico ordinal: 1º, 2º, ... 8º)
   const semestreCurricularOptions = [
-    "Primeiro", "Segundo", "Terceiro", "Quarto",
-    "Quinto", "Sexto", "Sétimo", "Oitavo"
+    "1º", "2º", "3º", "4º",
+    "5º", "6º", "7º", "8º"
   ];
 
   // Opções para Coordenadores
@@ -122,7 +139,7 @@ const SyllabusForm = () => {
         ...prevData,
         curso: curso || '',
         disciplina: disciplina || '',
-        semestre_ano: semestre_ano || '',
+        semestre_ano: normalizeSemestreAno(semestre_ano || ''),
         turma: turma || '',
         coordenador: coordenador,
         programa: curso || ''
@@ -153,7 +170,13 @@ const SyllabusForm = () => {
         return;
       }
       
-      setFormData(response.data);
+      // Normalizar campos antigos para o novo formato
+      const normalized = {
+        ...response.data,
+        semestre_ano: normalizeSemestreAno(response.data.semestre_ano),
+        sem_curricular: normalizeSemCurricular(response.data.sem_curricular)
+      };
+      setFormData(normalized);
       
       // Converter string de professores em lista
       if (response.data.professores) {

@@ -137,6 +137,25 @@ const db = new sqlite3.Database('./syllabus.db', (err) => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (assigned_to_user_id) REFERENCES users(id)
       )`);
+
+      // Normalização retroativa de valores de semestre (idempotente)
+      const normalizeSemesters = () => {
+        // Semestre/Ano: Primeiro/AAAA -> 1/AAAA, Segundo/AAAA -> 2/AAAA
+        db.run(`UPDATE syllabi SET semestre_ano = REPLACE(semestre_ano, 'Primeiro/', '1/') WHERE semestre_ano LIKE 'Primeiro/%'`);
+        db.run(`UPDATE syllabi SET semestre_ano = REPLACE(semestre_ano, 'Segundo/', '2/') WHERE semestre_ano LIKE 'Segundo/%'`);
+
+        // Sem. Curricular: textos para ordinais numéricos
+        db.run("UPDATE syllabi SET sem_curricular='1º' WHERE sem_curricular='Primeiro'");
+        db.run("UPDATE syllabi SET sem_curricular='2º' WHERE sem_curricular='Segundo'");
+        db.run("UPDATE syllabi SET sem_curricular='3º' WHERE sem_curricular='Terceiro'");
+        db.run("UPDATE syllabi SET sem_curricular='4º' WHERE sem_curricular='Quarto'");
+        db.run("UPDATE syllabi SET sem_curricular='5º' WHERE sem_curricular='Quinto'");
+        db.run("UPDATE syllabi SET sem_curricular='6º' WHERE sem_curricular='Sexto'");
+        db.run("UPDATE syllabi SET sem_curricular='7º' WHERE sem_curricular IN ('Sétimo','Setimo')");
+        db.run("UPDATE syllabi SET sem_curricular='8º' WHERE sem_curricular='Oitavo'");
+      };
+
+      normalizeSemesters();
     });
   }
 });
