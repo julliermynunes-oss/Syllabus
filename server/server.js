@@ -573,13 +573,26 @@ app.put('/api/requests/:id/accept', authenticateToken, (req, res) => {
 
 // Serve static files from React app in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '..', 'client', 'build')));
+  const buildPath = path.join(__dirname, '..', 'client', 'build');
+
+  // Middleware de cache-busting para assets do frontend
+  app.use((req, res, next) => {
+    if (/\.html$/i.test(req.url)) {
+      res.set('Cache-Control', 'no-store');
+    } else if (/\.(js|css|png|jpg|jpeg|gif|svg|webp|ico)$/i.test(req.url)) {
+      res.set('Cache-Control', 'no-cache');
+    }
+    next();
+  });
+
+  // Desabilitar etag para evitar 304 com bundle antigo
+  app.set('etag', false);
+  app.use(express.static(buildPath, { etag: false }));
   
   // For any other requests, send back React's index.html file
   app.get('*', (req, res) => {
-    // Evitar cache da página HTML principal (garante que o bundle mais novo seja carregado)
     res.set('Cache-Control', 'no-store');
-    res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
+    res.sendFile(path.join(buildPath, 'index.html'));
   });
 }
 
