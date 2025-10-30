@@ -433,15 +433,20 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           INFORMAÇÕES GERAIS
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '14px', width: '100%' }}>
-          <div><strong>Curso:</strong> {formData.curso}</div>
-          <div><strong>Semestre/Ano:</strong> {formData.semestre_ano}</div>
-          <div><strong>Turma:</strong> {formData.turma}</div>
-          <div><strong>Semestre Curricular:</strong> {formData.sem_curricular}</div>
-          <div><strong>Coordenador:</strong> {formData.coordenador}</div>
-          <div><strong>Idioma:</strong> {formData.idioma}</div>
-          <div style={{ gridColumn: '1 / -1' }}>
-            <strong>Professores:</strong> {professoresList.join(', ')}
-          </div>
+          {formData.curso && (<div><strong>Curso:</strong> {formData.curso}</div>)}
+          {formData.semestre_ano && (<div><strong>Semestre/Ano:</strong> {formData.semestre_ano}</div>)}
+          {formData.linha && (<div><strong>Linha:</strong> {formData.linha}</div>)}
+          {formData.turma && (<div><strong>Turma:</strong> {formData.turma}</div>)}
+          {formData.departamento && (<div><strong>Departamento:</strong> {formData.departamento}</div>)}
+          {formData.num_creditos && (<div><strong>Nº Créditos:</strong> {formData.num_creditos}</div>)}
+          {formData.sem_curricular && (<div><strong>Semestre Curricular:</strong> {formData.sem_curricular}</div>)}
+          {formData.coordenador && (<div><strong>Coordenador:</strong> {formData.coordenador}</div>)}
+          {formData.idioma && (<div><strong>Idioma:</strong> {formData.idioma}</div>)}
+          {professoresList && professoresList.length > 0 && (
+            <div style={{ gridColumn: '1 / -1' }}>
+              <strong>Professores:</strong> {professoresList.join(', ')}
+            </div>
+          )}
         </div>
       </div>
 
