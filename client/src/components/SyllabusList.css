@@ -21,16 +21,7 @@
   letter-spacing: -1px;
 }
 
-.build-tag {
-  font-size: 0.9rem;
-  background: #eef4fa;
-  color: #235795;
-  border: 2px solid #235795;
-  border-radius: 999px;
-  padding: 0.2rem 0.5rem;
-  vertical-align: middle;
-  margin-left: 0.5rem;
-}
+.build-tag { display: none; }
 
 .header-actions {
   display: flex;
@@ -68,12 +59,7 @@
   box-shadow: 0 4px 6px rgba(35, 87, 149, 0.3);
 }
 
-.icon-btn.alt {
-  background: #6c757d;
-}
-.icon-btn.alt:hover {
-  background: #5c636a;
-}
+.icon-btn.alt { display: none; }
 
 .icon-btn:hover {
   background: #2a6ca8;

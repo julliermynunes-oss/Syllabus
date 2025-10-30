@@ -203,7 +203,7 @@ const SyllabusList = () => {
   return (
     <div className="syllabus-list-container">
       <header className="header">
-        <h1 className="main-title">Syllabus <span className="build-tag">v2</span></h1>
+        <h1 className="main-title">Syllabus</h1>
         <div className="header-actions">
           <div className="user-badge" title={user?.email}>Professor: {user?.nome_completo || '—'}</div>
           <button className="icon-btn" onClick={handleLogout}>
@@ -211,9 +211,6 @@ const SyllabusList = () => {
           </button>
           <button className="icon-btn" onClick={() => setShowProfessorModal(true)}>
             +Professor
-          </button>
-          <button className="icon-btn alt" onClick={handleClaimOrphans} title="Reatribuir syllabi órfãos">
-            Reatribuir
           </button>
         </div>
       </header>
