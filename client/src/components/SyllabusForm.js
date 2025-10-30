@@ -628,24 +628,7 @@ const SyllabusForm = () => {
           </div>
         </div>
 
-        <div className="form-row">
-          <div className="form-field">
-            <label>Coordenador:</label>
-            <select
-              name="coordenador"
-              value={formData.coordenador}
-              onChange={handleInputChange}
-              disabled={!formData.curso}
-            >
-              <option value="">Selecione o Coordenador</option>
-              {coordenadorOptions.map((option, index) => (
-                <option key={index} value={option}>{option}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-field" />
-        </div>
+        {/* Coordenador movido para a linha com Sem. Curricular abaixo */}
 
         <div className="form-row">
           <div className="form-field" style={{ gridColumn: '1 / -1' }}>
