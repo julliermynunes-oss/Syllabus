@@ -524,6 +524,24 @@ app.delete('/api/syllabi/:id', authenticateToken, (req, res) => {
   );
 });
 
+// Manutenção: reatribuir syllabi órfãos (sem usuário correspondente) para o usuário logado
+app.post('/api/maintenance/claim-orphans', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+  db.run(
+    `UPDATE syllabi 
+     SET usuario_id = ?
+     WHERE usuario_id IS NULL 
+        OR usuario_id NOT IN (SELECT id FROM users)`,
+    [userId],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao reatribuir syllabi' });
+      }
+      res.json({ updated: this.changes });
+    }
+  );
+});
+
 // Request routes
 app.post('/api/requests', authenticateToken, (req, res) => {
   const { professor_nome, professor_email, curso, disciplina, semestre_ano, turma_nome } = req.body;

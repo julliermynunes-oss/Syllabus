@@ -143,6 +143,20 @@ const SyllabusList = () => {
     }
   };
 
+  // Reatribuir syllabi órfãos para o usuário atual (botão temporário)
+  const handleClaimOrphans = async () => {
+    try {
+      const resp = await axios.post(`${API_URL}/api/maintenance/claim-orphans`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert(`Syllabi reatribuídos: ${resp.data.updated}`);
+      fetchSyllabi();
+    } catch (err) {
+      console.error('Erro ao reatribuir syllabi:', err);
+      alert('Erro ao reatribuir syllabi órfãos');
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -197,6 +211,9 @@ const SyllabusList = () => {
           </button>
           <button className="icon-btn" onClick={() => setShowProfessorModal(true)}>
             +Professor
+          </button>
+          <button className="icon-btn alt" onClick={handleClaimOrphans} title="Reatribuir syllabi órfãos">
+            Reatribuir
           </button>
         </div>
       </header>

@@ -68,6 +68,13 @@
   box-shadow: 0 4px 6px rgba(35, 87, 149, 0.3);
 }
 
+.icon-btn.alt {
+  background: #6c757d;
+}
+.icon-btn.alt:hover {
+  background: #5c636a;
+}
+
 .icon-btn:hover {
   background: #2a6ca8;
   transform: translateY(-2px);
@@ -317,7 +324,7 @@
 }
 
 .section-title {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #235795;
   font-weight: 700;
   margin: 0 0 1rem 0;
