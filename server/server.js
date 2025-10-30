@@ -577,6 +577,8 @@ if (process.env.NODE_ENV === 'production') {
   
   // For any other requests, send back React's index.html file
   app.get('*', (req, res) => {
+    // Evitar cache da página HTML principal (garante que o bundle mais novo seja carregado)
+    res.set('Cache-Control', 'no-store');
     res.sendFile(path.join(__dirname, '..', 'client', 'build', 'index.html'));
   });
 }
