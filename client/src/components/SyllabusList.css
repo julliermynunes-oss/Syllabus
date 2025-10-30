@@ -21,9 +21,36 @@
   letter-spacing: -1px;
 }
 
+.build-tag {
+  font-size: 0.9rem;
+  background: #eef4fa;
+  color: #235795;
+  border: 2px solid #235795;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+}
+
 .header-actions {
   display: flex;
   gap: 1rem;
+}
+
+.logged-user {
+  color: #235795;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.user-badge {
+  padding: 0.5rem 0.75rem;
+  background: #eef4fa;
+  color: #235795;
+  border: 2px solid #235795;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 .icon-btn {
@@ -290,7 +317,7 @@
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #235795;
   font-weight: 700;
   margin: 0 0 1rem 0;
