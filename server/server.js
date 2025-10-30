@@ -30,12 +30,22 @@ if (process.env.NODE_ENV === 'production') {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Database setup
-const db = new sqlite3.Database('./syllabus.db', (err) => {
+// Database setup (supports persistent volume via DB_PATH)
+const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'syllabus.db');
+try {
+  const dbDir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+} catch (e) {
+  console.error('Could not ensure DB directory exists:', e);
+}
+
+const db = new sqlite3.Database(DB_PATH, (err) => {
   if (err) {
-    console.error('Error opening database:', err);
+    console.error('Error opening database:', err, '\nPath:', DB_PATH);
   } else {
-    console.log('Connected to SQLite database');
+    console.log('Connected to SQLite database at', DB_PATH);
     
     // Create tables
     db.serialize(() => {
