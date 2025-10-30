@@ -519,7 +519,7 @@ const SyllabusForm = () => {
         </div>
 
         <div className="form-row">
-          <div className="form-field" style={{ gridColumn: '1 / -1' }}>
+          <div className="form-field">
             <label>Linha:</label>
             <input
               type="text"
@@ -529,6 +529,7 @@ const SyllabusForm = () => {
               placeholder="Digite a linha ..."
             />
           </div>
+          <div className="form-field" />
         </div>
 
         <div className="form-row">
@@ -633,7 +634,11 @@ const SyllabusForm = () => {
             </select>
           </div>
 
-          <div className="form-field">
+          <div className="form-field" />
+        </div>
+
+        <div className="form-row">
+          <div className="form-field" style={{ gridColumn: '1 / -1' }}>
             <label>Professores:</label>
             <div className="professores-container">
               <div className="professor-input-row">
