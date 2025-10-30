@@ -529,10 +529,6 @@ const SyllabusForm = () => {
               placeholder="Digite a linha ..."
             />
           </div>
-          <div className="form-field" />
-        </div>
-
-        <div className="form-row">
           <div className="form-field">
             <label>Semestre/Ano:</label>
             <select
@@ -548,7 +544,9 @@ const SyllabusForm = () => {
               ))}
             </select>
           </div>
+        </div>
 
+        <div className="form-row">
           <div className="form-field">
             <label>Turma:</label>
             <input
@@ -559,9 +557,6 @@ const SyllabusForm = () => {
               placeholder="Digite nome/número da turma ..."
             />
           </div>
-        </div>
-
-        <div className="form-row">
           <div className="form-field">
             <label>Departamento:</label>
             <select
@@ -575,7 +570,9 @@ const SyllabusForm = () => {
               ))}
             </select>
           </div>
+        </div>
 
+        <div className="form-row">
           <div className="form-field">
             <label>Nº Créditos:</label>
             <input
@@ -585,6 +582,19 @@ const SyllabusForm = () => {
               onChange={handleInputChange}
               placeholder="Digite número de créditos ..."
             />
+          </div>
+          <div className="form-field">
+            <label>Idioma:</label>
+            <select
+              name="idioma"
+              value={formData.idioma}
+              onChange={handleInputChange}
+            >
+              <option value="">Selecione o Idioma</option>
+              <option value="Português">Português</option>
+              <option value="English">English</option>
+              <option value="Español">Español</option>
+            </select>
           </div>
         </div>
 
@@ -602,18 +612,18 @@ const SyllabusForm = () => {
               ))}
             </select>
           </div>
-
           <div className="form-field">
-            <label>Idioma:</label>
+            <label>Coordenador:</label>
             <select
-              name="idioma"
-              value={formData.idioma}
+              name="coordenador"
+              value={formData.coordenador}
               onChange={handleInputChange}
+              disabled={!formData.curso}
             >
-              <option value="">Selecione o Idioma</option>
-              <option value="Português">Português</option>
-              <option value="English">English</option>
-              <option value="Español">Español</option>
+              <option value="">Selecione o Coordenador</option>
+              {coordenadorOptions.map((option, index) => (
+                <option key={index} value={option}>{option}</option>
+              ))}
             </select>
           </div>
         </div>
