@@ -62,6 +62,7 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         usuario_id INTEGER NOT NULL,
         curso TEXT,
         disciplina TEXT,
+        linha TEXT,
         semestre_ano TEXT,
         turma TEXT,
         departamento TEXT,
@@ -79,6 +80,11 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
       // Add sobre_disciplina column if it doesn't exist
       db.run(`ALTER TABLE syllabi ADD COLUMN sobre_disciplina TEXT`, (err) => {
         // Ignore error if column already exists
+      });
+
+      // Add linha column if it doesn't exist
+      db.run(`ALTER TABLE syllabi ADD COLUMN linha TEXT`, (err) => {
+        // Ignore if exists
       });
 
       // Add conteudo column if it doesn't exist
@@ -451,7 +457,7 @@ app.post('/api/disciplines', authenticateToken, (req, res) => {
 
 app.post('/api/syllabi', authenticateToken, (req, res) => {
   const {
-    curso, disciplina, semestre_ano, turma, departamento,
+    curso, disciplina, linha, semestre_ano, turma, departamento,
     num_creditos, sem_curricular, idioma, coordenador,
     professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao,
     aula_aula, compromisso_etico, sobre_professor, referencias, competencias
@@ -459,11 +465,11 @@ app.post('/api/syllabi', authenticateToken, (req, res) => {
 
   db.run(
     `INSERT INTO syllabi 
-     (usuario_id, curso, disciplina, semestre_ano, turma, departamento,
+     (usuario_id, curso, disciplina, linha, semestre_ano, turma, departamento,
       num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
-      req.user.id, curso, disciplina, semestre_ano, turma, departamento,
+      req.user.id, curso, disciplina, linha, semestre_ano, turma, departamento,
       num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias
     ],
     function(err) {
@@ -478,7 +484,7 @@ app.post('/api/syllabi', authenticateToken, (req, res) => {
 app.put('/api/syllabi/:id', authenticateToken, (req, res) => {
   const id = req.params.id;
   const {
-    curso, disciplina, semestre_ano, turma, departamento,
+    curso, disciplina, linha, semestre_ano, turma, departamento,
     num_creditos, sem_curricular, idioma, coordenador,
     professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao,
     aula_aula, compromisso_etico, sobre_professor, referencias, competencias
@@ -486,11 +492,11 @@ app.put('/api/syllabi/:id', authenticateToken, (req, res) => {
 
   db.run(
     `UPDATE syllabi 
-     SET curso=?, disciplina=?, semestre_ano=?, turma=?, departamento=?,
+     SET curso=?, disciplina=?, linha=?, semestre_ano=?, turma=?, departamento=?,
          num_creditos=?, sem_curricular=?, idioma=?, coordenador=?, professores=?, programa=?, sobre_disciplina=?, conteudo=?, metodologia=?, criterio_avaliacao=?, aula_aula=?, compromisso_etico=?, sobre_professor=?, referencias=?, competencias=?
      WHERE id=? AND usuario_id=?`,
     [
-      curso, disciplina, semestre_ano, turma, departamento,
+      curso, disciplina, linha, semestre_ano, turma, departamento,
       num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias,
       id, req.user.id
     ],

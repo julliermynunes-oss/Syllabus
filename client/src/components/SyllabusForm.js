@@ -98,6 +98,7 @@ const SyllabusForm = () => {
   const [formData, setFormData] = useState({
     curso: '',
     disciplina: '',
+    linha: '',
     semestre_ano: '',
     turma: '',
     departamento: '',
@@ -501,6 +502,17 @@ const SyllabusForm = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          <div className="form-field">
+            <label>Linha:</label>
+            <input
+              type="text"
+              name="linha"
+              value={formData.linha}
+              onChange={handleInputChange}
+              placeholder="Digite a linha ..."
+            />
           </div>
         </div>
 

@@ -317,6 +317,7 @@ const SyllabusList = () => {
               <th>Semestre/Ano</th>
               <th>Programa</th>
               <th>Disciplina</th>
+              <th>Linha</th>
               <th>Coordenador</th>
               <th>Semestre Curricular</th>
               <th>Ações</th>
@@ -329,6 +330,7 @@ const SyllabusList = () => {
                 <td>{syllabus.semestre_ano}</td>
                 <td>{syllabus.programa}</td>
                 <td>{syllabus.disciplina}</td>
+                <td>{syllabus.linha}</td>
                 <td>{syllabus.coordenador}</td>
                 <td>{syllabus.sem_curricular}</td>
                 <td className="actions-cell">
