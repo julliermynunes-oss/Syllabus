@@ -387,7 +387,7 @@ app.get('/api/syllabi', authenticateToken, (req, res) => {
   let query = `
     SELECT s.*, u.nome_completo as usuario
     FROM syllabi s
-    JOIN users u ON s.usuario_id = u.id
+    LEFT JOIN users u ON s.usuario_id = u.id
     WHERE 1=1
   `;
   const params = [];
@@ -416,7 +416,7 @@ app.get('/api/syllabi/:id', authenticateToken, (req, res) => {
   const id = req.params.id;
 
   db.get(
-    'SELECT s.*, u.nome_completo as usuario FROM syllabi s JOIN users u ON s.usuario_id = u.id WHERE s.id = ?',
+    'SELECT s.*, u.nome_completo as usuario FROM syllabi s LEFT JOIN users u ON s.usuario_id = u.id WHERE s.id = ?',
     [id],
     (err, row) => {
       if (err) {
