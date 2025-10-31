@@ -244,30 +244,46 @@ function loadCSVData() {
 
     // Read Professores CSV
     professoresData = {};
-    fs.createReadStream(path.join(__dirname, '..', 'professores_eaesp.csv'), { encoding: 'utf8' })
-      .pipe(csv({ separator: ';', skipLinesWithError: true }))
-      .on('data', (row) => {
-        // Try different possible column names
-        const dept = (row.DEPT || row.dept || row.DEPT || Object.values(row)[0] || '').trim();
-        const professor = (row.Professores || row.professores || row.Professores || Object.values(row)[1] || '').trim();
-        if (dept && professor && dept !== 'DEPT') { // Skip header row
+    // Read file as binary and then decode properly
+    const csvPath = path.join(__dirname, '..', 'professores_eaesp.csv');
+    const fileBuffer = fs.readFileSync(csvPath);
+    
+    // Try latin1 (ISO-8859-1) encoding first, which is very common for Excel/Windows CSV exports
+    // If that doesn't work well, fallback to utf8
+    let csvContent = fileBuffer.toString('latin1');
+    
+    // Verify encoding by checking for common accented characters
+    // If we see replacement characters, the file might actually be in UTF-8
+    if (csvContent.includes('') && csvContent.match(/[áàâãéêíóôõúç]/gi) === null) {
+      csvContent = fileBuffer.toString('utf8');
+    }
+    
+    // Split into lines and process
+    const lines = csvContent.split('\n');
+    lines.forEach((line, index) => {
+      if (index === 0) return; // Skip header
+      if (!line.trim()) return; // Skip empty lines
+      
+      const parts = line.split(';');
+      if (parts.length >= 2) {
+        const dept = parts[0].trim();
+        const professor = parts[1].trim().replace(/\r$/, ''); // Remove carriage return
+        
+        if (dept && professor && dept !== 'DEPT') {
           if (!professoresData[dept]) {
             professoresData[dept] = [];
           }
           professoresData[dept].push(professor);
         }
-      })
-      .on('end', () => {
-        // Remove duplicates and sort
-        Object.keys(professoresData).forEach(dept => {
-          professoresData[dept] = [...new Set(professoresData[dept])].sort();
-        });
-        console.log('Professores CSV loaded successfully');
-        console.log(`Loaded professores for ${Object.keys(professoresData).length} departments`);
-      })
-      .on('error', (err) => {
-        console.error('Error reading professores CSV:', err);
-      });
+      }
+    });
+    
+    // Remove duplicates and sort
+    Object.keys(professoresData).forEach(dept => {
+      professoresData[dept] = [...new Set(professoresData[dept])].sort();
+    });
+    console.log('Professores CSV loaded successfully');
+    console.log(`Loaded professores for ${Object.keys(professoresData).length} departments`);
 
     console.log('CSV data loaded successfully');
   } catch (error) {
@@ -434,6 +450,9 @@ app.get('/api/disciplines', (req, res) => {
 // Professores route
 app.get('/api/professores', (req, res) => {
   const { departamento } = req.query;
+  
+  // Set charset UTF-8 in response header
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
   
   if (!departamento) {
     // If no department specified, return all professors grouped by department
