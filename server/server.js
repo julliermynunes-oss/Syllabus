@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sqlite3 = require('sqlite3').verbose();
 const csv = require('csv-parser');
+const XLSX = require('xlsx');
 const fs = require('fs');
 const multer = require('multer');
 const PDFDocument = require('pdfkit');
@@ -242,48 +243,68 @@ function loadCSVData() {
         }
       });
 
-    // Read Professores CSV
+    // Read Professores from XLSX file (better encoding support)
     professoresData = {};
-    // Read file as binary and then decode properly
-    const csvPath = path.join(__dirname, '..', 'professores_eaesp.csv');
-    const fileBuffer = fs.readFileSync(csvPath);
-    
-    // Try latin1 (ISO-8859-1) encoding first, which is very common for Excel/Windows CSV exports
-    // If that doesn't work well, fallback to utf8
-    let csvContent = fileBuffer.toString('latin1');
-    
-    // Verify encoding by checking for common accented characters
-    // If we see replacement characters, the file might actually be in UTF-8
-    if (csvContent.includes('') && csvContent.match(/[áàâãéêíóôõúç]/gi) === null) {
-      csvContent = fileBuffer.toString('utf8');
-    }
-    
-    // Split into lines and process
-    const lines = csvContent.split('\n');
-    lines.forEach((line, index) => {
-      if (index === 0) return; // Skip header
-      if (!line.trim()) return; // Skip empty lines
+    try {
+      const xlsxPath = path.join(__dirname, '..', 'Professores.xlsx');
+      const workbook = XLSX.readFile(xlsxPath);
+      const sheetName = workbook.SheetNames[0]; // Get first sheet
+      const worksheet = workbook.Sheets[sheetName];
       
-      const parts = line.split(';');
-      if (parts.length >= 2) {
-        const dept = parts[0].trim();
-        const professor = parts[1].trim().replace(/\r$/, ''); // Remove carriage return
+      // Convert to JSON array
+      const data = XLSX.utils.sheet_to_json(worksheet);
+      
+      data.forEach((row) => {
+        // Try different possible column names
+        const dept = (row.DEPT || row.dept || row['DEPT'] || Object.values(row)[0] || '').toString().trim();
+        const professor = (row.Professores || row.professores || row['Professores'] || Object.values(row)[1] || '').toString().trim();
         
-        if (dept && professor && dept !== 'DEPT') {
+        if (dept && professor && dept !== 'DEPT' && dept !== 'departamento') {
           if (!professoresData[dept]) {
             professoresData[dept] = [];
           }
           professoresData[dept].push(professor);
         }
+      });
+      
+      // Remove duplicates and sort
+      Object.keys(professoresData).forEach(dept => {
+        professoresData[dept] = [...new Set(professoresData[dept])].sort();
+      });
+      
+      console.log('Professores XLSX loaded successfully');
+      console.log(`Loaded professores for ${Object.keys(professoresData).length} departments`);
+    } catch (error) {
+      console.error('Error loading Professores.xlsx, trying CSV fallback:', error.message);
+      // Fallback to CSV if XLSX fails
+      const csvPath = path.join(__dirname, '..', 'professores_eaesp.csv');
+      if (fs.existsSync(csvPath)) {
+        const fileBuffer = fs.readFileSync(csvPath);
+        let csvContent = fileBuffer.toString('latin1');
+        if (csvContent.includes('') && csvContent.match(/[áàâãéêíóôõúç]/gi) === null) {
+          csvContent = fileBuffer.toString('utf8');
+        }
+        const lines = csvContent.split('\n');
+        lines.forEach((line, index) => {
+          if (index === 0) return;
+          if (!line.trim()) return;
+          const parts = line.split(';');
+          if (parts.length >= 2) {
+            const dept = parts[0].trim();
+            const professor = parts[1].trim().replace(/\r$/, '');
+            if (dept && professor && dept !== 'DEPT') {
+              if (!professoresData[dept]) {
+                professoresData[dept] = [];
+              }
+              professoresData[dept].push(professor);
+            }
+          }
+        });
+        Object.keys(professoresData).forEach(dept => {
+          professoresData[dept] = [...new Set(professoresData[dept])].sort();
+        });
       }
-    });
-    
-    // Remove duplicates and sort
-    Object.keys(professoresData).forEach(dept => {
-      professoresData[dept] = [...new Set(professoresData[dept])].sort();
-    });
-    console.log('Professores CSV loaded successfully');
-    console.log(`Loaded professores for ${Object.keys(professoresData).length} departments`);
+    }
 
     console.log('CSV data loaded successfully');
   } catch (error) {
