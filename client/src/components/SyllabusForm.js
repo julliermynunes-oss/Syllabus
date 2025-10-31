@@ -134,8 +134,10 @@ const SyllabusForm = () => {
   const [programs, setPrograms] = useState([]);
   const [filteredPrograms, setFilteredPrograms] = useState([]);
   const [filteredDisciplines, setFilteredDisciplines] = useState([]);
+  const [filteredProfessores, setFilteredProfessores] = useState([]);
   const [showProgramDropdown, setShowProgramDropdown] = useState(false);
   const [showDisciplineDropdown, setShowDisciplineDropdown] = useState(false);
+  const [showProfessoresDropdown, setShowProfessoresDropdown] = useState(false);
   const [activeTab, setActiveTab] = useState('cabecalho');
   const [currentProfessor, setCurrentProfessor] = useState('');
   const [professoresList, setProfessoresList] = useState([]);
@@ -248,6 +250,11 @@ const SyllabusForm = () => {
       } catch (err) {
         console.error('Erro ao buscar disciplinas:', err);
       }
+    } else if (name === 'departamento') {
+      // Quando o departamento mudar, limpar o campo de professor
+      setCurrentProfessor('');
+      setFilteredProfessores([]);
+      setShowProfessoresDropdown(false);
     }
   };
 
@@ -273,10 +280,56 @@ const SyllabusForm = () => {
     setShowDisciplineDropdown(false);
   };
 
+  // Função para buscar professores baseado no departamento
+  const fetchProfessores = async (searchValue) => {
+    const departamento = formData.departamento;
+    if (!departamento) {
+      setFilteredProfessores([]);
+      setShowProfessoresDropdown(false);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API_URL}/api/professores`, {
+        params: { departamento }
+      });
+      const filtered = response.data.filter(p =>
+        p.nome.toLowerCase().includes(searchValue.toLowerCase())
+      );
+      setFilteredProfessores(filtered);
+      setShowProfessoresDropdown(searchValue.length > 0 && filtered.length > 0);
+    } catch (err) {
+      console.error('Erro ao buscar professores:', err);
+      setFilteredProfessores([]);
+      setShowProfessoresDropdown(false);
+    }
+  };
+
+  // Handler para mudança no campo de professor
+  const handleProfessorInputChange = (e) => {
+    const value = e.target.value;
+    setCurrentProfessor(value);
+    if (formData.departamento) {
+      fetchProfessores(value);
+    } else {
+      setFilteredProfessores([]);
+      setShowProfessoresDropdown(false);
+    }
+  };
+
+  const selectProfessor = (professor) => {
+    setCurrentProfessor(professor.nome);
+    setShowProfessoresDropdown(false);
+  };
+
   const addProfessor = () => {
     if (currentProfessor.trim()) {
-      setProfessoresList([...professoresList, currentProfessor.trim()]);
+      // Verificar se o professor já não está na lista
+      if (!professoresList.includes(currentProfessor.trim())) {
+        setProfessoresList([...professoresList, currentProfessor.trim()]);
+      }
       setCurrentProfessor('');
+      setShowProfessoresDropdown(false);
     }
   };
 
@@ -635,22 +688,43 @@ const SyllabusForm = () => {
             <label>Professores:</label>
             <div className="professores-container">
               <div className="professor-input-row">
-                <input
-                  type="text"
-                  value={currentProfessor}
-                  onChange={(e) => setCurrentProfessor(e.target.value)}
-                  placeholder="Nome do professor"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addProfessor();
-                    }
-                  }}
-                />
+                <div className="autocomplete-wrapper" style={{ flex: 1 }}>
+                  <input
+                    type="text"
+                    value={currentProfessor}
+                    onChange={handleProfessorInputChange}
+                    placeholder={formData.departamento ? "Digite o nome do professor ..." : "Selecione um departamento primeiro"}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (showProfessoresDropdown && filteredProfessores.length > 0) {
+                          selectProfessor(filteredProfessores[0]);
+                        } else {
+                          addProfessor();
+                        }
+                      }
+                    }}
+                    disabled={!formData.departamento}
+                  />
+                  {showProfessoresDropdown && filteredProfessores.length > 0 && (
+                    <div className="autocomplete-dropdown">
+                      {filteredProfessores.map((p, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => selectProfessor(p)}
+                          className="autocomplete-item"
+                        >
+                          {p.nome}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <button
                   type="button"
                   className="add-professor-btn"
                   onClick={addProfessor}
+                  disabled={!formData.departamento}
                 >
                   Adicionar
                 </button>

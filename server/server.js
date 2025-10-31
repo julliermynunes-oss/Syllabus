@@ -190,6 +190,9 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
   }
 });
 
+// Store professores data in memory (keyed by departamento code)
+let professoresData = {};
+
 // Read CSV files and populate database
 function loadCSVData() {
   try {
@@ -237,6 +240,33 @@ function loadCSVData() {
         if (programsLoaded) {
           setTimeout(() => insertDisciplines(disciplinasData, new Map()), 500);
         }
+      });
+
+    // Read Professores CSV
+    professoresData = {};
+    fs.createReadStream('./professores_eaesp.csv')
+      .pipe(csv({ separator: ';', skipLinesWithError: true }))
+      .on('data', (row) => {
+        // Try different possible column names
+        const dept = (row.DEPT || row.dept || row.DEPT || Object.values(row)[0] || '').trim();
+        const professor = (row.Professores || row.professores || row.Professores || Object.values(row)[1] || '').trim();
+        if (dept && professor && dept !== 'DEPT') { // Skip header row
+          if (!professoresData[dept]) {
+            professoresData[dept] = [];
+          }
+          professoresData[dept].push(professor);
+        }
+      })
+      .on('end', () => {
+        // Remove duplicates and sort
+        Object.keys(professoresData).forEach(dept => {
+          professoresData[dept] = [...new Set(professoresData[dept])].sort();
+        });
+        console.log('Professores CSV loaded successfully');
+        console.log(`Loaded professores for ${Object.keys(professoresData).length} departments`);
+      })
+      .on('error', (err) => {
+        console.error('Error reading professores CSV:', err);
       });
 
     console.log('CSV data loaded successfully');
@@ -399,6 +429,31 @@ app.get('/api/disciplines', (req, res) => {
       res.json(rows);
     });
   }
+});
+
+// Professores route
+app.get('/api/professores', (req, res) => {
+  const { departamento } = req.query;
+  
+  if (!departamento) {
+    // If no department specified, return all professors grouped by department
+    return res.json(professoresData);
+  }
+  
+  // Extract department code from format "ADM - Administração..." or just "ADM"
+  let deptCode = '';
+  if (departamento.includes(' - ')) {
+    deptCode = departamento.split(' - ')[0].trim();
+  } else {
+    deptCode = departamento.trim();
+  }
+  
+  // Get professors for this department
+  const professores = professoresData[deptCode] || [];
+  
+  // Return as array of objects with nome field (to match disciplines API format)
+  const result = professores.map(nome => ({ nome }));
+  res.json(result);
 });
 
 // Syllabi routes
