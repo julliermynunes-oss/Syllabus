@@ -12,10 +12,13 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
   const [professoresList, setProfessoresList] = useState([]);
   const [programs, setPrograms] = useState([]);
   const [disciplines, setDisciplines] = useState([]);
+  const [allProfessores, setAllProfessores] = useState([]);
   const [filteredPrograms, setFilteredPrograms] = useState([]);
   const [filteredDisciplines, setFilteredDisciplines] = useState([]);
+  const [filteredProfessores, setFilteredProfessores] = useState([]);
   const [showProgramDropdown, setShowProgramDropdown] = useState(false);
   const [showDisciplineDropdown, setShowDisciplineDropdown] = useState(false);
+  const [showProfessoresDropdown, setShowProfessoresDropdown] = useState(false);
 
   // Gera opções de Semestre/Ano (formato numérico: 1/2026, 2/2026)
   const gerarOpcoesSemestreAno = () => {
@@ -58,8 +61,30 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
       }
     };
 
+    // Fetch all professores (without department filter)
+    const fetchAllProfessores = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/professores`);
+        const data = await response.json();
+        // Data comes as object with departments as keys, flatten to array of all professors
+        const allProfs = [];
+        Object.keys(data).forEach(dept => {
+          if (Array.isArray(data[dept])) {
+            allProfs.push(...data[dept].map(p => p.nome || p));
+          }
+        });
+        // Remove duplicates and sort
+        const uniqueProfs = [...new Set(allProfs)].sort();
+        setAllProfessores(uniqueProfs);
+        setFilteredProfessores(uniqueProfs);
+      } catch (err) {
+        console.error('Error fetching professores:', err);
+      }
+    };
+
     fetchPrograms();
     fetchDisciplines();
+    fetchAllProfessores();
   }, []);
 
   // Filter programs based on input
@@ -123,12 +148,39 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
     setShowDisciplineDropdown(false);
   };
 
+  // Handle professor input change with autocomplete
+  const handleProfessorInputChange = (e) => {
+    const value = e.target.value;
+    setCurrentProfessor(value);
+    
+    if (value.trim()) {
+      const filtered = allProfessores.filter(p => 
+        p.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredProfessores(filtered);
+      setShowProfessoresDropdown(value.length > 0 && filtered.length > 0);
+    } else {
+      setFilteredProfessores(allProfessores);
+      setShowProfessoresDropdown(false);
+    }
+  };
+
+  // Select professor from autocomplete
+  const selectProfessor = (professor) => {
+    setCurrentProfessor(professor);
+    setShowProfessoresDropdown(false);
+  };
+
   if (!isOpen) return null;
 
   const addProfessor = () => {
     if (currentProfessor.trim()) {
-      setProfessoresList([...professoresList, currentProfessor.trim()]);
+      // Check if professor is already in the list
+      if (!professoresList.includes(currentProfessor.trim())) {
+        setProfessoresList([...professoresList, currentProfessor.trim()]);
+      }
       setCurrentProfessor('');
+      setShowProfessoresDropdown(false);
     }
   };
 
@@ -275,19 +327,40 @@ const ProfessorModal = ({ isOpen, onClose, onAddProfessor }) => {
         <div className="form-field full-width">
           <label>Nome do Professor:</label>
           <div className="professor-input-row">
-            <input
-              type="text"
-              value={currentProfessor}
-              onChange={(e) => setCurrentProfessor(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addProfessor();
-                }
-              }}
-              placeholder="Nome do professor"
-              className="professor-input-field"
-            />
+            <div className="autocomplete-wrapper" style={{ flex: 1 }}>
+              <input
+                type="text"
+                value={currentProfessor}
+                onChange={handleProfessorInputChange}
+                onFocus={() => currentProfessor && setShowProfessoresDropdown(true)}
+                onBlur={() => setTimeout(() => setShowProfessoresDropdown(false), 200)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (showProfessoresDropdown && filteredProfessores.length > 0) {
+                      selectProfessor(filteredProfessores[0]);
+                    } else {
+                      addProfessor();
+                    }
+                  }
+                }}
+                placeholder="Digite o nome do professor ..."
+                className="professor-input-field"
+              />
+              {showProfessoresDropdown && filteredProfessores.length > 0 && (
+                <div className="autocomplete-dropdown">
+                  {filteredProfessores.map((p, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => selectProfessor(p)}
+                      className="autocomplete-item"
+                    >
+                      {p}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             <button type="button" className="add-professor-btn" onClick={addProfessor}>
               <FaPlus /> Adicionar
             </button>
