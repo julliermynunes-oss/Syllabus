@@ -202,7 +202,7 @@ function loadCSVData() {
     let disciplinesLoaded = false;
 
     // Read Cursos CSV
-    fs.createReadStream(path.join(__dirname, '..', 'Curso.csv'))
+    fs.createReadStream(path.join(__dirname, '..', 'Curso.csv'), { encoding: 'utf8' })
       .pipe(csv())
       .on('data', (row) => {
         cursosData.push(row);
@@ -230,7 +230,7 @@ function loadCSVData() {
       });
 
     // Read Disciplinas CSV
-    fs.createReadStream(path.join(__dirname, '..', 'Disciplina.csv'))
+    fs.createReadStream(path.join(__dirname, '..', 'Disciplina.csv'), { encoding: 'utf8' })
       .pipe(csv())
       .on('data', (row) => {
         disciplinasData.push(row);
@@ -244,7 +244,7 @@ function loadCSVData() {
 
     // Read Professores CSV
     professoresData = {};
-    fs.createReadStream(path.join(__dirname, '..', 'professores_eaesp.csv'))
+    fs.createReadStream(path.join(__dirname, '..', 'professores_eaesp.csv'), { encoding: 'utf8' })
       .pipe(csv({ separator: ';', skipLinesWithError: true }))
       .on('data', (row) => {
         // Try different possible column names
