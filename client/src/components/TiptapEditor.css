@@ -17,6 +17,15 @@
   top: 0;
   z-index: 10;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.tiptap-menu-bar.is-fixed {
+  position: fixed;
+  top: 0;
+  border-radius: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .tiptap-menu-bar button {
@@ -54,6 +63,11 @@
 .tiptap-editor-content {
   padding: 1.5rem;
   min-height: 300px;
+}
+
+/* Add padding-top when toolbar is fixed to prevent content jump */
+.tiptap-wrapper.toolbar-fixed .tiptap-editor-content {
+  padding-top: calc(1.5rem + 70px); /* Adjust based on toolbar height */
 }
 
 /* Editor Content Styles */

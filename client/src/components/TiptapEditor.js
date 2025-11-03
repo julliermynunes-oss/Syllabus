@@ -13,6 +13,9 @@ const TiptapEditor = ({ content, onChange }) => {
   const fileInputRef = React.useRef(null);
   const [contextMenu, setContextMenu] = React.useState(null);
   const contextMenuRef = React.useRef(null);
+  const menuBarRef = React.useRef(null);
+  const wrapperRef = React.useRef(null);
+  const [isSticky, setIsSticky] = React.useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -142,6 +145,58 @@ const TiptapEditor = ({ content, onChange }) => {
     setContextMenu(null);
   };
 
+  // Make toolbar sticky/fixed when scrolling
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (!wrapperRef.current || !menuBarRef.current) return;
+      
+      const wrapperRect = wrapperRef.current.getBoundingClientRect();
+      
+      // Find the scrollable parent container
+      let scrollableParent = wrapperRef.current.parentElement;
+      while (scrollableParent && scrollableParent !== document.body) {
+        const style = window.getComputedStyle(scrollableParent);
+        if (style.overflow === 'auto' || style.overflow === 'scroll' || 
+            style.overflowY === 'auto' || style.overflowY === 'scroll') {
+          break;
+        }
+        scrollableParent = scrollableParent.parentElement;
+      }
+      
+      // If toolbar is about to scroll out of view (top of wrapper is above viewport top)
+      // or wrapper top is less than a threshold
+      const threshold = 10; // pixels from top
+      if (wrapperRect.top < threshold) {
+        setIsSticky(true);
+        // Adjust width to match wrapper width
+        if (menuBarRef.current) {
+          menuBarRef.current.style.width = `${wrapperRect.width}px`;
+          menuBarRef.current.style.left = `${wrapperRect.left}px`;
+        }
+      } else {
+        setIsSticky(false);
+        if (menuBarRef.current) {
+          menuBarRef.current.style.width = 'auto';
+          menuBarRef.current.style.left = 'auto';
+        }
+      }
+    };
+
+    // Listen to scroll on window and potential scroll containers
+    window.addEventListener('scroll', handleScroll, true);
+    document.addEventListener('scroll', handleScroll, true);
+    handleScroll(); // Initial check
+    
+    // Also check on resize
+    window.addEventListener('resize', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll, true);
+      document.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, []);
+
   // Close context menu when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (e) => {
@@ -222,7 +277,7 @@ const TiptapEditor = ({ content, onChange }) => {
   }
 
   return (
-    <div className="tiptap-wrapper">
+    <div className={`tiptap-wrapper ${isSticky ? 'toolbar-fixed' : ''}`} ref={wrapperRef}>
       <input
         ref={fileInputRef}
         type="file"
@@ -230,7 +285,10 @@ const TiptapEditor = ({ content, onChange }) => {
         onChange={handleImageUpload}
         style={{ display: 'none' }}
       />
-      <div className="tiptap-menu-bar">
+      <div 
+        className={`tiptap-menu-bar ${isSticky ? 'is-fixed' : ''}`}
+        ref={menuBarRef}
+      >
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive('bold') ? 'is-active' : ''}
