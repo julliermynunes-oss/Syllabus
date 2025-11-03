@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { FaArrowLeft, FaFilePdf } from 'react-icons/fa';
+import { FaArrowLeft, FaFilePdf, FaTrash } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
@@ -288,6 +288,20 @@ const SyllabusForm = () => {
     }
   };
 
+  const handleDeleteCustomTab = () => {
+    if (window.confirm(`Tem certeza que deseja excluir a aba "${formData.custom_tab_name}"? Todo o conteúdo será perdido.`)) {
+      setFormData(prev => ({
+        ...prev,
+        custom_tab_name: '',
+        custom_tab_content: ''
+      }));
+      // Se a aba custom estava ativa, mudar para outra aba
+      if (activeTab === 'custom') {
+        setActiveTab('cabecalho');
+      }
+    }
+  };
+
   const selectDiscipline = (discipline) => {
     setFormData({ ...formData, disciplina: discipline.nome });
     setShowDisciplineDropdown(false);
@@ -514,13 +528,26 @@ const SyllabusForm = () => {
             Competências
           </button>
           {formData.custom_tab_name && (
-            <button
-              className={`tab ${activeTab === 'custom' ? 'active' : ''}`}
-              onClick={() => setActiveTab('custom')}
-              type="button"
-            >
-              {formData.custom_tab_name}
-            </button>
+            <div className="tab-with-delete">
+              <button
+                className={`tab custom-tab ${activeTab === 'custom' ? 'active' : ''}`}
+                onClick={() => setActiveTab('custom')}
+                type="button"
+              >
+                {formData.custom_tab_name}
+              </button>
+              <button
+                className="delete-custom-tab-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteCustomTab();
+                }}
+                type="button"
+                title="Excluir aba personalizada"
+              >
+                <FaTrash />
+              </button>
+            </div>
           )}
           {!formData.custom_tab_name && (
             <button
