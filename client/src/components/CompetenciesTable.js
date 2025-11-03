@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaTrash } from 'react-icons/fa';
 import axios from 'axios';
 import { API_URL } from '../config';
 import './CompetenciesTable.css';
@@ -104,10 +103,6 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
       return row;
     });
     setRows(newRows);
-  };
-
-  const deleteRow = (index) => {
-    setRows(rows.filter((_, i) => i !== index));
   };
 
   const getContribuicao = (grau) => {
