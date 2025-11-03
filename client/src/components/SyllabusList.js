@@ -642,6 +642,20 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           />
         </div>
       )}
+
+      {/* Aba Personalizada */}
+      {formData.custom_tab_name && formData.custom_tab_content && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            {formData.custom_tab_name.toUpperCase()}
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            className="preview-content"
+            dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
+          />
+        </div>
+      )}
     </div>
   );
 };
