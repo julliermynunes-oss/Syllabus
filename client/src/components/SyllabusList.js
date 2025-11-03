@@ -332,9 +332,6 @@ const SyllabusList = () => {
               </div>
             )}
           </div>
-        </div>
-
-        <div className="search-box-wrapper">
           <div className="search-box">
             <input
               type="text"

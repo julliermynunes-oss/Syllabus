@@ -75,10 +75,9 @@
 
 
 .search-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+  background: transparent;
   margin-bottom: 2.5rem;
+  width: 100%;
 }
 
 .filter-btn {
@@ -109,11 +108,12 @@
   align-items: center;
   gap: 1rem;
   position: relative;
+  width: 100%;
 }
 
 .search-box {
-  width: 280px;
-  flex-shrink: 0;
+  flex: 1 1 0;
+  min-width: 200px;
   position: relative;
   display: flex;
   align-items: center;
