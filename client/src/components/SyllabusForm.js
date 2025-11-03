@@ -684,8 +684,6 @@ const SyllabusForm = () => {
           </div>
         </div>
 
-        {/* Coordenador movido para a linha com Sem. Curricular abaixo */}
-
         <div className="form-row">
           <div className="form-field" style={{ gridColumn: '1 / -1' }}>
             <label>Professores:</label>
