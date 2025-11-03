@@ -139,6 +139,7 @@
   align-items: center;
   gap: 0.25rem;
   position: relative;
+  grid-column: span 1;
 }
 
 .tab.custom-tab {
