@@ -142,6 +142,15 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         // Ignore error if column already exists
       });
 
+      // Add custom_tab_name and custom_tab_content columns if they don't exist
+      db.run(`ALTER TABLE syllabi ADD COLUMN custom_tab_name TEXT`, (err) => {
+        // Ignore error if column already exists
+      });
+
+      db.run(`ALTER TABLE syllabi ADD COLUMN custom_tab_content TEXT`, (err) => {
+        // Ignore error if column already exists
+      });
+
       db.run(`CREATE TABLE IF NOT EXISTS programs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
@@ -569,17 +578,18 @@ app.post('/api/syllabi', authenticateToken, (req, res) => {
     curso, disciplina, linha, semestre_ano, turma, departamento,
     num_creditos, sem_curricular, idioma, coordenador,
     professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao,
-    aula_aula, compromisso_etico, sobre_professor, referencias, competencias
+    aula_aula, compromisso_etico, sobre_professor, referencias, competencias,
+    custom_tab_name, custom_tab_content
   } = req.body;
 
   db.run(
     `INSERT INTO syllabi 
      (usuario_id, curso, disciplina, linha, semestre_ano, turma, departamento,
-      num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias, custom_tab_name, custom_tab_content)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       req.user.id, curso, disciplina, linha, semestre_ano, turma, departamento,
-      num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias
+      num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias, custom_tab_name, custom_tab_content
     ],
     function(err) {
       if (err) {
@@ -596,17 +606,18 @@ app.put('/api/syllabi/:id', authenticateToken, (req, res) => {
     curso, disciplina, linha, semestre_ano, turma, departamento,
     num_creditos, sem_curricular, idioma, coordenador,
     professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao,
-    aula_aula, compromisso_etico, sobre_professor, referencias, competencias
+    aula_aula, compromisso_etico, sobre_professor, referencias, competencias,
+    custom_tab_name, custom_tab_content
   } = req.body;
 
   db.run(
     `UPDATE syllabi 
      SET curso=?, disciplina=?, linha=?, semestre_ano=?, turma=?, departamento=?,
-         num_creditos=?, sem_curricular=?, idioma=?, coordenador=?, professores=?, programa=?, sobre_disciplina=?, conteudo=?, metodologia=?, criterio_avaliacao=?, aula_aula=?, compromisso_etico=?, sobre_professor=?, referencias=?, competencias=?
+         num_creditos=?, sem_curricular=?, idioma=?, coordenador=?, professores=?, programa=?, sobre_disciplina=?, conteudo=?, metodologia=?, criterio_avaliacao=?, aula_aula=?, compromisso_etico=?, sobre_professor=?, referencias=?, competencias=?, custom_tab_name=?, custom_tab_content=?
      WHERE id=? AND usuario_id=?`,
     [
       curso, disciplina, linha, semestre_ano, turma, departamento,
-      num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias,
+      num_creditos, sem_curricular, idioma, coordenador, professores, programa, sobre_disciplina, conteudo, metodologia, criterio_avaliacao, aula_aula, compromisso_etico, sobre_professor, referencias, competencias, custom_tab_name, custom_tab_content,
       id, req.user.id
     ],
     function(err) {

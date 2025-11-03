@@ -88,7 +88,9 @@ const SyllabusForm = () => {
     compromisso_etico: '',
     sobre_professor: '',
     referencias: '',
-    competencias: ''
+    competencias: '',
+    custom_tab_name: '',
+    custom_tab_content: ''
   });
 
   const [programs, setPrograms] = useState([]);
@@ -104,6 +106,8 @@ const SyllabusForm = () => {
   const [allProfessoresForLider, setAllProfessoresForLider] = useState([]);
   const [filteredLiderDisciplina, setFilteredLiderDisciplina] = useState([]);
   const [showLiderDropdown, setShowLiderDropdown] = useState(false);
+  const [showCustomTabModal, setShowCustomTabModal] = useState(false);
+  const [customTabNameInput, setCustomTabNameInput] = useState('');
 
   useEffect(() => {
     fetchPrograms();
@@ -269,6 +273,19 @@ const SyllabusForm = () => {
   const selectLider = (lider) => {
     setFormData(prev => ({ ...prev, coordenador: lider }));
     setShowLiderDropdown(false);
+  };
+
+  const handleCreateCustomTab = () => {
+    if (customTabNameInput.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        custom_tab_name: customTabNameInput.trim(),
+        custom_tab_content: prev.custom_tab_content || ''
+      }));
+      setShowCustomTabModal(false);
+      setCustomTabNameInput('');
+      setActiveTab('custom');
+    }
   };
 
   const selectDiscipline = (discipline) => {
@@ -496,6 +513,25 @@ const SyllabusForm = () => {
           >
             Competências
           </button>
+          {formData.custom_tab_name && (
+            <button
+              className={`tab ${activeTab === 'custom' ? 'active' : ''}`}
+              onClick={() => setActiveTab('custom')}
+              type="button"
+            >
+              {formData.custom_tab_name}
+            </button>
+          )}
+          {!formData.custom_tab_name && (
+            <button
+              className="tab add-custom-tab-btn"
+              onClick={() => setShowCustomTabModal(true)}
+              type="button"
+              title="Adicionar aba personalizada"
+            >
+              + Nova Aba
+            </button>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="syllabus-form">
@@ -889,6 +925,19 @@ const SyllabusForm = () => {
           </div>
         )}
 
+        {/* Aba: Personalizada */}
+        {activeTab === 'custom' && formData.custom_tab_name && (
+          <div className="form-row full-width">
+            <div className="form-field">
+              <label>{formData.custom_tab_name}:</label>
+              <TiptapEditor
+                content={formData.custom_tab_content}
+                onChange={(content) => setFormData(prev => ({ ...prev, custom_tab_content: content }))}
+              />
+            </div>
+          </div>
+        )}
+
         <div className="form-actions">
           <button type="submit" className="submit-btn">
             {isEditing ? 'Atualizar' : 'Criar'} Syllabus
@@ -908,6 +957,49 @@ const SyllabusForm = () => {
       <div id="pdf-content" style={{ display: 'none', position: 'absolute', left: '-9999px', width: '210mm', maxWidth: '210mm' }}>
         <SyllabusPDFContent formData={formData} professoresList={professoresList} />
       </div>
+
+      {/* Modal para criar aba personalizada */}
+      {showCustomTabModal && (
+        <div className="modal-overlay" onClick={() => setShowCustomTabModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Nova Aba Personalizada</h2>
+            <p>Digite o nome da nova aba:</p>
+            <input
+              type="text"
+              value={customTabNameInput}
+              onChange={(e) => setCustomTabNameInput(e.target.value)}
+              placeholder="Ex: Material Complementar, Bibliografia Extensa, etc."
+              className="modal-input"
+              autoFocus
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleCreateCustomTab();
+                }
+              }}
+            />
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="modal-btn-confirm"
+                onClick={handleCreateCustomTab}
+                disabled={!customTabNameInput.trim()}
+              >
+                Criar Aba
+              </button>
+              <button
+                type="button"
+                className="modal-btn-cancel"
+                onClick={() => {
+                  setShowCustomTabModal(false);
+                  setCustomTabNameInput('');
+                }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
@@ -1057,6 +1149,19 @@ const SyllabusPDFContent = ({ formData, professoresList }) => {
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             dangerouslySetInnerHTML={{ __html: formData.referencias }}
+          />
+        </div>
+      )}
+
+      {/* Aba Personalizada */}
+      {formData.custom_tab_name && formData.custom_tab_content && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            {formData.custom_tab_name.toUpperCase()}
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
           />
         </div>
       )}

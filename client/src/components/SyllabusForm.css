@@ -84,6 +84,11 @@
   box-sizing: border-box;
 }
 
+.tabs-container:has(.add-custom-tab-btn),
+.tabs-container:has(.tab[class*="custom"]) {
+  grid-template-columns: repeat(11, 1fr);
+}
+
 .tab {
   padding: 0.75rem 1.25rem;
   border: none;
@@ -114,6 +119,113 @@
 
 .tab.active:hover {
   background: white;
+}
+
+.tab.add-custom-tab-btn {
+  background: #f0f7ff;
+  color: #235795;
+  border: 2px dashed #235795;
+  font-weight: 700;
+}
+
+.tab.add-custom-tab-btn:hover {
+  background: #e0efff;
+  border-color: #1a3e6b;
+}
+
+/* Modal para criar aba personalizada */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 100000;
+}
+
+.modal-content h2 {
+  margin: 0 0 1rem 0;
+  color: #235795;
+  font-size: 1.5rem;
+}
+
+.modal-content p {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #a4a4a4;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  box-sizing: border-box;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: #235795;
+  box-shadow: 0 0 0 3px rgba(35, 87, 149, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-btn-confirm {
+  padding: 0.75rem 1.5rem;
+  background-color: #235795;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-btn-confirm:hover:not(:disabled) {
+  background-color: #1a3e6b;
+}
+
+.modal-btn-confirm:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.modal-btn-cancel {
+  padding: 0.75rem 1.5rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-btn-cancel:hover {
+  background-color: #5a6268;
 }
 
 .syllabus-form {
