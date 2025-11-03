@@ -106,8 +106,11 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
   };
 
   const getContribuicao = (grau) => {
-    if (grau === 0) return '○ ○ ○';
-    return '●'.repeat(grau) + '○'.repeat(3 - grau);
+    const circles = [];
+    for (let i = 0; i < 3; i++) {
+      circles.push(i < grau ? '●' : '○');
+    }
+    return circles.join('\u00A0'); // Usar espaço não separável entre bolinhas
   };
 
   return (
