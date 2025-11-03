@@ -661,23 +661,24 @@ app.get('/api/search-amazon-books', async (req, res) => {
   }
 
   try {
-    const { default: DefaultApi } = require('paapi5-nodejs-sdk');
-    const api = new DefaultApi(accessKeyId, secretAccessKey, marketplace, region, associateTag);
+    const paapi5 = require('paapi5-nodejs-sdk');
+    const api = new paapi5.DefaultApi(accessKeyId, secretAccessKey, marketplace, region, associateTag);
     
-    // Criar requisição de busca
-    const searchItemsRequest = {
-      'Keywords': q,
-      'SearchIndex': 'Books',
-      'ItemCount': 10,
-      'Resources': [
-        'ItemInfo.Title',
-        'ItemInfo.Authors',
-        'ItemInfo.PublicationDate',
-        'ItemInfo.Publisher',
-        'ItemInfo.Isbn',
-        'Offers.Listings.Price'
-      ]
-    };
+    // Criar requisição de busca usando os modelos da biblioteca
+    const searchItemsRequest = new paapi5.SearchItemsRequest();
+    searchItemsRequest['Keywords'] = q;
+    searchItemsRequest['SearchIndex'] = 'Books';
+    searchItemsRequest['ItemCount'] = 10;
+    searchItemsRequest['PartnerTag'] = associateTag;
+    searchItemsRequest['PartnerType'] = paapi5.PartnerType.Associates;
+    searchItemsRequest['Resources'] = [
+      paapi5.SearchItemsResource.ItemInfoTitle,
+      paapi5.SearchItemsResource.ItemInfoAuthors,
+      paapi5.SearchItemsResource.ItemInfoPublicationDate,
+      paapi5.SearchItemsResource.ItemInfoPublisher,
+      paapi5.SearchItemsResource.ItemInfoIsbn,
+      paapi5.SearchItemsResource.OffersListingsPrice
+    ];
 
     const response = await api.searchItems(searchItemsRequest);
     
