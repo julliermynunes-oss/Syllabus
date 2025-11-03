@@ -313,7 +313,7 @@ const SyllabusList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="DIGITE O PROGRAMA"
+              placeholder="DIGITE O CURSO"
               value={programaSearch}
               onChange={(e) => handleProgramaSearchChange(e.target.value)}
               onBlur={() => setTimeout(() => setShowProgramDropdown(false), 200)}

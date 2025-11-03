@@ -75,9 +75,9 @@
 
 
 .search-section {
-  display: grid;
-  grid-template-columns: 2fr 2fr;
-  gap: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 2.5rem;
 }
 
@@ -112,8 +112,8 @@
 }
 
 .search-box {
-  flex: 1 1 0;
-  width: 300px;
+  width: 280px;
+  flex-shrink: 0;
   position: relative;
   display: flex;
   align-items: center;
