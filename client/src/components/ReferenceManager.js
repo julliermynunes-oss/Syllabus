@@ -82,7 +82,6 @@ const ReferenceManager = ({ content, onChange }) => {
     } catch (error) {
       console.error('Erro ao buscar na API do Google Scholar:', error);
       if (error.response?.status === 400 || error.response?.status === 404) {
-        const errorData = error.response?.data;
         let message = '❌ Google Scholar não está configurado\n\n';
         message += 'Para usar esta funcionalidade, configure a API key do SerpApi no servidor (Railway):\n\n';
         message += '1. Obtenha uma API key gratuita em: https://serpapi.com/users/sign_up\n';
@@ -120,7 +119,6 @@ const ReferenceManager = ({ content, onChange }) => {
     } catch (error) {
       console.error('Erro ao buscar na API da Amazon:', error);
       if (error.response?.status === 400 || error.response?.status === 404 || error.response?.status === 501) {
-        const errorData = error.response?.data;
         let message = '❌ Amazon Books não está configurado\n\n';
         message += 'Para usar esta funcionalidade, configure as credenciais AWS no servidor (Railway):\n\n';
         message += 'Variáveis necessárias:\n';
