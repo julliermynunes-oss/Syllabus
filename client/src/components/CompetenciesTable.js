@@ -113,6 +113,24 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
     return circles.join('\u00A0'); // Usar espaço não separável entre bolinhas
   };
 
+  // Função para extrair a sigla do curso do nome completo
+  const getCursoSigla = (cursoNome) => {
+    if (!cursoNome) return '';
+    
+    // Extrair sigla do padrão: "CGA - Curso de Graduação em Administração" -> "CGA"
+    const match = cursoNome.match(/^([A-Z]+(?:\s+[A-Z]+)?)/);
+    if (match) {
+      return match[1].replace(/\s+/g, '');
+    }
+    
+    // Se já for uma sigla curta (até 10 caracteres e apenas letras)
+    if (cursoNome.length <= 10 && /^[A-Z]+$/.test(cursoNome.trim())) {
+      return cursoNome.trim();
+    }
+    
+    return cursoNome;
+  };
+
   return (
     <div className="competencies-table-container">
       <div className="competencies-header">
@@ -123,6 +141,15 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
           </p>
         )}
       </div>
+
+      {curso && rows.length > 0 && (
+        <div className="competencies-intro">
+          <p>
+            Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
+            demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(curso)}.
+          </p>
+        </div>
+      )}
 
       <div className="competencies-table-wrapper">
         <table className="competencies-table">
