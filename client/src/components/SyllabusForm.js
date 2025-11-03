@@ -67,45 +67,6 @@ const SyllabusForm = () => {
     'PAE - Planejamento e Análise Econômica aplicados à Administração',
   ];
 
-  // Opções para Coordenadores
-  const coordenadorOptions = [
-    "Renato Guimarães Ferreira",
-    "Nelson Marconi",
-    "Edilene Santana Santos",
-    "Jorge Carneiro",
-    "Simone Guimarães Cornelsen",
-    "Laura Schiesari",
-    "Paul Ferreira",
-    "Luís Henrique Pereira",
-    "Marco Antonio Carvalho Teixeira",
-    "Gilberto Sarfati",
-    "Ianaíra Barretto Souza Neves",
-    "Alberto Albertin",
-    "Claudia Yoshinaga",
-    "Luciana Hashiba",
-    "Leandro Guissoni",
-    "Ana Maria Malik",
-    "Leandro Patah",
-    "Mario Monzoni",
-    "Thomaz Wood Junior",
-    "Isleide Arruda Fontenelle",
-    "Ricardo Corrêa Gomes"
-  ];
-
-  // Mapeamento de Curso para Coordenador
-  const cursoCoordMapping = {
-    "CGA - Curso de Graduação em Administração": "Renato Guimarães Ferreira",
-    "CGAP - Curso de Graduação em Administração Pública": "Nelson Marconi",
-    "AFA - 2ª Graduação em Contabilidade, Finanças e Analytics": "Edilene Santana Santos",
-    "OneMBA": "Jorge Carneiro",
-    "EMBA - Executive MBA": "Simone Guimarães Cornelsen",
-    "EMBA Saúde - Executive MBA Saúde": "Laura Schiesari",
-    "MPA - Mestrado Profissional em Administração": "Paul Ferreira",
-    "MPGI - Mestrado Profissional em Gestão Internacional": "Luís Henrique Pereira",
-    "MPGPP - Mestrado Profissional em Gestão e Políticas Públicas": "Marco Antonio Carvalho Teixeira",
-    "MPGC - Mestrado Profissional em Gestão para Competitividade": "Gilberto Sarfati",
-    "Doutorado Profissional em Administração": "Thomaz Wood Junior"
-  };
 
   const [formData, setFormData] = useState({
     curso: '',
@@ -124,7 +85,6 @@ const SyllabusForm = () => {
     conteudo: '',
     metodologia: '',
     criterio_avaliacao: '',
-    aula_aula: '',
     compromisso_etico: '',
     sobre_professor: '',
     referencias: '',
@@ -141,27 +101,48 @@ const SyllabusForm = () => {
   const [activeTab, setActiveTab] = useState('cabecalho');
   const [currentProfessor, setCurrentProfessor] = useState('');
   const [professoresList, setProfessoresList] = useState([]);
+  const [allProfessoresForLider, setAllProfessoresForLider] = useState([]);
+  const [filteredLiderDisciplina, setFilteredLiderDisciplina] = useState([]);
+  const [showLiderDropdown, setShowLiderDropdown] = useState(false);
 
   useEffect(() => {
     fetchPrograms();
+    fetchAllProfessoresForLider();
     if (isEditing) {
       fetchSyllabus();
     } else if (location.state) {
       // Pre-fill form with request data
       const { curso, disciplina, semestre_ano, turma } = location.state;
-      const coordenador = cursoCoordMapping[curso] || '';
       setFormData(prevData => ({
         ...prevData,
         curso: curso || '',
         disciplina: disciplina || '',
         semestre_ano: normalizeSemestreAno(semestre_ano || ''),
         turma: turma || '',
-        coordenador: coordenador,
         programa: curso || ''
       }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+  
+  const fetchAllProfessoresForLider = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/professores`);
+      const data = response.data;
+      // Flatten all professors from all departments
+      const allProfs = [];
+      Object.keys(data).forEach(dept => {
+        if (Array.isArray(data[dept])) {
+          allProfs.push(...data[dept].map(p => p.nome || p));
+        }
+      });
+      const uniqueProfs = [...new Set(allProfs)].sort();
+      setAllProfessoresForLider(uniqueProfs);
+      setFilteredLiderDisciplina(uniqueProfs);
+    } catch (err) {
+      console.error('Erro ao buscar professores para Líder:', err);
+    }
+  };
 
   const fetchPrograms = async () => {
     try {
@@ -259,20 +240,35 @@ const SyllabusForm = () => {
   };
 
   const selectProgram = (program) => {
-    // Buscar o coordenador correspondente ao curso
-    const coordenador = cursoCoordMapping[program.nome] || '';
-    
-    console.log('Curso selecionado:', program.nome);
-    console.log('Coordenador encontrado:', coordenador);
-    
     setFormData(prev => ({ 
       ...prev, 
       programa: program.nome, 
       curso: program.nome,
-      coordenador: coordenador, // Definir coordenador automaticamente
       disciplina: '' // Limpar disciplina ao selecionar novo curso
     }));
     setShowProgramDropdown(false);
+  };
+  
+  // Handler for Líder de Disciplina input
+  const handleLiderInputChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, coordenador: value }));
+    
+    if (value.trim()) {
+      const filtered = allProfessoresForLider.filter(p =>
+        p.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredLiderDisciplina(filtered);
+      setShowLiderDropdown(value.length > 0 && filtered.length > 0);
+    } else {
+      setFilteredLiderDisciplina(allProfessoresForLider);
+      setShowLiderDropdown(false);
+    }
+  };
+  
+  const selectLider = (lider) => {
+    setFormData(prev => ({ ...prev, coordenador: lider }));
+    setShowLiderDropdown(false);
   };
 
   const selectDiscipline = (discipline) => {
@@ -473,13 +469,6 @@ const SyllabusForm = () => {
             Avaliação
           </button>
           <button
-            className={`tab ${activeTab === 'aula_aula' ? 'active' : ''}`}
-            onClick={() => setActiveTab('aula_aula')}
-            type="button"
-          >
-            Aula-a-Aula
-          </button>
-          <button
             className={`tab ${activeTab === 'compromisso_etico' ? 'active' : ''}`}
             onClick={() => setActiveTab('compromisso_etico')}
             type="button"
@@ -666,18 +655,32 @@ const SyllabusForm = () => {
             </select>
           </div>
           <div className="form-field">
-            <label>Coordenador:</label>
-            <select
-              name="coordenador"
-              value={formData.coordenador}
-              onChange={handleInputChange}
-              disabled={!formData.curso}
-            >
-              <option value="">Selecione o Coordenador</option>
-              {coordenadorOptions.map((option, index) => (
-                <option key={index} value={option}>{option}</option>
-              ))}
-            </select>
+            <label>Líder de Disciplina:</label>
+            <div className="autocomplete-wrapper">
+              <input
+                type="text"
+                name="coordenador"
+                value={formData.coordenador}
+                onChange={handleLiderInputChange}
+                onFocus={() => formData.coordenador && setShowLiderDropdown(true)}
+                onBlur={() => setTimeout(() => setShowLiderDropdown(false), 200)}
+                placeholder="Digite o nome do líder de disciplina ..."
+                className="form-input"
+              />
+              {showLiderDropdown && filteredLiderDisciplina.length > 0 && (
+                <div className="autocomplete-dropdown">
+                  {filteredLiderDisciplina.map((p, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => selectLider(p)}
+                      className="autocomplete-item"
+                    >
+                      {p}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -815,21 +818,6 @@ const SyllabusForm = () => {
           </div>
         )}
 
-        {/* Aba: Aula-a-Aula */}
-        {activeTab === 'aula_aula' && (
-          <div className="form-row full-width">
-            <div className="form-field">
-              <label>Planejamento Aula-a-Aula:</label>
-              <TiptapEditor
-                content={formData.aula_aula}
-                onChange={(content) => setFormData(prev => ({ ...prev, aula_aula: content }))}
-              />
-              <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Aba: Compromisso Ético */}
         {activeTab === 'compromisso_etico' && (
@@ -963,7 +951,7 @@ const SyllabusPDFContent = ({ formData, professoresList }) => {
           {formData.departamento && (<div><strong>Departamento:</strong> {formData.departamento}</div>)}
           {formData.num_creditos && (<div><strong>Nº Créditos:</strong> {formData.num_creditos}</div>)}
           {formData.sem_curricular && (<div><strong>Semestre Curricular:</strong> {formData.sem_curricular}</div>)}
-          {formData.coordenador && (<div><strong>Coordenador:</strong> {formData.coordenador}</div>)}
+          {formData.coordenador && (<div><strong>Líder de Disciplina:</strong> {formData.coordenador}</div>)}
           {formData.idioma && (<div><strong>Idioma:</strong> {formData.idioma}</div>)}
           {professoresList && professoresList.length > 0 && (
             <div style={{ gridColumn: '1 / -1' }}>
@@ -1025,18 +1013,6 @@ const SyllabusPDFContent = ({ formData, professoresList }) => {
         </div>
       )}
 
-      {/* Aula-a-Aula */}
-      {formData.aula_aula && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            AULA-A-AULA
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.aula_aula }}
-          />
-        </div>
-      )}
 
       {/* Compromisso Ético */}
       {formData.compromisso_etico && (

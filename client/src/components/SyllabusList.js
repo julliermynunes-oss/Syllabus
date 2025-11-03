@@ -11,6 +11,8 @@ const SyllabusList = () => {
   const [syllabi, setSyllabi] = useState([]);
   const [programaSearch, setProgramaSearch] = useState('');
   const [disciplinaSearch, setDisciplinaSearch] = useState('');
+  const [professorSearch, setProfessorSearch] = useState('');
+  const [filterMeusOnly, setFilterMeusOnly] = useState(false);
   const [programs, setPrograms] = useState([]);
   const [disciplines, setDisciplines] = useState([]);
   const [filteredPrograms, setFilteredPrograms] = useState([]);
@@ -34,7 +36,24 @@ const SyllabusList = () => {
         params,
         headers: { Authorization: `Bearer ${token}` }
       });
-      setSyllabi(response.data);
+      
+      let filteredData = response.data;
+      
+      // Filter by professor name if search is provided
+      if (professorSearch) {
+        filteredData = filteredData.filter(s => {
+          const professores = s.professores || '';
+          return professores.toLowerCase().includes(professorSearch.toLowerCase()) ||
+                 (s.usuario && s.usuario.toLowerCase().includes(professorSearch.toLowerCase()));
+        });
+      }
+      
+      // Filter only my syllabi if filter is active
+      if (filterMeusOnly && user) {
+        filteredData = filteredData.filter(s => s.usuario_id === user.id);
+      }
+      
+      setSyllabi(filteredData);
     } catch (err) {
       console.error('Erro ao buscar syllabi:', err);
     }
@@ -79,7 +98,7 @@ const SyllabusList = () => {
       fetchPendingRequests();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [programaSearch, disciplinaSearch, token]);
+  }, [programaSearch, disciplinaSearch, professorSearch, filterMeusOnly, token]);
 
   const handleProgramaSearchChange = (value) => {
     setProgramaSearch(value);
@@ -303,6 +322,21 @@ const SyllabusList = () => {
               </div>
             )}
           </div>
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="DIGITE O NOME DO PROFESSOR"
+              value={professorSearch}
+              onChange={(e) => setProfessorSearch(e.target.value)}
+            />
+          </div>
+          <button
+            className={`filter-btn ${filterMeusOnly ? 'active' : ''}`}
+            onClick={() => setFilterMeusOnly(!filterMeusOnly)}
+            type="button"
+          >
+            {filterMeusOnly ? '✓ Meus Syllabi' : 'Meus Syllabi'}
+          </button>
           <button className="icon-btn-small" onClick={() => navigate('/syllabus/new')}>
             <FaPlus />
           </button>
@@ -440,7 +474,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           {formData.departamento && (<div><strong>Departamento:</strong> {formData.departamento}</div>)}
           {formData.num_creditos && (<div><strong>Nº Créditos:</strong> {formData.num_creditos}</div>)}
           {formData.sem_curricular && (<div><strong>Semestre Curricular:</strong> {formData.sem_curricular}</div>)}
-          {formData.coordenador && (<div><strong>Coordenador:</strong> {formData.coordenador}</div>)}
+          {formData.coordenador && (<div><strong>Líder de Disciplina:</strong> {formData.coordenador}</div>)}
           {formData.idioma && (<div><strong>Idioma:</strong> {formData.idioma}</div>)}
           {professoresList && professoresList.length > 0 && (
             <div style={{ gridColumn: '1 / -1' }}>
@@ -509,19 +543,6 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </div>
       )}
 
-      {/* Aula-a-Aula */}
-      {formData.aula_aula && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            AULA-A-AULA
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.aula_aula }}
-          />
-        </div>
-      )}
 
       {/* Compromisso Ético */}
       {formData.compromisso_etico && (
