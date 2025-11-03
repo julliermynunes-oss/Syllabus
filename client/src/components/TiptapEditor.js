@@ -11,6 +11,8 @@ import './TiptapEditor.css';
 
 const TiptapEditor = ({ content, onChange }) => {
   const fileInputRef = React.useRef(null);
+  const [contextMenu, setContextMenu] = React.useState(null);
+  const contextMenuRef = React.useRef(null);
 
   const editor = useEditor({
     extensions: [
@@ -125,6 +127,94 @@ const TiptapEditor = ({ content, onChange }) => {
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
     }
+  };
+
+  // Context menu handlers
+  const handleContextMenu = (e) => {
+    e.preventDefault();
+    setContextMenu({
+      x: e.clientX,
+      y: e.clientY,
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  // Close context menu when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
+        closeContextMenu();
+      }
+    };
+
+    if (contextMenu) {
+      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('contextmenu', handleClickOutside);
+      return () => {
+        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener('contextmenu', handleClickOutside);
+      };
+    }
+  }, [contextMenu]);
+
+  // Context menu actions
+  const handleCut = () => {
+    const { state } = editor;
+    const { selection } = state;
+    if (!selection.empty) {
+      navigator.clipboard.writeText(state.doc.textBetween(selection.from, selection.to));
+      editor.chain().focus().deleteSelection().run();
+    }
+    closeContextMenu();
+  };
+
+  const handleCopy = async () => {
+    const { state } = editor;
+    const { selection } = state;
+    if (!selection.empty) {
+      try {
+        await navigator.clipboard.writeText(state.doc.textBetween(selection.from, selection.to));
+      } catch (err) {
+        // Fallback for older browsers
+        const text = state.doc.textBetween(selection.from, selection.to);
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+    }
+    closeContextMenu();
+  };
+
+  const handlePaste = async () => {
+    editor.chain().focus().run();
+    // Trigger paste event - browser handles it
+    const pasteEvent = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(pasteEvent);
+    closeContextMenu();
+  };
+
+  const handleSelectAll = () => {
+    editor.chain().focus().selectAll().run();
+    closeContextMenu();
+  };
+
+  const handleUndo = () => {
+    editor.chain().focus().undo().run();
+    closeContextMenu();
+  };
+
+  const handleRedo = () => {
+    editor.chain().focus().redo().run();
+    closeContextMenu();
   };
 
   if (!editor) {
@@ -329,9 +419,45 @@ const TiptapEditor = ({ content, onChange }) => {
           ➡
         </button>
       </div>
-      <div className="tiptap-editor-content">
+      <div 
+        className="tiptap-editor-content"
+        onContextMenu={handleContextMenu}
+      >
         <EditorContent editor={editor} />
       </div>
+      
+      {/* Context Menu */}
+      {contextMenu && (
+        <div
+          ref={contextMenuRef}
+          className="context-menu"
+          style={{
+            left: `${contextMenu.x}px`,
+            top: `${contextMenu.y}px`,
+          }}
+        >
+          <div className="context-menu-item" onClick={handleCut}>
+            <span>✂️</span> Recortar
+          </div>
+          <div className="context-menu-item" onClick={handleCopy}>
+            <span>📋</span> Copiar
+          </div>
+          <div className="context-menu-item" onClick={handlePaste}>
+            <span>📄</span> Colar
+          </div>
+          <div className="context-menu-divider"></div>
+          <div className="context-menu-item" onClick={handleSelectAll}>
+            <span>☑️</span> Selecionar Tudo
+          </div>
+          <div className="context-menu-divider"></div>
+          <div className="context-menu-item" onClick={handleUndo}>
+            <span>↶</span> Desfazer
+          </div>
+          <div className="context-menu-item" onClick={handleRedo}>
+            <span>↷</span> Refazer
+          </div>
+        </div>
+      )}
     </div>
   );
 };
