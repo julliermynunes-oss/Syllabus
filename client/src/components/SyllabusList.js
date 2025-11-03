@@ -15,10 +15,13 @@ const SyllabusList = () => {
   const [filterMeusOnly, setFilterMeusOnly] = useState(false);
   const [programs, setPrograms] = useState([]);
   const [disciplines, setDisciplines] = useState([]);
+  const [allProfessores, setAllProfessores] = useState([]);
   const [filteredPrograms, setFilteredPrograms] = useState([]);
   const [filteredDisciplines, setFilteredDisciplines] = useState([]);
+  const [filteredProfessores, setFilteredProfessores] = useState([]);
   const [showProgramDropdown, setShowProgramDropdown] = useState(false);
   const [showDisciplineDropdown, setShowDisciplineDropdown] = useState(false);
+  const [showProfessorDropdown, setShowProfessorDropdown] = useState(false);
   const [showProfessorModal, setShowProfessorModal] = useState(false);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [previewSyllabus, setPreviewSyllabus] = useState(null);
@@ -71,15 +74,28 @@ const SyllabusList = () => {
   };
 
   useEffect(() => {
-    // Carregar programas e disciplinas
+    // Carregar programas, disciplinas e professores
     const loadData = async () => {
       try {
-        const [programsRes, disciplinesRes] = await Promise.all([
+        const [programsRes, disciplinesRes, professoresRes] = await Promise.all([
           axios.get(`${API_URL}/api/programs`),
-          axios.get(`${API_URL}/api/disciplines`)
+          axios.get(`${API_URL}/api/disciplines`),
+          axios.get(`${API_URL}/api/professores`)
         ]);
         setPrograms(programsRes.data);
         setDisciplines(disciplinesRes.data);
+        
+        // Flatten professores from all departments
+        const data = professoresRes.data;
+        const allProfs = [];
+        Object.keys(data).forEach(dept => {
+          if (Array.isArray(data[dept])) {
+            allProfs.push(...data[dept].map(p => p.nome || p));
+          }
+        });
+        const uniqueProfs = [...new Set(allProfs)].sort();
+        setAllProfessores(uniqueProfs);
+        setFilteredProfessores(uniqueProfs);
       } catch (err) {
         console.error('Erro ao carregar dados:', err);
       }
@@ -116,6 +132,25 @@ const SyllabusList = () => {
     );
     setFilteredDisciplines(filtered);
     setShowDisciplineDropdown(value.length > 0);
+  };
+
+  const handleProfessorSearchChange = (value) => {
+    setProfessorSearch(value);
+    if (value.trim()) {
+      const filtered = allProfessores.filter(p =>
+        p.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredProfessores(filtered);
+      setShowProfessorDropdown(value.length > 0 && filtered.length > 0);
+    } else {
+      setFilteredProfessores(allProfessores);
+      setShowProfessorDropdown(false);
+    }
+  };
+
+  const selectProfessor = (professor) => {
+    setProfessorSearch(professor);
+    setShowProfessorDropdown(false);
   };
 
   const selectPrograma = (program) => {
@@ -327,8 +362,23 @@ const SyllabusList = () => {
               type="text"
               placeholder="DIGITE O NOME DO PROFESSOR"
               value={professorSearch}
-              onChange={(e) => setProfessorSearch(e.target.value)}
+              onChange={(e) => handleProfessorSearchChange(e.target.value)}
+              onFocus={() => professorSearch && setShowProfessorDropdown(true)}
+              onBlur={() => setTimeout(() => setShowProfessorDropdown(false), 200)}
             />
+            {showProfessorDropdown && filteredProfessores.length > 0 && (
+              <div className="autocomplete-dropdown">
+                {filteredProfessores.map((p, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => selectProfessor(p)}
+                    className="autocomplete-item"
+                  >
+                    {p}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <button
             className={`filter-btn ${filterMeusOnly ? 'active' : ''}`}
