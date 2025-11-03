@@ -10,6 +10,45 @@
   border: 1px solid #e0e0e0;
 }
 
+.search-type-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-type-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  color: #666;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.search-type-btn:hover {
+  border-color: #235795;
+  color: #235795;
+  background: #f0f7ff;
+}
+
+.search-type-btn.active {
+  background: #235795;
+  color: white;
+  border-color: #235795;
+}
+
+.search-type-btn.active:hover {
+  background: #2a6ca8;
+  border-color: #2a6ca8;
+}
+
 .search-input-group {
   display: flex;
   gap: 0.5rem;
