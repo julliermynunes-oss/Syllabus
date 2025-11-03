@@ -81,14 +81,20 @@ const ReferenceManager = ({ content, onChange }) => {
       setSearchResults(response.data);
     } catch (error) {
       console.error('Erro ao buscar na API do Google Scholar:', error);
-      if (error.response?.status === 400) {
-        window.alert(
-          'Para usar a busca do Google Scholar, é necessário configurar a API key do SerpApi no servidor.\n\n' +
-          'Configure SERPAPI_KEY nas variáveis de ambiente do servidor (Railway).\n\n' +
-          'Obtenha uma API key em: https://serpapi.com/users/sign_up'
-        );
+      if (error.response?.status === 400 || error.response?.status === 404) {
+        const errorData = error.response?.data;
+        let message = '❌ Google Scholar não está configurado\n\n';
+        message += 'Para usar esta funcionalidade, configure a API key do SerpApi no servidor (Railway):\n\n';
+        message += '1. Obtenha uma API key gratuita em: https://serpapi.com/users/sign_up\n';
+        message += '2. No Railway, adicione a variável: SERPAPI_KEY\n';
+        message += '3. Cole sua API key como valor\n\n';
+        message += '📖 Consulte o arquivo API_KEYS_SETUP.md para mais detalhes.';
+        window.alert(message);
+        setSearchResults([]);
       } else {
-        window.alert(error.response?.data?.message || 'Erro ao buscar no Google Scholar. Tente novamente.');
+        const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar no Google Scholar. Tente novamente.';
+        window.alert(`Erro: ${errorMsg}`);
+        setSearchResults([]);
       }
     } finally {
       setIsSearching(false);
@@ -113,17 +119,22 @@ const ReferenceManager = ({ content, onChange }) => {
       setSearchResults(response.data);
     } catch (error) {
       console.error('Erro ao buscar na API da Amazon:', error);
-      if (error.response?.status === 400) {
-        window.alert(
-          'Para usar a busca da Amazon Books, é necessário configurar as credenciais AWS no servidor.\n\n' +
-          'Configure as seguintes variáveis de ambiente no servidor (Railway):\n' +
-          '- AWS_ACCESS_KEY_ID\n' +
-          '- AWS_SECRET_ACCESS_KEY\n' +
-          '- AWS_ASSOCIATE_TAG\n\n' +
-          'Consulte a documentação em: https://webservices.amazon.com/paapi5/documentation/'
-        );
+      if (error.response?.status === 400 || error.response?.status === 404 || error.response?.status === 501) {
+        const errorData = error.response?.data;
+        let message = '❌ Amazon Books não está configurado\n\n';
+        message += 'Para usar esta funcionalidade, configure as credenciais AWS no servidor (Railway):\n\n';
+        message += 'Variáveis necessárias:\n';
+        message += '• AWS_ACCESS_KEY_ID\n';
+        message += '• AWS_SECRET_ACCESS_KEY\n';
+        message += '• AWS_ASSOCIATE_TAG\n\n';
+        message += '📖 Consulte o arquivo API_KEYS_SETUP.md para instruções detalhadas.\n';
+        message += '🔗 Documentação: https://webservices.amazon.com/paapi5/documentation/';
+        window.alert(message);
+        setSearchResults([]);
       } else {
-        window.alert(error.response?.data?.message || 'Erro ao buscar na Amazon. Tente novamente.');
+        const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar na Amazon. Verifique suas credenciais e tente novamente.';
+        window.alert(`Erro: ${errorMsg}`);
+        setSearchResults([]);
       }
     } finally {
       setIsSearching(false);
@@ -284,6 +295,17 @@ const ReferenceManager = ({ content, onChange }) => {
             <FaShoppingCart /> Amazon Books
           </button>
         </div>
+
+        {(searchType === 'scholar' || searchType === 'amazon') && (
+          <div className="api-config-note">
+            <p>
+              ⚠️ <strong>Nota:</strong> Esta busca requer configuração de API keys no servidor (Railway).
+              {searchType === 'scholar' && ' Configure SERPAPI_KEY.'}
+              {searchType === 'amazon' && ' Configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY e AWS_ASSOCIATE_TAG.'}
+              {' '}Consulte o arquivo <strong>API_KEYS_SETUP.md</strong> para instruções.
+            </p>
+          </div>
+        )}
         
         <div className="search-input-group">
           <input

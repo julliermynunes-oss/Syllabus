@@ -49,6 +49,26 @@
   border-color: #2a6ca8;
 }
 
+.api-config-note {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+}
+
+.api-config-note p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #856404;
+  line-height: 1.5;
+}
+
+.api-config-note strong {
+  color: #856404;
+  font-weight: 600;
+}
+
 .search-input-group {
   display: flex;
   gap: 0.5rem;
