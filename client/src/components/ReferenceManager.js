@@ -87,7 +87,7 @@ const ReferenceManager = ({ content, onChange }) => {
         message += '1. Obtenha uma API key gratuita em: https://serpapi.com/users/sign_up\n';
         message += '2. No Railway, adicione a variável: SERPAPI_KEY\n';
         message += '3. Cole sua API key como valor\n\n';
-        message += '📖 Consulte o arquivo API_KEYS_SETUP.md para mais detalhes.';
+        message += '📖 Consulte o arquivo CONFIGURAR_APIS.md para instruções detalhadas passo a passo.';
         window.alert(message);
         setSearchResults([]);
       } else {
@@ -125,7 +125,7 @@ const ReferenceManager = ({ content, onChange }) => {
         message += '• AWS_ACCESS_KEY_ID\n';
         message += '• AWS_SECRET_ACCESS_KEY\n';
         message += '• AWS_ASSOCIATE_TAG\n\n';
-        message += '📖 Consulte o arquivo API_KEYS_SETUP.md para instruções detalhadas.\n';
+        message += '📖 Consulte o arquivo CONFIGURAR_APIS.md para instruções detalhadas passo a passo.\n';
         message += '🔗 Documentação: https://webservices.amazon.com/paapi5/documentation/';
         window.alert(message);
         setSearchResults([]);
@@ -300,7 +300,7 @@ const ReferenceManager = ({ content, onChange }) => {
               ⚠️ <strong>Nota:</strong> Esta busca requer configuração de API keys no servidor (Railway).
               {searchType === 'scholar' && ' Configure SERPAPI_KEY.'}
               {searchType === 'amazon' && ' Configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY e AWS_ASSOCIATE_TAG.'}
-              {' '}Consulte o arquivo <strong>API_KEYS_SETUP.md</strong> para instruções.
+              {' '}Consulte o arquivo <strong>CONFIGURAR_APIS.md</strong> para instruções passo a passo detalhadas.
             </p>
           </div>
         )}
