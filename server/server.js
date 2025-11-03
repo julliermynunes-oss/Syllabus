@@ -203,6 +203,9 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
 // Store professores data in memory (keyed by departamento code)
 let professoresData = {};
 
+// Store competências data in memory (keyed by curso)
+let competenciasData = {};
+
 // Read CSV files and populate database
 function loadCSVData() {
   try {
@@ -316,9 +319,73 @@ function loadCSVData() {
     }
 
     console.log('CSV data loaded successfully');
+    
+    // Load competências from XLSX
+    loadCompetenciasData();
   } catch (error) {
     console.error('Error loading CSV data:', error);
   }
+}
+
+// Function to load competências from XLSX
+function loadCompetenciasData() {
+  try {
+    const xlsxPath = path.join(__dirname, '..', 'Competências.xlsx');
+    if (!fs.existsSync(xlsxPath)) {
+      console.warn('Competências.xlsx not found');
+      return;
+    }
+
+    const workbook = XLSX.readFile(xlsxPath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(worksheet);
+
+    // Group competências by curso
+    competenciasData = {};
+    data.forEach(row => {
+      const curso = (row.Curso || '').trim();
+      if (curso) {
+        if (!competenciasData[curso]) {
+          competenciasData[curso] = [];
+        }
+        competenciasData[curso].push({
+          competencia: (row.Competência || '').trim(),
+          descricao: (row.Descrição || '').trim()
+        });
+      }
+    });
+
+    console.log(`Loaded competências for ${Object.keys(competenciasData).length} cursos`);
+  } catch (error) {
+    console.error('Error loading competências:', error);
+  }
+}
+
+// Function to map full course name to course code
+function getCursoCode(cursoNome) {
+  if (!cursoNome) return null;
+  
+  // Map common patterns: "CGA - Curso de Graduação em Administração" -> "CGA"
+  const match = cursoNome.match(/^([A-Z]+(?:\s+[A-Z]+)?)/);
+  if (match) {
+    return match[1].replace(/\s+/g, '');
+  }
+  
+  // Direct match if already a code
+  if (Object.keys(competenciasData).includes(cursoNome)) {
+    return cursoNome;
+  }
+  
+  // Try to find by partial match
+  const cursoUpper = cursoNome.toUpperCase();
+  for (const code of Object.keys(competenciasData)) {
+    if (cursoUpper.includes(code) || code.includes(cursoUpper)) {
+      return code;
+    }
+  }
+  
+  return null;
 }
 
 function insertDisciplines(disciplinasData, programsMap) {
@@ -503,6 +570,25 @@ app.get('/api/professores', (req, res) => {
   // Return as array of objects with nome field (to match disciplines API format)
   const result = professores.map(nome => ({ nome }));
   res.json(result);
+});
+
+// Competências endpoint
+app.get('/api/competencias', (req, res) => {
+  const { curso } = req.query;
+  
+  if (!curso) {
+    return res.status(400).json({ error: 'Curso é obrigatório' });
+  }
+
+  // Map curso name to code
+  const cursoCode = getCursoCode(curso);
+  
+  if (!cursoCode || !competenciasData[cursoCode]) {
+    return res.json([]);
+  }
+
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.json(competenciasData[cursoCode]);
 });
 
 // Syllabi routes

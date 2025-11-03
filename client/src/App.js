@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import SyllabusList from './components/SyllabusList';
 import SyllabusForm from './components/SyllabusForm';
+import CompetenciesManager from './components/CompetenciesManager';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 
@@ -33,6 +34,14 @@ function App() {
             element={
               <PrivateRoute>
                 <SyllabusForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/competencias"
+            element={
+              <PrivateRoute>
+                <CompetenciesManager />
               </PrivateRoute>
             }
           />

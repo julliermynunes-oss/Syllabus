@@ -1,14 +1,73 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPlus, FaTrash } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
+import axios from 'axios';
+import { API_URL } from '../config';
 import './CompetenciesTable.css';
 
-const CompetenciesTable = ({ data, onChange }) => {
+const CompetenciesTable = ({ data, onChange, curso }) => {
   const [rows, setRows] = useState([]);
   const initializedRef = useRef(false);
+  const loadedCursoRef = useRef(null);
 
-  // Inicializar dados da tabela apenas uma vez
+  // Carregar competências do XLSX quando curso mudar
   useEffect(() => {
-    if (!initializedRef.current) {
+    if (curso && curso !== loadedCursoRef.current) {
+      loadCompetenciasFromAPI(curso);
+      loadedCursoRef.current = curso;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [curso]);
+
+  const loadCompetenciasFromAPI = async (cursoNome) => {
+    if (!cursoNome) return;
+
+    try {
+      const response = await axios.get(`${API_URL}/api/competencias`, {
+        params: { curso: cursoNome }
+      });
+
+      if (response.data && response.data.length > 0) {
+        // Transformar dados da API para o formato da tabela
+        const newRows = response.data.map(item => ({
+          competencia: item.competencia || '',
+          descricao: item.descricao || '',
+          grau: 0 // Iniciar com grau 0
+        }));
+        setRows(newRows);
+      } else {
+        // Se não houver competências, verificar se há dados salvos
+        if (data && data.length > 0) {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.rows && parsed.rows.length > 0) {
+              setRows(parsed.rows);
+            } else {
+              setRows([]);
+            }
+          } catch (e) {
+            setRows([]);
+          }
+        } else {
+          setRows([]);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar competências:', error);
+      // Fallback para dados salvos se houver
+      if (data && data.length > 0) {
+        try {
+          const parsed = JSON.parse(data);
+          setRows(parsed.rows || []);
+        } catch (e) {
+          setRows([]);
+        }
+      }
+    }
+  };
+
+  // Inicializar dados da tabela se já existirem (edição)
+  useEffect(() => {
+    if (!initializedRef.current && !curso) {
       if (data && data.length > 0) {
         try {
           const parsed = JSON.parse(data);
@@ -33,11 +92,11 @@ const CompetenciesTable = ({ data, onChange }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows]);
 
-  const addRow = () => {
-    setRows([...rows, { competencia: '', descricao: '', grau: 0 }]);
-  };
-
   const updateRow = (index, field, value) => {
+    // Não permitir editar competência
+    if (field === 'competencia') {
+      return;
+    }
     const newRows = rows.map((row, i) => {
       if (i === index) {
         return { ...row, [field]: value };
@@ -60,9 +119,11 @@ const CompetenciesTable = ({ data, onChange }) => {
     <div className="competencies-table-container">
       <div className="competencies-header">
         <h3>Competências da Disciplina</h3>
-        <button type="button" onClick={addRow} className="add-row-btn">
-          <FaPlus /> Adicionar Linha
-        </button>
+        {!curso && (
+          <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+            Selecione um curso e disciplina para carregar as competências automaticamente.
+          </p>
+        )}
       </div>
 
       <div className="competencies-table-wrapper">
@@ -79,7 +140,9 @@ const CompetenciesTable = ({ data, onChange }) => {
             {rows.length === 0 && (
               <tr className="empty-row">
                 <td colSpan="4" className="empty-message">
-                  Nenhuma competência adicionada. Clique em "Adicionar Linha" para começar.
+                  {curso 
+                    ? 'Nenhuma competência encontrada para este curso.' 
+                    : 'Selecione um curso e disciplina para carregar as competências automaticamente.'}
                 </td>
               </tr>
             )}
@@ -89,9 +152,9 @@ const CompetenciesTable = ({ data, onChange }) => {
                   <input
                     type="text"
                     value={row.competencia || ''}
-                    onChange={(e) => updateRow(index, 'competencia', e.target.value)}
+                    readOnly
                     placeholder="Nome da competência"
-                    className="table-input"
+                    className="table-input readonly"
                   />
                 </td>
                 <td className="col-descricao">
@@ -113,14 +176,7 @@ const CompetenciesTable = ({ data, onChange }) => {
                   </button>
                 </td>
                 <td className="col-actions">
-                  <button
-                    type="button"
-                    onClick={() => deleteRow(index)}
-                    className="delete-btn"
-                    title="Remover linha"
-                  >
-                    <FaTrash />
-                  </button>
+                  {/* Não mostrar botão de excluir, pois competências vêm do XLSX */}
                 </td>
               </tr>
             ))}

@@ -947,6 +947,7 @@ const SyllabusForm = () => {
               <CompetenciesTable
                 data={formData.competencias}
                 onChange={(content) => setFormData(prev => ({ ...prev, competencias: content }))}
+                curso={formData.curso}
               />
             </div>
           </div>

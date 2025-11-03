@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { FaPlus, FaSignOutAlt, FaEdit, FaTrash, FaCopy, FaEye } from 'react-icons/fa';
+import { FaPlus, FaSignOutAlt, FaEdit, FaTrash, FaCopy, FaEye, FaCog } from 'react-icons/fa';
 import ProfessorModal from './ProfessorModal';
 import './SyllabusList.css';
 
@@ -454,9 +454,14 @@ const SyllabusList = () => {
         </table>
       </div>
 
-      <button className="add-button" onClick={() => navigate('/syllabus/new')}>
-        <FaPlus /> Adicionar Novo Syllabus
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
+        <button className="add-button" onClick={() => navigate('/syllabus/new')}>
+          <FaPlus /> Adicionar Novo Syllabus
+        </button>
+        <button className="manage-competencias-btn" onClick={() => navigate('/competencias')}>
+          <FaCog /> Gerenciar Competências
+        </button>
+      </div>
 
       {/* Modal de Adicionar Professor */}
       <ProfessorModal

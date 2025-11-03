@@ -329,6 +329,30 @@
   box-shadow: 0 8px 25px rgba(35, 87, 149, 0.4);
 }
 
+.manage-competencias-btn {
+  margin-top: 2rem;
+  padding: 1.25rem 2.5rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.manage-competencias-btn:hover {
+  background: #218838;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+}
+
 /* Notifications section */
 .notifications-section {
   background: white;
