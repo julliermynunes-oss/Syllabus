@@ -113,7 +113,7 @@
 
 .search-box {
   flex: 1 1 0;
-  min-width: 200px;
+  width: 300px;
   position: relative;
   display: flex;
   align-items: center;
@@ -122,6 +122,17 @@
   border-radius: 12px;
   background: white;
   transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.search-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.9rem;
+  color: #235795;
+  font-weight: 500;
 }
 
 .autocomplete-dropdown {
@@ -157,16 +168,6 @@
   border-bottom: none;
 }
 
-.search-box input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  background: transparent;
-  color: #235795;
-  font-weight: 500;
-}
-
 .search-box input::placeholder {
   color: #686868;
 }
@@ -179,14 +180,6 @@
 .search-icon {
   margin-right: 0.5rem;
   color: #666;
-}
-
-.search-box input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 0.9rem;
-  background: transparent;
 }
 
 .icon-btn-small {
