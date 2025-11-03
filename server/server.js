@@ -9,6 +9,7 @@ const XLSX = require('xlsx');
 const fs = require('fs');
 const multer = require('multer');
 const PDFDocument = require('pdfkit');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -589,6 +590,134 @@ app.get('/api/competencias', (req, res) => {
 
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.json(competenciasData[cursoCode]);
+});
+
+// Google Scholar endpoint (via backend para usar API key do servidor)
+app.get('/api/search-scholar', async (req, res) => {
+  const { q } = req.query;
+  
+  if (!q) {
+    return res.status(400).json({ error: 'Query é obrigatória' });
+  }
+
+  const serpApiKey = process.env.SERPAPI_KEY;
+  
+  if (!serpApiKey) {
+    return res.status(400).json({ 
+      error: 'API key do SerpApi não configurada',
+      message: 'Configure SERPAPI_KEY nas variáveis de ambiente do servidor'
+    });
+  }
+
+  try {
+    const response = await axios.get(
+      `https://serpapi.com/search.json?engine=google_scholar&q=${encodeURIComponent(q)}&api_key=${serpApiKey}&num=10`,
+      {
+        headers: {
+          'Accept': 'application/json'
+        }
+      }
+    );
+
+    const items = (response.data.organic_results || []).map(item => ({
+      type: 'scholar',
+      title: item.title,
+      link: item.link,
+      snippet: item.snippet,
+      publication_info: item.publication_info,
+      authors: item.publication_info?.authors || []
+    }));
+    
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.json(items);
+  } catch (error) {
+    console.error('Erro ao buscar no Google Scholar:', error);
+    res.status(500).json({ 
+      error: 'Erro ao buscar no Google Scholar',
+      message: error.response?.data?.error || error.message
+    });
+  }
+});
+
+// Amazon Books endpoint (Product Advertising API 5.0)
+app.get('/api/search-amazon-books', async (req, res) => {
+  const { q } = req.query;
+  
+  if (!q) {
+    return res.status(400).json({ error: 'Query é obrigatória' });
+  }
+
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  const associateTag = process.env.AWS_ASSOCIATE_TAG;
+  const region = process.env.AWS_REGION || 'us-east-1';
+  const marketplace = process.env.AWS_MARKETPLACE || 'www.amazon.com';
+
+  if (!accessKeyId || !secretAccessKey || !associateTag) {
+    return res.status(400).json({ 
+      error: 'Credenciais AWS não configuradas',
+      message: 'Configure AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY e AWS_ASSOCIATE_TAG nas variáveis de ambiente'
+    });
+  }
+
+  try {
+    const { default: DefaultApi } = require('paapi5-nodejs-sdk');
+    const api = new DefaultApi(accessKeyId, secretAccessKey, marketplace, region, associateTag);
+    
+    // Criar requisição de busca
+    const searchItemsRequest = {
+      'Keywords': q,
+      'SearchIndex': 'Books',
+      'ItemCount': 10,
+      'Resources': [
+        'ItemInfo.Title',
+        'ItemInfo.Authors',
+        'ItemInfo.PublicationDate',
+        'ItemInfo.Publisher',
+        'ItemInfo.Isbn',
+        'Offers.Listings.Price'
+      ]
+    };
+
+    const response = await api.searchItems(searchItemsRequest);
+    
+    const items = [];
+    if (response.SearchResult && response.SearchResult.Items) {
+      response.SearchResult.Items.forEach(item => {
+        const itemInfo = item.ItemInfo || {};
+        const titleInfo = itemInfo.Title || {};
+        const authorsInfo = itemInfo.Authors || {};
+        const publicationInfo = itemInfo.PublicationDate || {};
+        const publisherInfo = itemInfo.Publisher || {};
+        const isbnInfo = itemInfo.Isbn || {};
+        const offersInfo = item.Offers || {};
+        const listings = offersInfo.Listings || [];
+        const priceInfo = listings[0]?.Price || {};
+        
+        items.push({
+          type: 'amazon',
+          asin: item.ASIN,
+          title: titleInfo.DisplayValue || '',
+          authors: authorsInfo.DisplayValues || [],
+          publicationDate: publicationInfo.DisplayValue || '',
+          publisher: publisherInfo.DisplayValue || '',
+          isbn: isbnInfo.DisplayValue || '',
+          price: priceInfo.DisplayAmount || '',
+          detailPageURL: item.DetailPageURL || '',
+          images: item.Images || {}
+        });
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.json(items);
+  } catch (error) {
+    console.error('Erro ao buscar na Amazon:', error);
+    res.status(500).json({ 
+      error: 'Erro ao buscar na Amazon',
+      message: error.message || 'Verifique suas credenciais AWS e se a conta tem acesso à API'
+    });
+  }
 });
 
 // Syllabi routes

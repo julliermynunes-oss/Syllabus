@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt } from 'react-icons/fa';
+import { API_URL } from '../config';
+import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaShoppingCart } from 'react-icons/fa';
 import './ReferenceManager.css';
 
 const ReferenceManager = ({ content, onChange }) => {
@@ -8,7 +9,7 @@ const ReferenceManager = ({ content, onChange }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
-  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar'
+  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'amazon'
 
   const searchCrossRef = async () => {
     if (!searchTerm.trim()) return;
@@ -65,46 +66,64 @@ const ReferenceManager = ({ content, onChange }) => {
   const searchGoogleScholar = async () => {
     if (!searchTerm.trim()) return;
 
-    // SerpApi requer API key. Por enquanto, vamos mostrar um aviso
-    const serpApiKey = process.env.REACT_APP_SERPAPI_KEY;
-    
-    if (!serpApiKey) {
-      window.alert(
-        'Para usar a busca do Google Scholar, é necessário configurar uma API key do SerpApi.\n\n' +
-        '1. Obtenha uma API key em: https://serpapi.com/users/sign_up\n' +
-        '2. Adicione no arquivo .env: REACT_APP_SERPAPI_KEY=sua_api_key\n' +
-        '3. Reinicie o servidor'
-      );
-      setIsSearching(false);
-      return;
-    }
-
     setIsSearching(true);
     try {
       const response = await axios.get(
-        `https://serpapi.com/search.json?engine=google_scholar&q=${encodeURIComponent(searchTerm)}&api_key=${serpApiKey}&num=10`,
+        `${API_URL}/api/search-scholar`,
         {
+          params: { q: searchTerm },
           headers: {
             'Accept': 'application/json'
           }
         }
       );
 
-      const items = (response.data.organic_results || []).map(item => ({
-        type: 'scholar',
-        title: item.title,
-        link: item.link,
-        snippet: item.snippet,
-        publication_info: item.publication_info,
-        authors: item.publication_info?.authors || []
-      }));
-      setSearchResults(items);
+      setSearchResults(response.data);
     } catch (error) {
       console.error('Erro ao buscar na API do Google Scholar:', error);
-      if (error.response?.status === 401) {
-        window.alert('API key do SerpApi inválida. Verifique sua configuração.');
+      if (error.response?.status === 400) {
+        window.alert(
+          'Para usar a busca do Google Scholar, é necessário configurar a API key do SerpApi no servidor.\n\n' +
+          'Configure SERPAPI_KEY nas variáveis de ambiente do servidor (Railway).\n\n' +
+          'Obtenha uma API key em: https://serpapi.com/users/sign_up'
+        );
       } else {
-        window.alert('Erro ao buscar no Google Scholar. Tente novamente.');
+        window.alert(error.response?.data?.message || 'Erro ao buscar no Google Scholar. Tente novamente.');
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const searchAmazonBooks = async () => {
+    if (!searchTerm.trim()) return;
+
+    setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/search-amazon-books`,
+        {
+          params: { q: searchTerm },
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar na API da Amazon:', error);
+      if (error.response?.status === 400) {
+        window.alert(
+          'Para usar a busca da Amazon Books, é necessário configurar as credenciais AWS no servidor.\n\n' +
+          'Configure as seguintes variáveis de ambiente no servidor (Railway):\n' +
+          '- AWS_ACCESS_KEY_ID\n' +
+          '- AWS_SECRET_ACCESS_KEY\n' +
+          '- AWS_ASSOCIATE_TAG\n\n' +
+          'Consulte a documentação em: https://webservices.amazon.com/paapi5/documentation/'
+        );
+      } else {
+        window.alert(error.response?.data?.message || 'Erro ao buscar na Amazon. Tente novamente.');
       }
     } finally {
       setIsSearching(false);
@@ -118,6 +137,8 @@ const ReferenceManager = ({ content, onChange }) => {
       searchGoogleBooks();
     } else if (searchType === 'scholar') {
       searchGoogleScholar();
+    } else if (searchType === 'amazon') {
+      searchAmazonBooks();
     }
   };
 
@@ -131,6 +152,10 @@ const ReferenceManager = ({ content, onChange }) => {
       const pubInfo = item.publication_info || {};
       const yearMatch = pubInfo.summary?.match(/\d{4}/);
       year = yearMatch ? parseInt(yearMatch[0]) : null;
+    } else if (item.type === 'amazon') {
+      const publishedDate = item.publicationDate || '';
+      // Amazon pode retornar apenas ano ou data completa
+      year = publishedDate ? parseInt(publishedDate.match(/\d{4}/)?.[0] || publishedDate) : null;
     } else {
       year = item.published?.['date-parts']?.[0]?.[0] || item.created?.['date-parts']?.[0]?.[0];
     }
@@ -161,6 +186,17 @@ const ReferenceManager = ({ content, onChange }) => {
       const journal = pubInfo.summary || '';
       
       return `${authors} (${year}). ${title}. ${journal}`;
+    } else if (item.type === 'amazon') {
+      const authors = item.authors && item.authors.length > 0
+        ? item.authors.join(', ')
+        : 'Autor não especificado';
+      const title = item.title || 'Sem título';
+      const publisher = item.publisher || '';
+      const publicationDate = item.publicationDate || '';
+      const year = publicationDate ? publicationDate.match(/\d{4}/)?.[0] || publicationDate : '';
+      const isbn = item.isbn || '';
+      
+      return `${authors} (${year}). ${title}. ${publisher ? publisher + '. ' : ''}${isbn ? 'ISBN: ' + isbn : ''}`;
     } else {
       // Artigo (Crossref)
       const authors = item.author
@@ -204,6 +240,8 @@ const ReferenceManager = ({ content, onChange }) => {
       return 'Pesquisar livros por título ou autor no Google Books...';
     } else if (searchType === 'scholar') {
       return 'Pesquisar artigos no Google Scholar...';
+    } else if (searchType === 'amazon') {
+      return 'Pesquisar livros na Amazon...';
     } else {
       return 'Pesquisar por título, autor ou DOI na API do Crossref...';
     }
@@ -236,6 +274,14 @@ const ReferenceManager = ({ content, onChange }) => {
             title="Buscar no Google Scholar"
           >
             <FaFileAlt /> Google Scholar
+          </button>
+          <button
+            type="button"
+            className={`search-type-btn ${searchType === 'amazon' ? 'active' : ''}`}
+            onClick={() => setSearchType('amazon')}
+            title="Buscar Livros na Amazon"
+          >
+            <FaShoppingCart /> Amazon Books
           </button>
         </div>
         
@@ -272,6 +318,8 @@ const ReferenceManager = ({ content, onChange }) => {
                           ? (item.volumeInfo?.title || 'Sem título')
                           : item.type === 'scholar'
                           ? (item.title || 'Sem título')
+                          : item.type === 'amazon'
+                          ? (item.title || 'Sem título')
                           : (item.title?.[0] || 'Sem título')
                         }
                       </strong>
@@ -286,6 +334,8 @@ const ReferenceManager = ({ content, onChange }) => {
                         ? (item.volumeInfo?.authors?.join(', ') || 'Autor não especificado')
                         : item.type === 'scholar'
                         ? (item.authors?.map(a => a.name || a).join(', ') || 'Autor não especificado')
+                        : item.type === 'amazon'
+                        ? (item.authors?.join(', ') || 'Autor não especificado')
                         : (item.author?.[0] 
                             ? `${item.author[0].given || ''} ${item.author[0].family || ''}`.trim()
                             : 'Autor não especificado'
@@ -296,6 +346,12 @@ const ReferenceManager = ({ content, onChange }) => {
                       }
                       {item.type === 'scholar' && item.publication_info?.summary && 
                         ` - ${item.publication_info.summary}`
+                      }
+                      {item.type === 'amazon' && item.publicationDate && 
+                        ` (${item.publicationDate.match(/\d{4}/)?.[0] || item.publicationDate})`
+                      }
+                      {item.type === 'amazon' && item.price && 
+                        ` - ${item.price}`
                       }
                       {item.type === 'article' && item.published && 
                         ` (${item.published['date-parts']?.[0]?.[0] || ''})`
