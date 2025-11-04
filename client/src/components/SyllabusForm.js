@@ -115,6 +115,14 @@ const SyllabusForm = () => {
   const [customTabNameInput, setCustomTabNameInput] = useState('');
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
+  // Manter menu "Mais" aberto se uma de suas abas estiver ativa
+  useEffect(() => {
+    const moreMenuTabs = ['compromisso_etico', 'professores', 'contatos', 'ods', 'referencias', 'competencias', 'custom'];
+    if (moreMenuTabs.includes(activeTab)) {
+      setShowMoreMenu(true);
+    }
+  }, [activeTab]);
+
   useEffect(() => {
     fetchPrograms();
     fetchAllProfessoresForLider();
