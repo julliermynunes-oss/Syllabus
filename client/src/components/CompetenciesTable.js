@@ -8,6 +8,23 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
   const initializedRef = useRef(false);
   const loadedCursoRef = useRef(null);
 
+  // Carregar dados salvos primeiro (se houver)
+  useEffect(() => {
+    if (!initializedRef.current && data && data.trim() !== '') {
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.rows && parsed.rows.length > 0) {
+          setRows(parsed.rows);
+          initializedRef.current = true;
+          console.log('Competências carregadas do banco:', parsed.rows.length, 'linhas');
+        }
+      } catch (e) {
+        console.error('Erro ao parsear competências salvas:', e);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
   // Carregar competências do XLSX quando curso mudar
   useEffect(() => {
     if (curso && curso !== loadedCursoRef.current) {
@@ -26,20 +43,50 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
       });
 
       if (response.data && response.data.length > 0) {
-        // Transformar dados da API para o formato da tabela
-        const newRows = response.data.map(item => ({
-          competencia: item.competencia || '',
-          descricao: item.descricao || '',
-          grau: 0 // Iniciar com grau 0
-        }));
+        // Verificar se já temos dados salvos para mesclar
+        let savedRows = [];
+        if (data && data.trim() !== '') {
+          try {
+            const parsed = JSON.parse(data);
+            savedRows = parsed.rows || [];
+          } catch (e) {
+            // Ignorar erro de parse
+          }
+        }
+
+        // Criar um mapa dos dados salvos por competência
+        const savedMap = new Map();
+        savedRows.forEach(row => {
+          if (row.competencia) {
+            savedMap.set(row.competencia, {
+              descricao: row.descricao || '',
+              grau: row.grau || 0
+            });
+          }
+        });
+
+        // Transformar dados da API para o formato da tabela, preservando dados salvos
+        const newRows = response.data.map(item => {
+          const competencia = item.competencia || '';
+          const saved = savedMap.get(competencia);
+          
+          return {
+            competencia: competencia,
+            descricao: saved ? saved.descricao : (item.descricao || ''),
+            grau: saved ? saved.grau : 0
+          };
+        });
+        
         setRows(newRows);
+        initializedRef.current = true;
       } else {
-        // Se não houver competências, verificar se há dados salvos
-        if (data && data.length > 0) {
+        // Se não houver competências da API, usar dados salvos se houver
+        if (data && data.trim() !== '') {
           try {
             const parsed = JSON.parse(data);
             if (parsed.rows && parsed.rows.length > 0) {
               setRows(parsed.rows);
+              initializedRef.current = true;
             } else {
               setRows([]);
             }
@@ -53,34 +100,19 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
     } catch (error) {
       console.error('Erro ao carregar competências:', error);
       // Fallback para dados salvos se houver
-      if (data && data.length > 0) {
+      if (data && data.trim() !== '') {
         try {
           const parsed = JSON.parse(data);
-          setRows(parsed.rows || []);
+          if (parsed.rows && parsed.rows.length > 0) {
+            setRows(parsed.rows);
+            initializedRef.current = true;
+          }
         } catch (e) {
           setRows([]);
         }
       }
     }
   };
-
-  // Inicializar dados da tabela se já existirem (edição)
-  useEffect(() => {
-    if (!initializedRef.current && !curso) {
-      if (data && data.length > 0) {
-        try {
-          const parsed = JSON.parse(data);
-          setRows(parsed.rows || []);
-        } catch (e) {
-          setRows([]);
-        }
-      } else {
-        setRows([]);
-      }
-      initializedRef.current = true;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Salvar dados automaticamente quando mudarem
   useEffect(() => {
