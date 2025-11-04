@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { FaPlus, FaSignOutAlt, FaEdit, FaTrash, FaCopy, FaEye, FaCog } from 'react-icons/fa';
@@ -245,14 +247,32 @@ const SyllabusList = () => {
   return (
     <div className="syllabus-list-container">
       <header className="header">
-        <h1 className="main-title">Syllabus</h1>
+        <h1 className="main-title">{t('syllabus')}</h1>
         <div className="header-actions">
-          <div className="user-badge" title={user?.email}>Professor: {user?.nome_completo || '—'}</div>
+          <select
+            value={language}
+            onChange={(e) => changeLanguage(e.target.value)}
+            style={{
+              padding: '0.5rem 1rem',
+              border: '2px solid #235795',
+              borderRadius: '8px',
+              background: 'white',
+              color: '#235795',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontSize: '0.9rem'
+            }}
+          >
+            <option value="pt">🇧🇷 Português</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Español</option>
+          </select>
+          <div className="user-badge" title={user?.email}>{t('professor')}: {user?.nome_completo || '—'}</div>
           <button className="icon-btn" onClick={handleLogout}>
-            <FaSignOutAlt /> Sair
+            <FaSignOutAlt /> {t('logout')}
           </button>
           <button className="icon-btn" onClick={() => setShowProfessorModal(true)}>
-            +Professor
+            {t('addProfessor')}
           </button>
         </div>
       </header>
