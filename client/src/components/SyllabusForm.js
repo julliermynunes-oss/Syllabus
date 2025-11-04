@@ -1090,7 +1090,6 @@ function SyllabusForm() {
         </div>
       )}
     </div>
-    </div>
   );
 }
 
