@@ -679,6 +679,7 @@ app.get('/api/search-dataverse', async (req, res) => {
         if (!metadata.length && (dataset.globalId || dataset.persistentId)) {
           try {
             const persistentId = encodeURIComponent(dataset.globalId || dataset.persistentId);
+            // Usar a Native API correta para buscar o dataset
             const datasetUrl = `${dataverseUrl}/api/datasets/:persistentId?persistentId=${persistentId}`;
             const datasetHeaders = { 'Accept': 'application/json' };
             if (dataverseApiKey) {
