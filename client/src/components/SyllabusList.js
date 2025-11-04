@@ -440,14 +440,14 @@ const SyllabusList = () => {
                   <button
                     className="action-btn view"
                     onClick={() => handleView(syllabus.id)}
-                    title="Visualizar"
+                    title={t('view')}
                   >
                     <FaEye />
                   </button>
                   <button
                     className="action-btn copy"
                     onClick={() => handleDuplicate(syllabus)}
-                    title="Copiar"
+                    title={t('copy')}
                   >
                     <FaCopy />
                   </button>
@@ -456,14 +456,14 @@ const SyllabusList = () => {
                       <button
                         className="action-btn edit"
                         onClick={() => navigate(`/syllabus/edit/${syllabus.id}`)}
-                        title="Editar"
+                        title={t('edit')}
                       >
                         <FaEdit />
                       </button>
                       <button
                         className="action-btn delete"
                         onClick={() => handleDelete(syllabus.id)}
-                        title="Deletar"
+                        title={t('delete')}
                       >
                         <FaTrash />
                       </button>
