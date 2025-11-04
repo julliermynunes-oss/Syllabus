@@ -438,7 +438,7 @@ function SyllabusForm() {
         @media print {
           @page {
             margin: 0 !important;
-            margin-top: 45px !important;
+            margin-top: 35px !important;
           }
           body {
             margin: 0 !important;

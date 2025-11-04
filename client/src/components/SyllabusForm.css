@@ -844,17 +844,17 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 40px;
+  height: 30px;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
-  padding: 5px 20px;
+  padding: 3px 20px;
   z-index: 1000;
   display: flex;
   align-items: center;
 }
 
 .pdf-container {
-  padding-top: 45px !important;
+  padding-top: 35px !important;
 }
 
 @media print {
@@ -1123,10 +1123,10 @@
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    height: 40px !important;
+    height: 30px !important;
     background-color: #fff !important;
     border-bottom: 1px solid #e0e0e0 !important;
-    padding: 5px 20px !important;
+    padding: 3px 20px !important;
     z-index: 1000 !important;
     display: flex !important;
     align-items: center !important;
@@ -1137,20 +1137,20 @@
   }
 
   .pdf-logo-header img {
-    max-height: 30px !important;
+    max-height: 24px !important;
     height: auto !important;
     width: auto !important;
   }
 
   .pdf-container {
-    padding-top: 45px !important;
+    padding-top: 35px !important;
   }
   
   /* Configurações de página - Remove cabeçalhos e rodapés do navegador */
   @page {
     size: A4;
     margin: 0;
-    margin-top: 45px; /* Espaço mínimo para o logo fixo */
+    margin-top: 35px; /* Espaço mínimo para o logo fixo */
   }
   
   /* Remover cabeçalhos e rodapés do navegador */
