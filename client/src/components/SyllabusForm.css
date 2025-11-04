@@ -996,7 +996,12 @@
   .back-btn,
   .export-pdf-btn,
   .preview-btn,
-  .form-header,
+  .form-header {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+
 @media (max-width: 1024px) {
   .form-box-with-tabs {
     flex-direction: column;
