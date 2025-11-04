@@ -177,7 +177,9 @@ const SyllabusForm = () => {
       const normalized = {
         ...response.data,
         semestre_ano: normalizeSemestreAno(response.data.semestre_ano),
-        sem_curricular: normalizeSemCurricular(response.data.sem_curricular)
+        sem_curricular: normalizeSemCurricular(response.data.sem_curricular),
+        professores_data: response.data.professores_data || '',
+        contatos: response.data.contatos || ''
       };
       setFormData(normalized);
       

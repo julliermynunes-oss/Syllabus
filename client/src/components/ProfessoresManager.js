@@ -7,23 +7,30 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
   const [professoresInfo, setProfessoresInfo] = useState({});
 
   useEffect(() => {
-    // Inicializar dados dos professores
+    // Inicializar dados dos professores apenas uma vez quando os dados são carregados
     if (professoresData) {
       try {
         const parsed = typeof professoresData === 'string' 
           ? JSON.parse(professoresData) 
           : professoresData;
-        setProfessoresInfo(parsed || {});
+        if (parsed && Object.keys(parsed).length > 0) {
+          setProfessoresInfo(parsed);
+          return; // Não sincronizar se já temos dados
+        }
       } catch (e) {
-        setProfessoresInfo({});
+        console.error('Erro ao parsear dados dos professores:', e);
       }
-    } else {
+    }
+    
+    // Só inicializar vazio se não tiver dados
+    if (Object.keys(professoresInfo).length === 0) {
       setProfessoresInfo({});
     }
   }, [professoresData]);
 
   useEffect(() => {
     // Sincronizar com a lista de professores do cabeçalho
+    // Mas não sobrescrever dados existentes
     const updated = { ...professoresInfo };
     let hasChanges = false;
 
@@ -48,9 +55,13 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
       }
     });
 
-    if (hasChanges) {
+    // Só atualizar se houver mudanças E se não tivermos dados carregados do servidor
+    if (hasChanges && (!professoresData || professoresData === '')) {
       setProfessoresInfo(updated);
       onUpdate(JSON.stringify(updated));
+    } else if (hasChanges) {
+      // Se temos dados do servidor, apenas atualizar o estado local, não chamar onUpdate
+      setProfessoresInfo(updated);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [professoresList.join(',')]);
