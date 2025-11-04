@@ -907,13 +907,13 @@ function SyllabusForm() {
         {activeTab === 'sobre' && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Descrição da Disciplina:</label>
+              <label>{t('description')}</label>
               <TiptapEditor
                 content={formData.sobre_disciplina}
                 onChange={(content) => setFormData(prev => ({ ...prev, sobre_disciplina: content }))}
               />
               <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+                {t('editorNote')}
               </p>
             </div>
           </div>
@@ -923,13 +923,13 @@ function SyllabusForm() {
         {activeTab === 'conteudo' && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Conteúdo Programático:</label>
+              <label>{t('programmaticContent')}</label>
               <TiptapEditor
                 content={formData.conteudo}
                 onChange={(content) => setFormData(prev => ({ ...prev, conteudo: content }))}
               />
               <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+                {t('editorNote')}
               </p>
             </div>
           </div>
@@ -939,13 +939,13 @@ function SyllabusForm() {
         {activeTab === 'metodologia' && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Metodologia de Ensino:</label>
+              <label>{t('teachingMethodology')}</label>
               <TiptapEditor
                 content={formData.metodologia}
                 onChange={(content) => setFormData(prev => ({ ...prev, metodologia: content }))}
               />
               <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+                {t('editorNote')}
               </p>
             </div>
           </div>
@@ -955,7 +955,7 @@ function SyllabusForm() {
         {activeTab === 'avaliacao' && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Critério de Avaliação:</label>
+              <label>{t('evaluationCriteria')}</label>
               <AvaliacaoTable
                 data={formData.criterio_avaliacao}
                 onChange={(content) => setFormData(prev => ({ ...prev, criterio_avaliacao: content }))}
@@ -969,13 +969,13 @@ function SyllabusForm() {
         {activeTab === 'compromisso_etico' && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Compromisso Ético:</label>
+              <label>{t('ethicalCommitment')}</label>
               <TiptapEditor
                 content={formData.compromisso_etico}
                 onChange={(content) => setFormData(prev => ({ ...prev, compromisso_etico: content }))}
               />
               <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+                {t('editorNote')}
               </p>
             </div>
           </div>
@@ -999,13 +999,13 @@ function SyllabusForm() {
         {activeTab === 'contatos' && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Contatos:</label>
+              <label>{t('contactsLabel')}</label>
               <TiptapEditor
                 content={formData.contatos}
                 onChange={(content) => setFormData(prev => ({ ...prev, contatos: content }))}
               />
               <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+                {t('editorNote')}
               </p>
             </div>
           </div>
@@ -1015,13 +1015,13 @@ function SyllabusForm() {
         {activeTab === 'ods' && !isRestrictedCourse(formData.curso) && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Objetivos de Desenvolvimento Sustentável (ODS):</label>
+              <label>{t('odsLabel')}</label>
               <TiptapEditor
                 content={formData.ods}
                 onChange={(content) => setFormData(prev => ({ ...prev, ods: content }))}
               />
               <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+                {t('editorNote')}
               </p>
             </div>
           </div>
@@ -1032,20 +1032,20 @@ function SyllabusForm() {
           <div className="form-row full-width">
             <div className="form-field">
               <h3 style={{ marginBottom: '1.5rem', color: '#235795' }}>
-                Buscar e Adicionar Referências Bibliográficas
+                {t('searchReferences')}
               </h3>
               <ReferenceManager
                 content={formData.referencias}
                 onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
               />
               <div style={{ marginTop: '2rem' }}>
-                <label>Editor de Referências (para edição manual):</label>
+                <label>{t('manualEditor')}</label>
                 <TiptapEditor
                   content={formData.referencias}
                   onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
                 />
                 <p className="editor-note">
-                  💡 <strong>Nota:</strong> Use a busca acima para adicionar referências automaticamente da API do Crossref, ou edite manualmente usando o editor rich text.
+                  {t('referencesNote')}
                 </p>
               </div>
             </div>
@@ -1057,7 +1057,7 @@ function SyllabusForm() {
           <div className="form-row full-width">
             <div className="form-field">
               <h3 style={{ marginBottom: '1.5rem', color: '#235795' }}>
-                Competências da Disciplina
+                {t('competenciesLabel')}
               </h3>
               <CompetenciesTable
                 data={formData.competencias}
@@ -1072,13 +1072,13 @@ function SyllabusForm() {
         {activeTab === 'o_que_e_esperado' && !isRestrictedCourse(formData.curso) && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>O que é esperado do aluno(a):</label>
+              <label>{t('expectedFromStudentLabel')}</label>
               <TiptapEditor
                 content={formData.o_que_e_esperado}
                 onChange={(content) => setFormData(prev => ({ ...prev, o_que_e_esperado: content }))}
               />
               <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+                {t('editorNote')}
               </p>
             </div>
           </div>
@@ -1099,14 +1099,14 @@ function SyllabusForm() {
 
         <div className="form-actions">
           <button type="submit" className="submit-btn">
-            {isEditing ? 'Atualizar' : 'Criar'} Syllabus
+            {isEditing ? t('update') : t('createSyllabus')}
           </button>
           <button
             type="button"
             className="cancel-btn"
             onClick={() => navigate('/syllabi')}
           >
-            Cancelar
+            {t('cancel')}
           </button>
         </div>
           </form>
@@ -1122,8 +1122,8 @@ function SyllabusForm() {
       {showCustomTabModal && (
         <div className="modal-overlay" onClick={() => setShowCustomTabModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Nova Aba Personalizada</h2>
-            <p>Digite o nome da nova aba:</p>
+            <h2>{t('newCustomTab')}</h2>
+            <p>{t('enterTabName')}</p>
             <input
               type="text"
               value={customTabNameInput}
@@ -1144,7 +1144,7 @@ function SyllabusForm() {
                 onClick={handleCreateCustomTab}
                 disabled={!customTabNameInput.trim()}
               >
-                Criar Aba
+                {t('createTab')}
               </button>
               <button
                 type="button"
@@ -1154,7 +1154,7 @@ function SyllabusForm() {
                   setCustomTabNameInput('');
                 }}
               >
-                Cancelar
+                {t('cancel')}
               </button>
             </div>
           </div>
