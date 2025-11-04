@@ -52,24 +52,40 @@ function SyllabusPDFContent({ formData, professoresList }) {
   const { t } = useTranslation();
   
   return (
-    <div style={{ 
+    <div className="pdf-container" style={{ 
       padding: '10px 15px',
+      paddingTop: '80px', // Espaço para o logo fixo
       fontFamily: 'Arial, sans-serif',
       color: '#000',
       backgroundColor: '#fff',
       maxWidth: '100%',
       width: '100%',
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      position: 'relative'
     }}>
-      {/* Cabeçalho */}
-      <div style={{ textAlign: 'center', marginBottom: '40px', borderBottom: '3px solid #235795', paddingBottom: '20px' }}>
-        <img src="/FGV LOGO NOVO.png" alt="FGV Logo" style={{ maxWidth: '180px', height: 'auto', marginBottom: '20px' }} />
-        <h1 style={{ fontSize: '28px', color: '#235795', marginBottom: '10px' }}>
-          SYLLABUS
-        </h1>
-        <h2 style={{ fontSize: '22px', color: '#333', fontWeight: 'normal' }}>
-          {formData.disciplina || 'Nome da Disciplina'}
-        </h2>
+      {/* Logo fixo que aparecerá em todas as páginas */}
+      <div className="pdf-logo-header" style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '70px',
+        backgroundColor: '#fff',
+        borderBottom: '1px solid #e0e0e0',
+        padding: '10px 20px',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        <img 
+          src="/FGV LOGO NOVO.png" 
+          alt="FGV Logo" 
+          style={{ 
+            maxHeight: '50px', 
+            height: 'auto',
+            width: 'auto'
+          }} 
+        />
       </div>
 
       {/* 1. Informações Gerais - Layout vertical (um abaixo do outro) */}
@@ -78,6 +94,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
           {t('generalInformation')}
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', width: '100%' }}>
+          {formData.disciplina && (
+            <div>
+              <strong>{t('discipline')}:</strong> {formData.disciplina}
+            </div>
+          )}
           {formData.curso && (
             <div>
               <strong>{t('course')}:</strong> {formData.curso}

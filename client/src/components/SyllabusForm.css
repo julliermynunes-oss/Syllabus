@@ -838,6 +838,25 @@
 }
 
 /* Estilos específicos para impressão */
+/* Estilos para o logo fixo no PDF */
+.pdf-logo-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 10px 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+}
+
+.pdf-container {
+  padding-top: 80px !important;
+}
+
 @media print {
   @page {
     size: A4;
