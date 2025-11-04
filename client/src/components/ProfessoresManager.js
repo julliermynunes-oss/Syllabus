@@ -5,6 +5,7 @@ import './ProfessoresManager.css';
 
 const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
   const [professoresInfo, setProfessoresInfo] = useState({});
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     // Inicializar dados dos professores quando os dados são carregados do servidor
@@ -14,32 +15,37 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
           ? JSON.parse(professoresData) 
           : professoresData;
         if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-          // Só atualizar se realmente tiver dados válidos
+          // Carregar dados do servidor
           setProfessoresInfo(parsed);
+          setIsInitialized(true);
+        } else {
+          // Se parsed está vazio mas temos uma string, ainda marcar como inicializado
+          setIsInitialized(true);
         }
       } catch (e) {
         console.error('Erro ao parsear dados dos professores:', e);
-        // Se der erro no parse, manter o estado atual se já tiver dados
-        if (Object.keys(professoresInfo).length === 0) {
-          setProfessoresInfo({});
-        }
+        setIsInitialized(true);
       }
     } else if (!professoresData || professoresData === '') {
-      // Só inicializar vazio se realmente não tiver dados E se o estado também estiver vazio
-      // Isso evita limpar dados que já foram carregados
-      if (Object.keys(professoresInfo).length === 0) {
-        setProfessoresInfo({});
+      // Se não tem dados do servidor e ainda não inicializamos, marcar como inicializado
+      if (!isInitialized) {
+        setIsInitialized(true);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [professoresData]);
 
   useEffect(() => {
+    // Só sincronizar depois que os dados do servidor foram carregados (se houver)
+    if (!isInitialized) {
+      return;
+    }
+
     // Sincronizar com a lista de professores do cabeçalho
     // Mas não sobrescrever dados existentes que foram carregados do servidor
     const hasDataFromServer = professoresData && professoresData.trim() !== '';
     
-    // Se temos dados do servidor, não fazer sincronização automática
+    // Se temos dados do servidor, não fazer sincronização automática que sobrescreva
     // Apenas adicionar novos professores que não existem
     if (hasDataFromServer) {
       const updated = { ...professoresInfo };
