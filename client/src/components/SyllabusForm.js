@@ -634,11 +634,11 @@ const SyllabusForm = () => {
                 )}
               </div>
             )}
-          </div>
+        </div>
 
         {/* Form Content Area */}
         <div className="form-content-area">
-      <form onSubmit={handleSubmit} className="syllabus-form">
+          <form onSubmit={handleSubmit} className="syllabus-form">
         {/* Aba: Cabeçalho */}
         {activeTab === 'cabecalho' && (
           <>
@@ -1082,7 +1082,7 @@ const SyllabusForm = () => {
             Cancelar
           </button>
         </div>
-      </form>
+          </form>
         </div>
       </div>
 
