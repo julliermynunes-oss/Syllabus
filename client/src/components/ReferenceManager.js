@@ -197,15 +197,45 @@ const ReferenceManager = ({ content, onChange }) => {
       return `${authors} (${year}). ${title}. ${publisher}. ${doi}`;
     } else {
       // Artigo (Crossref)
-      const authors = item.author
-        ? item.author
-            .map((author) => `${author.given || ''} ${author.family || ''}`.trim())
-            .join(', ')
-        : 'Autor não especificado';
+      let authors = 'Autor não especificado';
+      
+      if (item.author && Array.isArray(item.author) && item.author.length > 0) {
+        // Crossref pode ter diferentes formatos de autor
+        const authorNames = item.author.map((author) => {
+          // Formato padrão: given + family
+          if (author.given && author.family) {
+            return `${author.given} ${author.family}`.trim();
+          }
+          // Se só tiver family
+          if (author.family) {
+            return author.family;
+          }
+          // Se só tiver given
+          if (author.given) {
+            return author.given;
+          }
+          // Se tiver name como string completa
+          if (author.name) {
+            return author.name;
+          }
+          // Tentar outros campos possíveis
+          return author.literal || author.fullName || '';
+        }).filter(name => name && name.trim() !== '');
+        
+        if (authorNames.length > 0) {
+          authors = authorNames.join(', ');
+        }
+      } else if (item.author && typeof item.author === 'string') {
+        // Se author for uma string direta
+        authors = item.author;
+      } else if (item['container-title'] && !item.author) {
+        // Alguns artigos podem não ter autor, mas ter container-title
+        // Neste caso, manter "Autor não especificado"
+      }
       
       const year = item.published?.['date-parts']?.[0]?.[0] || item.created?.['date-parts']?.[0]?.[0] || '';
-      const title = item.title?.[0] || item.container_title || '';
-      const journal = item.container_title || '';
+      const title = item.title?.[0] || item['container-title']?.[0] || item['short-title']?.[0] || 'Sem título';
+      const journal = item['container-title']?.[0] || item['journal-title']?.[0] || item['publisher'] || '';
       const doi = item.DOI ? `DOI: ${item.DOI}` : '';
 
       return `${authors} (${year}). ${title}. ${journal ? journal + '. ' : ''}${doi}`;
@@ -340,10 +370,27 @@ const ReferenceManager = ({ content, onChange }) => {
                         ? (item.authors?.map(a => a.name || a).join(', ') || 'Autor não especificado')
                         : item.type === 'dataverse'
                         ? (item.authors || 'Autor não especificado')
-                        : (item.author?.[0] 
-                            ? `${item.author[0].given || ''} ${item.author[0].family || ''}`.trim()
-                            : 'Autor não especificado'
-                          )
+                        : item.type === 'article'
+                        ? (() => {
+                            // Extrair autores do Crossref com diferentes formatos
+                            if (item.author && Array.isArray(item.author) && item.author.length > 0) {
+                              const authorNames = item.author.map(author => {
+                                if (author.given && author.family) {
+                                  return `${author.given} ${author.family}`.trim();
+                                }
+                                if (author.family) return author.family;
+                                if (author.given) return author.given;
+                                if (author.name) return author.name;
+                                return author.literal || author.fullName || '';
+                              }).filter(name => name && name.trim() !== '');
+                              return authorNames.length > 0 ? authorNames.join(', ') : 'Autor não especificado';
+                            }
+                            if (item.author && typeof item.author === 'string') {
+                              return item.author;
+                            }
+                            return 'Autor não especificado';
+                          })()
+                        : 'Autor não especificado'
                       }
                       {item.type === 'book' && item.volumeInfo?.publishedDate && 
                         ` (${item.volumeInfo.publishedDate.split('-')[0]})`
