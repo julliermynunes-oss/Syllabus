@@ -779,11 +779,83 @@ app.get('/api/search-dataverse', async (req, res) => {
           }
         }
         
-        const publicationDate = getFieldValue('datePublished') || 
-                               getFieldValue('distributionDate') ||
-                               getFieldValue('dateOfDeposit') ||
-                               dataset.publicationDate ||
-                               dataset.dateOfDeposit;
+        // Extrair data de publicação - tentar diferentes campos
+        let publicationDate = null;
+        
+        // Tentar vários campos de data nos metadados
+        const dateFields = ['datePublished', 'distributionDate', 'dateOfDeposit', 'publicationDate', 'date', 'year'];
+        for (const fieldName of dateFields) {
+          const dateValue = getFieldValue(fieldName);
+          if (dateValue) {
+            publicationDate = dateValue;
+            break;
+          }
+        }
+        
+        // Se não encontrou nos metadados, tentar diretamente no dataset
+        if (!publicationDate) {
+          publicationDate = dataset.publicationDate || 
+                           dataset.dateOfDeposit || 
+                           dataset.distributionDate ||
+                           dataset.date ||
+                           dataset.year;
+        }
+        
+        // Se ainda não encontrou, tentar extrair de outras estruturas
+        if (!publicationDate && dataset.citation) {
+          // Tentar extrair da citation pronta
+          const citation = dataset.citation;
+          publicationDate = citation.datePublished || 
+                           citation.dateOfDeposit || 
+                           citation.year ||
+                           citation.date;
+        }
+        
+        // Tentar extrair do campo "date" que pode estar em diferentes formatos
+        if (!publicationDate) {
+          const dateField = metadata.find(f => f.typeName === 'date' || f.typeName === 'year');
+          if (dateField && dateField.value) {
+            publicationDate = dateField.value;
+          }
+        }
+        
+        // Se ainda não encontrou, tentar buscar no dataset completo via Native API
+        if (!publicationDate && (dataset.globalId || dataset.persistentId)) {
+          try {
+            const persistentId = encodeURIComponent(dataset.globalId || dataset.persistentId);
+            const datasetUrl = `${dataverseUrl}/api/datasets/:persistentId?persistentId=${persistentId}`;
+            const datasetHeaders = { 'Accept': 'application/json' };
+            if (dataverseApiKey) {
+              datasetHeaders['X-Dataverse-key'] = dataverseApiKey;
+            }
+            
+            const datasetResponse = await axios.get(datasetUrl, { headers: datasetHeaders });
+            const fullDataset = datasetResponse.data?.data;
+            
+            if (fullDataset) {
+              // Tentar extrair data dos metadados completos
+              const fullMetadata = fullDataset.metadataBlocks?.citation?.fields || [];
+              const dateFieldsFull = ['datePublished', 'distributionDate', 'dateOfDeposit', 'publicationDate', 'date', 'year'];
+              for (const fieldName of dateFieldsFull) {
+                const dateField = fullMetadata.find(f => f.typeName === fieldName);
+                if (dateField && dateField.value) {
+                  publicationDate = dateField.value;
+                  break;
+                }
+              }
+              
+              // Se ainda não encontrou, tentar diretamente no dataset completo
+              if (!publicationDate) {
+                publicationDate = fullDataset.publicationDate || 
+                                 fullDataset.dateOfDeposit || 
+                                 fullDataset.distributionDate;
+              }
+            }
+          } catch (err) {
+            // Se falhar, continuar sem data
+            console.log('Não foi possível obter data do dataset:', err.message);
+          }
+        }
         
         const publisher = getFieldValue('publisher') || 
                          getFieldValue('publisherName') || 

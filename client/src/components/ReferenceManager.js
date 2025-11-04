@@ -175,7 +175,23 @@ const ReferenceManager = ({ content, onChange }) => {
       const title = item.title || 'Sem título';
       const publisher = item.publisher || 'Dataverse';
       const publishedDate = item.publicationDate || '';
-      const year = publishedDate ? publishedDate.match(/\d{4}/)?.[0] || publishedDate : '';
+      
+      // Extrair ano da data - pode vir em diferentes formatos
+      let year = '';
+      if (publishedDate) {
+        // Pode ser uma string com ano, data completa, ou objeto
+        if (typeof publishedDate === 'string') {
+          // Tentar extrair ano de formato YYYY-MM-DD ou apenas YYYY
+          const yearMatch = publishedDate.match(/\b(\d{4})\b/);
+          year = yearMatch ? yearMatch[1] : publishedDate;
+        } else if (typeof publishedDate === 'object' && publishedDate !== null) {
+          // Se for objeto, tentar extrair o ano
+          year = publishedDate.year || publishedDate.value || '';
+        } else {
+          year = String(publishedDate);
+        }
+      }
+      
       const doi = item.doi || item.persistentId ? `DOI: ${item.doi || item.persistentId}` : '';
       
       return `${authors} (${year}). ${title}. ${publisher}. ${doi}`;
