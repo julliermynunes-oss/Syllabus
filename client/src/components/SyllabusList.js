@@ -289,9 +289,9 @@ const SyllabusList = () => {
               <div key={request.id} className="request-item">
                 <div className="request-info">
                   <h3>{request.disciplina}</h3>
-                  <p>Curso: {request.curso}</p>
-                  <p>Semestre/Ano: {request.semestre_ano}</p>
-                  {request.turma_nome && <p>Turma: {request.turma_nome}</p>}
+                  <p>{t('course')}: {request.curso}</p>
+                  <p>{t('semesterYear')}: {request.semestre_ano}</p>
+                  {request.turma_nome && <p>{t('class')}: {request.turma_nome}</p>}
                 </div>
                 <button 
                   className="accept-btn" 
@@ -320,7 +320,7 @@ const SyllabusList = () => {
                     }
                   }}
                 >
-                  Aceitar e Criar Syllabus
+                  {t('acceptAndCreate')}
                 </button>
               </div>
             ))}
@@ -416,14 +416,14 @@ const SyllabusList = () => {
         <table className="syllabus-table">
           <thead>
             <tr>
-              <th>Professor</th>
-              <th>Semestre/Ano</th>
-              <th>Programa</th>
-              <th>Disciplina</th>
-              <th>Linha</th>
-              <th>Coordenador</th>
-              <th>Semestre Curricular</th>
-              <th>Ações</th>
+              <th>{t('professor')}</th>
+              <th>{t('semesterYear')}</th>
+              <th>{t('course')}</th>
+              <th>{t('discipline')}</th>
+              <th>{t('line')}</th>
+              <th>{t('disciplineLeader')}</th>
+              <th>{t('curricularSemester')}</th>
+              <th>{t('actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -497,7 +497,7 @@ const SyllabusList = () => {
         <div className="preview-modal-overlay" onClick={() => setPreviewSyllabus(null)}>
           <div className="preview-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="preview-modal-header">
-              <h2>Visualização do Syllabus</h2>
+              <h2>{t('view')} {t('syllabus')}</h2>
               <button className="close-btn" onClick={() => setPreviewSyllabus(null)}>
                 ✕
               </button>
@@ -850,8 +850,10 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
 
 // Componente para a tabela de competências no preview
 const CompetenciesTablePDF = ({ data }) => {
+  const { t } = useTranslation();
+  
   if (!data || data === '' || data === '[]') {
-    return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>Nenhuma competência cadastrada.</div>;
+    return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
   }
   
   try {
@@ -888,7 +890,7 @@ const CompetenciesTablePDF = ({ data }) => {
     );
   } catch (e) {
     console.error('Erro ao renderizar competências:', e, 'Data:', data);
-    return <div style={{ fontSize: '14px', color: '#f00' }}>Erro ao carregar competências.</div>;
+    return <div style={{ fontSize: '14px', color: '#f00' }}>{t('errorLoadingCompetencies')}</div>;
   }
 };
 
