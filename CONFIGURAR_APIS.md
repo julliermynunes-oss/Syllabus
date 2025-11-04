@@ -1,6 +1,6 @@
 # 🔑 Como Configurar as APIs (Guia Passo a Passo)
 
-Este guia vai te ajudar a configurar as APIs do Google Scholar e Amazon Books para usar as buscas no sistema.
+Este guia vai te ajudar a configurar as APIs do Google Scholar e Dataverse para usar as buscas no sistema.
 
 ---
 
@@ -34,7 +34,54 @@ Após o reinício, vá na aplicação e tente fazer uma busca no Google Scholar.
 
 ---
 
-## 🛒 Amazon Books (Amazon Product Advertising API)
+## 🗄️ Dataverse (Harvard Dataverse)
+
+Para usar a busca do Dataverse, você pode configurar uma API key opcional (buscas públicas funcionam sem configuração).
+
+### Passo 1: Obter a API Key (Opcional)
+
+1. Acesse: https://dataverse.harvard.edu (ou outro servidor Dataverse)
+2. Crie uma conta gratuita
+3. Vá em **"Account"** → **"API Token"**
+4. Gere um novo token
+5. **Copie o token** (você só pode vê-lo uma vez!)
+
+### Passo 2: Configurar no Railway (Opcional)
+
+1. No Railway, vá no mesmo lugar: **Seu Projeto** → **Seu Serviço** → **"Variables"**
+2. Adicione as seguintes variáveis (opcionais):
+
+   **Variável 1 (Opcional):**
+   - **Key**: `DATAVERSE_URL`
+   - **Value**: `https://dataverse.harvard.edu` (ou outro servidor Dataverse)
+   - Clique em **"Add"**
+   - *Nota: Se não configurar, usará o Harvard Dataverse por padrão*
+
+   **Variável 2 (Opcional):**
+   - **Key**: `DATAVERSE_API_KEY`
+   - **Value**: Cole o token que você copiou
+   - Clique em **"Add"**
+   - *Nota: Buscas públicas funcionam sem API key, mas algumas funcionalidades podem requerer autenticação*
+
+3. O Railway vai **reiniciar automaticamente** o servidor
+
+### ✅ Como saber se funcionou?
+
+Após o reinício, vá na aplicação e tente fazer uma busca no Dataverse. Se aparecerem resultados, está funcionando! 🎉
+
+### 📝 Notas Importantes:
+
+- **Buscas públicas funcionam sem API key!** Você pode usar o Dataverse mesmo sem configurar nada.
+- A API key é útil para:
+  - Acessar datasets privados (se você tiver permissão)
+  - Aumentar limites de requisições (dependendo do servidor)
+  - Operações que requerem autenticação
+- O Dataverse é um repositório de **datasets acadêmicos**, não livros tradicionais
+- Cada servidor Dataverse pode ter políticas diferentes
+
+---
+
+## 🛒 Amazon Books (Removido)
 
 ### ⚠️ Requisitos Antes de Começar
 
@@ -100,23 +147,20 @@ Após o reinício, vá na aplicação e tente fazer uma busca na Amazon Books. S
 - Aguarde o servidor reiniciar (pode levar 1-2 minutos)
 - Tente fazer uma busca novamente
 
-### "Amazon Books não está configurado"
+### "Dataverse não está retornando resultados"
 
 **Solução:**
-- Verifique se você adicionou **TODAS** as três variáveis:
-  - `AWS_ACCESS_KEY_ID`
-  - `AWS_SECRET_ACCESS_KEY`
-  - `AWS_ASSOCIATE_TAG`
-- Certifique-se de que você é um Amazon Associate **aprovado**
-- Verifique se suas credenciais não expiraram
-- Aguarde o servidor reiniciar
+- **Buscas públicas funcionam sem configuração!** Se não está funcionando:
+  - Verifique sua conexão com a internet
+  - Tente fazer uma busca mais genérica
+  - Alguns servidores Dataverse podem ter limites de taxa
+  - Se você configurou `DATAVERSE_API_KEY`, verifique se o token está correto
 
 ### "Erro 401" ou "Não autorizado"
 
 **Solução:**
 - Verifique se você copiou as chaves corretamente (sem espaços extras)
-- Para Amazon: verifique se você preencheu todos os requisitos do Associate Program
-- Tente recriar as credenciais no console da AWS
+- Para Dataverse: buscas públicas não requerem autenticação. Se você configurou uma API key, verifique se o token está correto
 
 ### O servidor não reiniciou automaticamente
 
@@ -136,13 +180,14 @@ Key: SERPAPI_KEY
 Value: [sua chave do SerpApi]
 ```
 
-### Para Amazon Books:
+### Para Dataverse (Opcional):
 ```
-Railway → Variables → Adicione 3 variáveis:
-1. AWS_ACCESS_KEY_ID = [sua access key]
-2. AWS_SECRET_ACCESS_KEY = [sua secret key]
-3. AWS_ASSOCIATE_TAG = [seu associate tag]
+Railway → Variables → Adicione variáveis opcionais:
+1. DATAVERSE_URL = https://dataverse.harvard.edu (opcional, padrão)
+2. DATAVERSE_API_KEY = [seu token] (opcional - buscas públicas funcionam sem)
 ```
+
+**Nota:** O Dataverse funciona mesmo sem configuração! As variáveis são opcionais.
 
 ---
 
@@ -151,8 +196,8 @@ Railway → Variables → Adicione 3 variáveis:
 - **Não compartilhe suas chaves** publicamente
 - As chaves ficam seguras no servidor (Railway), nunca no código
 - O plano gratuito do SerpApi dá 100 buscas/mês
-- Para Amazon, você precisa ser Associate aprovado
-- As buscas de **Crossref** e **Google Books** funcionam sem configuração! ✅
+- As buscas de **Crossref**, **Google Books** e **Dataverse** funcionam sem configuração! ✅
+- O Dataverse é ideal para encontrar **datasets acadêmicos** e pesquisas científicas
 
 ---
 

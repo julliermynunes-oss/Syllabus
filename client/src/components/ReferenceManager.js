@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt } from 'react-icons/fa';
+import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase } from 'react-icons/fa';
 import './ReferenceManager.css';
 
 const ReferenceManager = ({ content, onChange }) => {
@@ -9,7 +9,7 @@ const ReferenceManager = ({ content, onChange }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
-  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar'
+  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'dataverse'
 
   const searchCrossRef = async () => {
     if (!searchTerm.trim()) return;
@@ -89,6 +89,32 @@ const ReferenceManager = ({ content, onChange }) => {
     }
   };
 
+  const searchDataverse = async () => {
+    if (!searchTerm.trim()) return;
+
+    setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/search-dataverse`,
+        {
+          params: { q: searchTerm },
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar na API do Dataverse:', error);
+      const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar no Dataverse. Tente novamente.';
+      window.alert(`Erro: ${errorMsg}`);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const performSearch = () => {
     if (searchType === 'articles') {
       searchCrossRef();
@@ -96,6 +122,8 @@ const ReferenceManager = ({ content, onChange }) => {
       searchGoogleBooks();
     } else if (searchType === 'scholar') {
       searchGoogleScholar();
+    } else if (searchType === 'dataverse') {
+      searchDataverse();
     }
   };
 
@@ -109,6 +137,9 @@ const ReferenceManager = ({ content, onChange }) => {
       const pubInfo = item.publication_info || {};
       const yearMatch = pubInfo.summary?.match(/\d{4}/);
       year = yearMatch ? parseInt(yearMatch[0]) : null;
+    } else if (item.type === 'dataverse') {
+      const publishedDate = item.publicationDate || '';
+      year = publishedDate ? parseInt(publishedDate.match(/\d{4}/)?.[0] || publishedDate) : null;
     } else {
       year = item.published?.['date-parts']?.[0]?.[0] || item.created?.['date-parts']?.[0]?.[0];
     }
@@ -139,6 +170,15 @@ const ReferenceManager = ({ content, onChange }) => {
       const journal = pubInfo.summary || '';
       
       return `${authors} (${year}). ${title}. ${journal}`;
+    } else if (item.type === 'dataverse') {
+      const authors = item.authors || 'Autor não especificado';
+      const title = item.title || 'Sem título';
+      const publisher = item.publisher || 'Dataverse';
+      const publishedDate = item.publicationDate || '';
+      const year = publishedDate ? publishedDate.match(/\d{4}/)?.[0] || publishedDate : '';
+      const doi = item.doi || item.persistentId ? `DOI: ${item.doi || item.persistentId}` : '';
+      
+      return `${authors} (${year}). ${title}. ${publisher}. ${doi}`;
     } else {
       // Artigo (Crossref)
       const authors = item.author
@@ -182,6 +222,8 @@ const ReferenceManager = ({ content, onChange }) => {
       return 'Pesquisar livros por título ou autor no Google Books...';
     } else if (searchType === 'scholar') {
       return 'Pesquisar artigos no Google Scholar...';
+    } else if (searchType === 'dataverse') {
+      return 'Pesquisar datasets no Dataverse (Harvard)...';
     } else {
       return 'Pesquisar por título, autor ou DOI na API do Crossref...';
     }
@@ -214,6 +256,14 @@ const ReferenceManager = ({ content, onChange }) => {
             title="Buscar no Google Scholar"
           >
             <FaFileAlt /> Google Scholar
+          </button>
+          <button
+            type="button"
+            className={`search-type-btn ${searchType === 'dataverse' ? 'active' : ''}`}
+            onClick={() => setSearchType('dataverse')}
+            title="Buscar Datasets no Dataverse"
+          >
+            <FaDatabase /> Dataverse
           </button>
         </div>
         
@@ -248,7 +298,7 @@ const ReferenceManager = ({ content, onChange }) => {
                       <strong>
                         {item.type === 'book' 
                           ? (item.volumeInfo?.title || 'Sem título')
-                          : item.type === 'scholar'
+                          : item.type === 'scholar' || item.type === 'dataverse'
                           ? (item.title || 'Sem título')
                           : (item.title?.[0] || 'Sem título')
                         }
@@ -264,6 +314,8 @@ const ReferenceManager = ({ content, onChange }) => {
                         ? (item.volumeInfo?.authors?.join(', ') || 'Autor não especificado')
                         : item.type === 'scholar'
                         ? (item.authors?.map(a => a.name || a).join(', ') || 'Autor não especificado')
+                        : item.type === 'dataverse'
+                        ? (item.authors || 'Autor não especificado')
                         : (item.author?.[0] 
                             ? `${item.author[0].given || ''} ${item.author[0].family || ''}`.trim()
                             : 'Autor não especificado'
@@ -274,6 +326,12 @@ const ReferenceManager = ({ content, onChange }) => {
                       }
                       {item.type === 'scholar' && item.publication_info?.summary && 
                         ` - ${item.publication_info.summary}`
+                      }
+                      {item.type === 'dataverse' && item.publicationDate && 
+                        ` (${item.publicationDate.match(/\d{4}/)?.[0] || item.publicationDate})`
+                      }
+                      {item.type === 'dataverse' && item.publisher && 
+                        ` - ${item.publisher}`
                       }
                       {item.type === 'article' && item.published && 
                         ` (${item.published['date-parts']?.[0]?.[0] || ''})`

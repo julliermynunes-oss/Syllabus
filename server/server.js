@@ -639,6 +639,93 @@ app.get('/api/search-scholar', async (req, res) => {
   }
 });
 
+// Dataverse endpoint (Harvard Dataverse Search API)
+app.get('/api/search-dataverse', async (req, res) => {
+  const { q } = req.query;
+  
+  if (!q) {
+    return res.status(400).json({ error: 'Query é obrigatória' });
+  }
+
+  // URL do Dataverse - pode ser configurada via env ou usar o padrão do Harvard
+  const dataverseUrl = process.env.DATAVERSE_URL || 'https://dataverse.harvard.edu';
+  const dataverseApiKey = process.env.DATAVERSE_API_KEY; // Opcional - algumas buscas públicas funcionam sem
+
+  try {
+    // Construir URL da Search API
+    const searchUrl = `${dataverseUrl}/api/search?q=${encodeURIComponent(q)}&type=dataset&per_page=10`;
+    
+    const headers = {
+      'Accept': 'application/json'
+    };
+
+    // Adicionar API key se disponível (opcional para buscas públicas)
+    if (dataverseApiKey) {
+      headers['X-Dataverse-key'] = dataverseApiKey;
+    }
+
+    const response = await axios.get(searchUrl, { headers });
+
+    // Transformar resposta do Dataverse para formato padronizado
+    const items = [];
+    if (response.data.data && response.data.data.items) {
+      response.data.data.items.forEach(item => {
+        const dataset = item;
+        const metadata = dataset.metadataBlocks?.citation?.fields || [];
+        
+        // Extrair informações relevantes dos metadados
+        const getFieldValue = (fieldName) => {
+          const field = metadata.find(f => f.typeName === fieldName || f.type === fieldName);
+          if (field) {
+            if (field.value) {
+              return Array.isArray(field.value) ? field.value[0] : field.value;
+            }
+            return field.value;
+          }
+          return null;
+        };
+
+        const title = getFieldValue('title') || dataset.name || 'Sem título';
+        const authors = getFieldValue('author') || [];
+        const authorsStr = Array.isArray(authors) 
+          ? authors.map(a => a.authorName?.value || a || 'Autor desconhecido').join(', ')
+          : (authors.authorName?.value || authors || 'Autor desconhecido');
+        
+        const publicationDate = getFieldValue('datePublished') || 
+                               getFieldValue('distributionDate') ||
+                               dataset.publicationDate;
+        
+        const publisher = getFieldValue('publisher') || 'Dataverse';
+        const description = getFieldValue('dsDescription') || '';
+        const descriptionStr = Array.isArray(description) 
+          ? description[0]?.dsDescriptionValue?.value || ''
+          : (description.dsDescriptionValue?.value || description || '');
+
+        items.push({
+          type: 'dataverse',
+          title: title,
+          authors: authorsStr,
+          publicationDate: publicationDate,
+          publisher: publisher,
+          description: descriptionStr,
+          persistentId: dataset.persistentId || dataset.globalId,
+          doi: dataset.persistentId || '',
+          url: dataset.persistentUrl || `${dataverseUrl}/dataset.xhtml?persistentId=${dataset.persistentId || dataset.globalId}`
+        });
+      });
+    }
+    
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.json(items);
+  } catch (error) {
+    console.error('Erro ao buscar no Dataverse:', error);
+    res.status(500).json({ 
+      error: 'Erro ao buscar no Dataverse',
+      message: error.response?.data?.message || error.message || 'Erro ao buscar datasets no Dataverse'
+    });
+  }
+});
+
 // Syllabi routes
 app.get('/api/syllabi', authenticateToken, (req, res) => {
   const { programa, disciplina } = req.query;
