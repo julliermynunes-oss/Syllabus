@@ -919,6 +919,7 @@ const SyllabusForm = () => {
           <div className="form-row full-width">
             <div className="form-field">
               <ProfessoresManager
+                key={`professores-${id || 'new'}-${formData.professores_data ? formData.professores_data.substring(0, 20) : 'empty'}`}
                 professoresList={professoresList}
                 professoresData={formData.professores_data}
                 onUpdate={(data) => setFormData(prev => ({ ...prev, professores_data: data }))}
