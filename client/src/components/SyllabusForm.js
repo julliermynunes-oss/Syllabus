@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { FaArrowLeft, FaFilePdf, FaTrash } from 'react-icons/fa';
+import { FaArrowLeft, FaFilePdf, FaTrash, FaChevronDown } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
@@ -113,6 +113,7 @@ const SyllabusForm = () => {
   const [showLiderDropdown, setShowLiderDropdown] = useState(false);
   const [showCustomTabModal, setShowCustomTabModal] = useState(false);
   const [customTabNameInput, setCustomTabNameInput] = useState('');
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   useEffect(() => {
     fetchPrograms();
@@ -514,80 +515,119 @@ const SyllabusForm = () => {
           >
             Avaliação
           </button>
-          <button
-            className={`tab ${activeTab === 'compromisso_etico' ? 'active' : ''}`}
-            onClick={() => setActiveTab('compromisso_etico')}
-            type="button"
-          >
-            Ética
-          </button>
-          <button
-            className={`tab ${activeTab === 'professores' ? 'active' : ''}`}
-            onClick={() => setActiveTab('professores')}
-            type="button"
-          >
-            Professores
-          </button>
-          <button
-            className={`tab ${activeTab === 'contatos' ? 'active' : ''}`}
-            onClick={() => setActiveTab('contatos')}
-            type="button"
-          >
-            Contatos
-          </button>
-          <button
-            className={`tab ${activeTab === 'ods' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ods')}
-            type="button"
-          >
-            ODS
-          </button>
-          <button
-            className={`tab ${activeTab === 'referencias' ? 'active' : ''}`}
-            onClick={() => setActiveTab('referencias')}
-            type="button"
-          >
-            Referências
-          </button>
-          <button
-            className={`tab ${activeTab === 'competencias' ? 'active' : ''}`}
-            onClick={() => setActiveTab('competencias')}
-            type="button"
-          >
-            Competências
-          </button>
-          {formData.custom_tab_name && (
-            <div className="tab-with-delete">
-              <button
-                className={`tab custom-tab ${activeTab === 'custom' ? 'active' : ''}`}
-                onClick={() => setActiveTab('custom')}
-                type="button"
-              >
-                {formData.custom_tab_name}
-              </button>
-              <button
-                className="delete-custom-tab-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteCustomTab();
-                }}
-                type="button"
-                title="Excluir aba personalizada"
-              >
-                <FaTrash />
-              </button>
-            </div>
-          )}
-          {!formData.custom_tab_name && (
+
+          {/* Menu Mais */}
+          <div className="more-menu-container">
             <button
-              className="tab add-custom-tab-btn"
-              onClick={() => setShowCustomTabModal(true)}
+              className={`tab more-menu-btn ${showMoreMenu ? 'active' : ''}`}
+              onClick={() => setShowMoreMenu(!showMoreMenu)}
               type="button"
-              title="Adicionar aba personalizada"
             >
-              + Nova Aba
+              Mais <FaChevronDown className={`chevron ${showMoreMenu ? 'open' : ''}`} />
             </button>
-          )}
+            {showMoreMenu && (
+              <div className="more-menu-dropdown">
+                <button
+                  className={`tab ${activeTab === 'compromisso_etico' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('compromisso_etico');
+                    setShowMoreMenu(false);
+                  }}
+                  type="button"
+                >
+                  Ética
+                </button>
+                <button
+                  className={`tab ${activeTab === 'professores' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('professores');
+                    setShowMoreMenu(false);
+                  }}
+                  type="button"
+                >
+                  Professores
+                </button>
+                <button
+                  className={`tab ${activeTab === 'contatos' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('contatos');
+                    setShowMoreMenu(false);
+                  }}
+                  type="button"
+                >
+                  Contatos
+                </button>
+                <button
+                  className={`tab ${activeTab === 'ods' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('ods');
+                    setShowMoreMenu(false);
+                  }}
+                  type="button"
+                >
+                  ODS
+                </button>
+                <button
+                  className={`tab ${activeTab === 'referencias' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('referencias');
+                    setShowMoreMenu(false);
+                  }}
+                  type="button"
+                >
+                  Referências
+                </button>
+                <button
+                  className={`tab ${activeTab === 'competencias' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveTab('competencias');
+                    setShowMoreMenu(false);
+                  }}
+                  type="button"
+                >
+                  Competências
+                </button>
+                {formData.custom_tab_name && (
+                  <div className="tab-with-delete">
+                    <button
+                      className={`tab custom-tab ${activeTab === 'custom' ? 'active' : ''}`}
+                      onClick={() => {
+                        setActiveTab('custom');
+                        setShowMoreMenu(false);
+                      }}
+                      type="button"
+                    >
+                      {formData.custom_tab_name}
+                    </button>
+                    <button
+                      className="delete-custom-tab-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteCustomTab();
+                      }}
+                      type="button"
+                      title="Excluir aba personalizada"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                )}
+                {!formData.custom_tab_name && (
+                  <button
+                    className="tab add-custom-tab-btn"
+                    onClick={() => {
+                      setShowCustomTabModal(true);
+                      setShowMoreMenu(false);
+                    }}
+                    type="button"
+                    title="Adicionar aba personalizada"
+                  >
+                    + Nova Aba
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
           </div>
         </div>
 
