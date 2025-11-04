@@ -619,9 +619,9 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
                   </tbody>
                 </table>
                 {parsed.observacoes && parsed.observacoes.trim() !== '' && (
-                  <div style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '4px', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                  <div style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '4px', fontSize: '14px', lineHeight: '1.6' }}>
                     <strong>Observações Adicionais:</strong>
-                    <div style={{ marginTop: '8px' }}>{parsed.observacoes}</div>
+                    <div style={{ marginTop: '8px' }} className="preview-content" dangerouslySetInnerHTML={{ __html: parsed.observacoes }} />
                   </div>
                 )}
               </div>

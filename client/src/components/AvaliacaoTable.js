@@ -61,10 +61,6 @@ const AvaliacaoTable = ({ data, onChange }) => {
     setRows(newRows);
   };
 
-  const updateRowCriterio = (index, content) => {
-    updateRow(index, 'criterio', content);
-  };
-
   const addRow = () => {
     setRows([...rows, { tipo: '', criterio: '', peso: '' }]);
   };
@@ -101,12 +97,13 @@ const AvaliacaoTable = ({ data, onChange }) => {
                   />
                 </td>
                 <td className="col-criterio">
-                  <div className="criterio-editor-wrapper">
-                    <TiptapEditor
-                      content={row.criterio || ''}
-                      onChange={(content) => updateRowCriterio(index, content)}
-                    />
-                  </div>
+                  <textarea
+                    value={row.criterio || ''}
+                    onChange={(e) => updateRow(index, 'criterio', e.target.value)}
+                    placeholder="Descreva o critério de avaliação"
+                    className="table-textarea"
+                    rows="2"
+                  />
                 </td>
                 <td className="col-peso">
                   <input
@@ -147,12 +144,9 @@ const AvaliacaoTable = ({ data, onChange }) => {
 
       <div className="avaliacao-observacoes">
         <label>Observações Adicionais:</label>
-        <textarea
-          value={observacoes}
-          onChange={(e) => setObservacoes(e.target.value)}
-          placeholder="Adicione observações adicionais sobre os critérios de avaliação, se necessário..."
-          className="observacoes-textarea"
-          rows="4"
+        <TiptapEditor
+          content={observacoes}
+          onChange={(content) => setObservacoes(content)}
         />
       </div>
     </div>
