@@ -951,6 +951,22 @@ const SyllabusForm = () => {
           </div>
         )}
 
+        {/* Aba: ODS */}
+        {activeTab === 'ods' && (
+          <div className="form-row full-width">
+            <div className="form-field">
+              <label>Objetivos de Desenvolvimento Sustentável (ODS):</label>
+              <TiptapEditor
+                content={formData.ods}
+                onChange={(content) => setFormData(prev => ({ ...prev, ods: content }))}
+              />
+              <p className="editor-note">
+                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Aba: Referências Bibliográficas */}
         {activeTab === 'referencias' && (
           <div className="form-row full-width">
