@@ -389,6 +389,7 @@ export const translations = {
     selectCurricularSemester: 'Seleccione el Semestre Curricular',
     language: 'Idioma',
     selectLanguage: 'Seleccione el Idioma',
+    selectSemesterYear: 'Seleccione el Semestre/Año',
     disciplineLeader: 'Líder de Disciplina',
     professorsList: 'Profesores',
     addProfessorButton: 'Agregar',
