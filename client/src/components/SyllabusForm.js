@@ -474,10 +474,11 @@ const SyllabusForm = () => {
         )}
       </div>
 
-      {/* Container unificado com abas e formulário */}
+      {/* Container unificado com sidebar e formulário */}
       <div className="form-box-with-tabs">
-        {/* Abas */}
-        <div className="tabs-container">
+        {/* Sidebar Navigation */}
+        <div className="sidebar-navigation">
+          <div className="tabs-container">
           <button
             className={`tab ${activeTab === 'cabecalho' ? 'active' : ''}`}
             onClick={() => setActiveTab('cabecalho')}
@@ -587,9 +588,12 @@ const SyllabusForm = () => {
               + Nova Aba
             </button>
           )}
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="syllabus-form">
+        {/* Form Content Area */}
+        <div className="form-content-area">
+      <form onSubmit={handleSubmit} className="syllabus-form">
         {/* Aba: Cabeçalho */}
         {activeTab === 'cabecalho' && (
           <>
@@ -1034,6 +1038,7 @@ const SyllabusForm = () => {
           </button>
         </div>
       </form>
+        </div>
       </div>
 
       {/* Componente oculto para PDF */}
