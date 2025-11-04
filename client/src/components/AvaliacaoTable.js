@@ -98,7 +98,7 @@ const AvaliacaoTable = ({ data, onChange }) => {
                 </td>
                 <td className="col-criterio">
                   <textarea
-                    value={row.criterio || ''}
+                    value={typeof row.criterio === 'string' ? row.criterio.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ') : (row.criterio || '')}
                     onChange={(e) => updateRow(index, 'criterio', e.target.value)}
                     placeholder="Descreva o critério de avaliação"
                     className="table-textarea"
