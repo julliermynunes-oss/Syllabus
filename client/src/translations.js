@@ -486,6 +486,7 @@ export const translations = {
     odsTitle: 'OBJETIVOS DE DESARROLLO SOSTENIBLE (ODS)',
     competenciesTitle: 'COMPETENCIAS DE LA DISCIPLINA',
     referencesTitle: 'REFERENCIAS BIBLIOGRÁFICAS',
+    expectedFromStudentTitle: 'QUÉ SE ESPERA DEL ALUMNO(A)',
     noCompetencies: 'Ninguna competencia registrada.',
     errorLoadingCompetencies: 'Error al cargar competencias.',
     
