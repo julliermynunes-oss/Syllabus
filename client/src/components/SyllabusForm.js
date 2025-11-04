@@ -7,6 +7,7 @@ import { FaArrowLeft, FaFilePdf, FaTrash } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
+import ProfessoresManager from './ProfessoresManager';
 import './SyllabusForm.css';
 
 const SyllabusForm = () => {
@@ -90,7 +91,9 @@ const SyllabusForm = () => {
     referencias: '',
     competencias: '',
     custom_tab_name: '',
-    custom_tab_content: ''
+    custom_tab_content: '',
+    professores_data: '',
+    contatos: ''
   });
 
   const [programs, setPrograms] = useState([]);
@@ -507,11 +510,18 @@ const SyllabusForm = () => {
             Ética
           </button>
           <button
-            className={`tab ${activeTab === 'sobre_professor' ? 'active' : ''}`}
-            onClick={() => setActiveTab('sobre_professor')}
+            className={`tab ${activeTab === 'professores' ? 'active' : ''}`}
+            onClick={() => setActiveTab('professores')}
             type="button"
           >
-            Professor
+            Professores
+          </button>
+          <button
+            className={`tab ${activeTab === 'contatos' ? 'active' : ''}`}
+            onClick={() => setActiveTab('contatos')}
+            type="button"
+          >
+            Contatos
           </button>
           <button
             className={`tab ${activeTab === 'referencias' ? 'active' : ''}`}
@@ -896,14 +906,27 @@ const SyllabusForm = () => {
           </div>
         )}
 
-        {/* Aba: Sobre o Professor */}
-        {activeTab === 'sobre_professor' && (
+        {/* Aba: Professores */}
+        {activeTab === 'professores' && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Sobre o Professor:</label>
+              <ProfessoresManager
+                professoresList={professoresList}
+                professoresData={formData.professores_data}
+                onUpdate={(data) => setFormData(prev => ({ ...prev, professores_data: data }))}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Aba: Contatos */}
+        {activeTab === 'contatos' && (
+          <div className="form-row full-width">
+            <div className="form-field">
+              <label>Contatos:</label>
               <TiptapEditor
-                content={formData.sobre_professor}
-                onChange={(content) => setFormData(prev => ({ ...prev, sobre_professor: content }))}
+                content={formData.contatos}
+                onChange={(content) => setFormData(prev => ({ ...prev, contatos: content }))}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
@@ -1145,15 +1168,97 @@ const SyllabusPDFContent = ({ formData, professoresList }) => {
         </div>
       )}
 
-      {/* Sobre o Professor */}
-      {formData.sobre_professor && (
+      {/* Professores */}
+      {formData.professores_data && professoresList && professoresList.length > 0 && (() => {
+        try {
+          const professoresData = typeof formData.professores_data === 'string' 
+            ? JSON.parse(formData.professores_data) 
+            : formData.professores_data;
+          
+          const professoresComDados = professoresList.filter(prof => {
+            const data = professoresData[prof];
+            return data && (data.foto || data.descricao || data.linkedin || (data.outrosLinks && data.outrosLinks.length > 0));
+          });
+
+          if (professoresComDados.length > 0) {
+            return (
+              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                  PROFESSORES
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                  {professoresComDados.map((professorNome) => {
+                    const profData = professoresData[professorNome] || {};
+                    return (
+                      <div key={professorNome} style={{ 
+                        border: '1px solid #e0e0e0', 
+                        borderRadius: '8px', 
+                        padding: '15px',
+                        background: '#fff'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
+                          {profData.foto && (
+                            <img 
+                              src={profData.foto} 
+                              alt={professorNome}
+                              style={{ 
+                                width: '80px', 
+                                height: '80px', 
+                                borderRadius: '50%', 
+                                objectFit: 'cover',
+                                border: '2px solid #235795'
+                              }}
+                            />
+                          )}
+                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px' }}>{professorNome}</h4>
+                        </div>
+                        {profData.descricao && (
+                          <div 
+                            style={{ fontSize: '13px', lineHeight: '1.5', marginBottom: '12px', color: '#333' }}
+                            dangerouslySetInnerHTML={{ __html: profData.descricao }}
+                          />
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+                          {profData.linkedin && (
+                            <div>
+                              <strong>LinkedIn:</strong>{' '}
+                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5' }}>
+                                {profData.linkedin}
+                              </a>
+                            </div>
+                          )}
+                          {profData.outrosLinks && profData.outrosLinks.map((link, idx) => (
+                            link.url && (
+                              <div key={idx}>
+                                <strong>{link.label || 'Link'}:</strong>{' '}
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
+                                  {link.url}
+                                </a>
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+        } catch (e) {
+          return null;
+        }
+      })()}
+
+      {/* Contatos */}
+      {formData.contatos && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            SOBRE O PROFESSOR
+            CONTATOS
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.sobre_professor }}
+            dangerouslySetInnerHTML={{ __html: formData.contatos }}
           />
         </div>
       )}

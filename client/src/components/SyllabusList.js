@@ -610,16 +610,99 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </div>
       )}
 
-      {/* Sobre o Professor */}
-      {formData.sobre_professor && (
+      {/* Professores */}
+      {formData.professores_data && professoresList && professoresList.length > 0 && (() => {
+        try {
+          const professoresData = typeof formData.professores_data === 'string' 
+            ? JSON.parse(formData.professores_data) 
+            : formData.professores_data;
+          
+          const professoresComDados = professoresList.filter(prof => {
+            const data = professoresData[prof];
+            return data && (data.foto || data.descricao || data.linkedin || (data.outrosLinks && data.outrosLinks.length > 0));
+          });
+
+          if (professoresComDados.length > 0) {
+            return (
+              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                  PROFESSORES
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                  {professoresComDados.map((professorNome) => {
+                    const profData = professoresData[professorNome] || {};
+                    return (
+                      <div key={professorNome} style={{ 
+                        border: '1px solid #e0e0e0', 
+                        borderRadius: '8px', 
+                        padding: '15px',
+                        background: '#fff'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
+                          {profData.foto && (
+                            <img 
+                              src={profData.foto} 
+                              alt={professorNome}
+                              style={{ 
+                                width: '80px', 
+                                height: '80px', 
+                                borderRadius: '50%', 
+                                objectFit: 'cover',
+                                border: '2px solid #235795'
+                              }}
+                            />
+                          )}
+                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px' }}>{professorNome}</h4>
+                        </div>
+                        {profData.descricao && (
+                          <div 
+                            style={{ fontSize: '13px', lineHeight: '1.5', marginBottom: '12px', color: '#333' }}
+                            className="preview-content"
+                            dangerouslySetInnerHTML={{ __html: profData.descricao }}
+                          />
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+                          {profData.linkedin && (
+                            <div>
+                              <strong>LinkedIn:</strong>{' '}
+                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5' }}>
+                                {profData.linkedin}
+                              </a>
+                            </div>
+                          )}
+                          {profData.outrosLinks && profData.outrosLinks.map((link, idx) => (
+                            link.url && (
+                              <div key={idx}>
+                                <strong>{link.label || 'Link'}:</strong>{' '}
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
+                                  {link.url}
+                                </a>
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+        } catch (e) {
+          return null;
+        }
+      })()}
+
+      {/* Contatos */}
+      {formData.contatos && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            SOBRE O PROFESSOR
+            CONTATOS
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.sobre_professor }}
+            dangerouslySetInnerHTML={{ __html: formData.contatos }}
           />
         </div>
       )}

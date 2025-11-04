@@ -1,0 +1,255 @@
+.professores-manager {
+  padding: 20px 0;
+}
+
+.professores-manager-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.professores-manager-empty svg {
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.professores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.professor-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.professor-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.professor-card-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #235795;
+}
+
+.professor-card-header h3 {
+  margin: 0;
+  color: #235795;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.professor-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.professor-photo-section {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photo-label {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+}
+
+.professor-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #235795;
+  display: block;
+}
+
+.professor-photo-placeholder {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px dashed #ccc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  color: #999;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.professor-photo-placeholder:hover {
+  border-color: #235795;
+  background: #f0f0f0;
+}
+
+.professor-photo-placeholder svg {
+  margin-bottom: 8px;
+}
+
+.professor-photo-placeholder span {
+  font-size: 12px;
+}
+
+.remove-photo-btn {
+  position: absolute;
+  top: 0;
+  right: calc(50% - 75px + 10px);
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.remove-photo-btn:hover {
+  background: #cc0000;
+}
+
+.professor-description-section {
+  width: 100%;
+}
+
+.professor-description-section label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.professor-link-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.professor-link-section label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.professor-link-section label svg {
+  color: #0077b5;
+}
+
+.professor-link-section input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.professor-link-section input:focus {
+  outline: none;
+  border-color: #235795;
+}
+
+.professor-links-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.professor-links-section label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.link-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.link-input-group input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.link-input-group input:focus {
+  outline: none;
+  border-color: #235795;
+}
+
+.remove-link-btn {
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.remove-link-btn:hover {
+  background: #cc0000;
+}
+
+.add-link-btn {
+  background: #235795;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+  align-self: flex-start;
+}
+
+.add-link-btn:hover {
+  background: #1a4270;
+}
+
+@media (max-width: 768px) {
+  .professores-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .link-input-group {
+    flex-direction: column;
+  }
+  
+  .link-input-group input {
+    width: 100%;
+  }
+}
+
