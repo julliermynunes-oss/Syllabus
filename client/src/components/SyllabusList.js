@@ -10,6 +10,8 @@ import ProfessorModal from './ProfessorModal';
 import './SyllabusList.css';
 
 const SyllabusList = () => {
+  const { t } = useTranslation();
+  const { language, changeLanguage } = useLanguage();
   const [syllabi, setSyllabi] = useState([]);
   const [programaSearch, setProgramaSearch] = useState('');
   const [disciplinaSearch, setDisciplinaSearch] = useState('');
@@ -280,7 +282,7 @@ const SyllabusList = () => {
       <div className="section-divider"></div>
 
       <section className="notifications-section">
-        <h2 className="section-title">Notificações</h2>
+        <h2 className="section-title">{t('notifications')}</h2>
         {pendingRequests.length > 0 ? (
           <div className="requests-list">
             {pendingRequests.map((request) => (
@@ -324,7 +326,7 @@ const SyllabusList = () => {
             ))}
           </div>
         ) : (
-          <p>Nenhuma requisição pendente</p>
+          <p>{t('noNotifications')}</p>
         )}
       </section>
 
@@ -333,7 +335,7 @@ const SyllabusList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="DIGITE O CURSO"
+              placeholder={t('searchByCourse').toUpperCase()}
               value={programaSearch}
               onChange={(e) => handleProgramaSearchChange(e.target.value)}
               onBlur={() => setTimeout(() => setShowProgramDropdown(false), 200)}
@@ -355,7 +357,7 @@ const SyllabusList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="DIGITE A DISCIPLINA"
+              placeholder={t('searchByDiscipline').toUpperCase()}
               value={disciplinaSearch}
               onChange={(e) => handleDisciplinaSearchChange(e.target.value)}
               onBlur={() => setTimeout(() => setShowDisciplineDropdown(false), 200)}
@@ -377,7 +379,7 @@ const SyllabusList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="DIGITE O NOME DO PROFESSOR"
+              placeholder={t('searchByProfessor').toUpperCase()}
               value={professorSearch}
               onChange={(e) => handleProfessorSearchChange(e.target.value)}
               onFocus={() => professorSearch && setShowProfessorDropdown(true)}
@@ -402,7 +404,7 @@ const SyllabusList = () => {
             onClick={() => setFilterMeusOnly(!filterMeusOnly)}
             type="button"
           >
-            {filterMeusOnly ? '✓ Meus Syllabi' : 'Meus Syllabi'}
+            {filterMeusOnly ? `✓ ${t('filterMySyllabi')}` : t('filterMySyllabi')}
           </button>
           <button className="icon-btn-small" onClick={() => navigate('/syllabus/new')}>
             <FaPlus />
