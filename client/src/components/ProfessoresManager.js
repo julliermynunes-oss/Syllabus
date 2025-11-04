@@ -9,13 +9,16 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
 
   useEffect(() => {
     // Inicializar dados dos professores quando os dados são carregados do servidor
-    if (professoresData && professoresData.trim() !== '') {
+    const dataStr = professoresData !== null && professoresData !== undefined ? String(professoresData) : '';
+    
+    if (dataStr && dataStr.trim() !== '') {
       try {
         const parsed = typeof professoresData === 'string' 
           ? JSON.parse(professoresData) 
           : professoresData;
         if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
           // Carregar dados do servidor
+          console.log('Carregando dados dos professores:', Object.keys(parsed).length, 'professores');
           setProfessoresInfo(parsed);
           setIsInitialized(true);
         } else {
@@ -23,10 +26,10 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
           setIsInitialized(true);
         }
       } catch (e) {
-        console.error('Erro ao parsear dados dos professores:', e);
+        console.error('Erro ao parsear dados dos professores:', e, professoresData);
         setIsInitialized(true);
       }
-    } else if (!professoresData || professoresData === '') {
+    } else {
       // Se não tem dados do servidor e ainda não inicializamos, marcar como inicializado
       if (!isInitialized) {
         setIsInitialized(true);
