@@ -52,6 +52,13 @@ function SyllabusForm() {
            cursoUpper.startsWith('AFA ');
   };
 
+  // Função para determinar idioma destino baseado no idioma selecionado
+  const getTargetLanguage = (sourceLang) => {
+    if (!sourceLang || sourceLang === 'Português') return 'English';
+    if (sourceLang === 'English') return 'Español';
+    return 'Português';
+  };
+
   // Função para gerar opções de semestre/ano (formato numérico: 1/2026, 2/2026)
   const generateSemestreAnoOptions = () => {
     const options = [];
@@ -885,6 +892,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.sobre_disciplina}
                 onChange={(content) => setFormData(prev => ({ ...prev, sobre_disciplina: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
@@ -901,6 +910,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.conteudo}
                 onChange={(content) => setFormData(prev => ({ ...prev, conteudo: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
@@ -917,6 +928,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.metodologia}
                 onChange={(content) => setFormData(prev => ({ ...prev, metodologia: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
@@ -947,6 +960,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.compromisso_etico}
                 onChange={(content) => setFormData(prev => ({ ...prev, compromisso_etico: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
@@ -977,6 +992,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.contatos}
                 onChange={(content) => setFormData(prev => ({ ...prev, contatos: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
@@ -993,6 +1010,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.ods}
                 onChange={(content) => setFormData(prev => ({ ...prev, ods: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
@@ -1017,6 +1036,8 @@ function SyllabusForm() {
                 <TiptapEditor
                   content={formData.referencias}
                   onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
+                  sourceLanguage={formData.idioma || 'Português'}
+                  targetLanguage={getTargetLanguage(formData.idioma)}
                 />
                 <p className="editor-note">
                   💡 <strong>Nota:</strong> Use a busca acima para adicionar referências automaticamente da API do Crossref, ou edite manualmente usando o editor rich text.
@@ -1050,6 +1071,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.o_que_e_esperado}
                 onChange={(content) => setFormData(prev => ({ ...prev, o_que_e_esperado: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
               <p className="editor-note">
                 💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.

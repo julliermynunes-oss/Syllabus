@@ -7,15 +7,20 @@ import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { Image } from '@tiptap/extension-image';
 import { Link } from '@tiptap/extension-link';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config';
 import './TiptapEditor.css';
 
-const TiptapEditor = ({ content, onChange }) => {
+const TiptapEditor = ({ content, onChange, sourceLanguage, targetLanguage }) => {
+  const { token } = useAuth();
   const fileInputRef = React.useRef(null);
   const [contextMenu, setContextMenu] = React.useState(null);
   const contextMenuRef = React.useRef(null);
   const menuBarRef = React.useRef(null);
   const wrapperRef = React.useRef(null);
   const [isSticky, setIsSticky] = React.useState(false);
+  const [isTranslating, setIsTranslating] = React.useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -272,6 +277,47 @@ const TiptapEditor = ({ content, onChange }) => {
     closeContextMenu();
   };
 
+  const handleTranslate = async () => {
+    if (!sourceLanguage || !targetLanguage || sourceLanguage === targetLanguage) {
+      alert('Selecione idiomas de origem e destino diferentes para traduzir');
+      return;
+    }
+
+    const text = editor.getText();
+    if (!text || text.trim().length === 0) {
+      alert('Não há texto para traduzir');
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/translate`,
+        {
+          text: text,
+          source: sourceLanguage,
+          target: targetLanguage
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      if (response.data && response.data.translatedText) {
+        // Substituir o conteúdo do editor com a tradução
+        editor.commands.setContent(response.data.translatedText);
+        onChange(response.data.translatedText);
+      }
+    } catch (error) {
+      console.error('Erro ao traduzir:', error);
+      alert('Erro ao traduzir texto. Verifique se a API de tradução está configurada corretamente.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   if (!editor) {
     return null;
   }
@@ -402,6 +448,22 @@ const TiptapEditor = ({ content, onChange }) => {
         >
           📊 Tabela
         </button>
+        <div className="divider"></div>
+        {sourceLanguage && targetLanguage && sourceLanguage !== targetLanguage && (
+          <button
+            onClick={handleTranslate}
+            disabled={isTranslating || !editor.getText() || editor.getText().trim().length === 0}
+            type="button"
+            title={`Traduzir de ${sourceLanguage} para ${targetLanguage}`}
+            style={{ 
+              background: isTranslating ? '#ccc' : '#28a745',
+              color: 'white',
+              border: 'none'
+            }}
+          >
+            {isTranslating ? '⏳ Traduzindo...' : '🌐 Traduzir'}
+          </button>
+        )}
         <button
           onClick={() => editor.chain().focus().addColumnAfter().run()}
           disabled={!editor.can().addColumnAfter()}

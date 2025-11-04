@@ -32,6 +32,10 @@ if (process.env.NODE_ENV === 'production') {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// LibreTranslate configuration
+const LIBRETRANSLATE_URL = process.env.LIBRETRANSLATE_URL || 'https://libretranslate.com';
+const LIBRETRANSLATE_API_KEY = process.env.LIBRETRANSLATE_API_KEY || null;
+
 // Database setup (supports persistent volume via DB_PATH)
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'syllabus.db');
 const isUsingVolume = !!process.env.DB_PATH;
@@ -982,6 +986,77 @@ app.get('/api/syllabi/:id', authenticateToken, (req, res) => {
       res.json(row);
     }
   );
+});
+
+// Endpoint para tradução usando LibreTranslate
+app.post('/api/translate', authenticateToken, async (req, res) => {
+  const { text, source, target } = req.body;
+
+  if (!text || !source || !target) {
+    return res.status(400).json({ error: 'Texto, idioma origem e idioma destino são obrigatórios' });
+  }
+
+  if (source === target) {
+    return res.json({ translatedText: text });
+  }
+
+  try {
+    // Mapear nomes de idiomas para códigos ISO
+    const languageMap = {
+      'Português': 'pt',
+      'English': 'en',
+      'Español': 'es',
+      'Français': 'fr',
+      'Deutsch': 'de',
+      'Italiano': 'it',
+      'pt': 'pt',
+      'en': 'en',
+      'es': 'es',
+      'fr': 'fr',
+      'de': 'de',
+      'it': 'it'
+    };
+
+    const sourceCode = languageMap[source] || source.toLowerCase().substring(0, 2);
+    const targetCode = languageMap[target] || target.toLowerCase().substring(0, 2);
+
+    const translateData = {
+      q: text,
+      source: sourceCode,
+      target: targetCode
+    };
+
+    if (LIBRETRANSLATE_API_KEY) {
+      translateData.api_key = LIBRETRANSLATE_API_KEY;
+    }
+
+    // Converter dados para formato URL-encoded
+    const formData = new URLSearchParams();
+    formData.append('q', translateData.q);
+    formData.append('source', translateData.source);
+    formData.append('target', translateData.target);
+    if (translateData.api_key) {
+      formData.append('api_key', translateData.api_key);
+    }
+
+    const response = await axios.post(`${LIBRETRANSLATE_URL}/translate`, formData.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
+
+    if (response.data && response.data.translatedText) {
+      res.json({ translatedText: response.data.translatedText });
+    } else {
+      res.status(500).json({ error: 'Resposta inválida da API de tradução' });
+    }
+  } catch (error) {
+    console.error('Erro ao traduzir:', error.response?.data || error.message);
+    res.status(500).json({ 
+      error: 'Erro ao traduzir texto',
+      details: error.response?.data?.error || error.message
+    });
+  }
 });
 
 app.post('/api/disciplines', authenticateToken, (req, res) => {
