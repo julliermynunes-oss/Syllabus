@@ -168,7 +168,7 @@ const SyllabusList = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Tem certeza que deseja deletar este syllabus?')) return;
+    if (!window.confirm(t('deleteConfirm'))) return;
 
     try {
       await axios.delete(`${API_URL}/api/syllabi/${id}`, {
@@ -178,9 +178,9 @@ const SyllabusList = () => {
     } catch (err) {
       console.error('Erro ao deletar syllabus:', err);
       if (err.response && err.response.status === 403) {
-        alert('Você não tem permissão para excluir este syllabus');
+        alert(t('noPermissionDelete'));
       } else {
-        alert('Erro ao deletar syllabus');
+        alert(t('errorDeleting'));
       }
     }
   };
@@ -194,10 +194,10 @@ const SyllabusList = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchSyllabi();
-      alert('Syllabus duplicado com sucesso!');
+      alert(t('syllabusDuplicated'));
     } catch (err) {
       console.error('Erro ao duplicar syllabus:', err);
-      alert('Erro ao duplicar syllabus');
+      alert(t('errorDuplicating'));
     }
   };
 
@@ -221,10 +221,10 @@ const SyllabusList = () => {
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert(`Requisição criada para: ${professorData.professores}`);
+      alert(`${t('requestCreated')} ${professorData.professores}`);
     } catch (err) {
       console.error('Erro ao criar requisição:', err);
-      alert('Erro ao criar requisição');
+      alert(t('errorCreatingRequest'));
     }
   };
 
@@ -316,7 +316,7 @@ const SyllabusList = () => {
                       });
                     } catch (err) {
                       console.error('Erro ao aceitar requisição:', err);
-                      alert('Erro ao aceitar requisição');
+                      alert(t('errorAcceptingRequest'));
                     }
                   }}
                 >
@@ -478,10 +478,10 @@ const SyllabusList = () => {
 
       <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
         <button className="add-button" onClick={() => navigate('/syllabus/new')}>
-          <FaPlus /> Adicionar Novo Syllabus
+          <FaPlus /> {t('newSyllabus')}
         </button>
         <button className="manage-competencias-btn" onClick={() => navigate('/competencias')}>
-          <FaCog /> Gerenciar Competências
+          <FaCog /> {t('manageCompetencies')}
         </button>
       </div>
 
