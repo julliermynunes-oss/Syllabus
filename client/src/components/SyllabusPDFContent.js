@@ -1,0 +1,368 @@
+import React from 'react';
+
+// Componente para a tabela de competências no PDF
+const CompetenciesTablePDF = ({ data }) => {
+  if (!data || data === '' || data === '[]') {
+    return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>Nenhuma competência cadastrada.</div>;
+  }
+  
+  try {
+    const parsed = JSON.parse(data);
+    
+    // O formato é { rows: [...] }
+    const rows = parsed.rows || parsed;
+    
+    if (!rows || rows.length === 0) {
+      return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>Nenhuma competência cadastrada.</div>;
+    }
+    
+    return (
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '12px' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
+            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>Competência</th>
+            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>Descrição</th>
+            <th style={{ padding: '10px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '12px', width: '100px' }}>Grau de Contribuição</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, index) => (
+            <tr key={index}>
+              <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.competencia || '-'}</td>
+              <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.descricao || '-'}</td>
+              <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px' }}>
+                {'●'.repeat(row.grau || 0)}{'○'.repeat(3 - (row.grau || 0))}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  } catch (e) {
+    console.error('Erro ao renderizar competências:', e, 'Data:', data);
+    return <div style={{ fontSize: '14px', color: '#f00' }}>Erro ao carregar competências.</div>;
+  }
+};
+
+// Componente separado para a visualização do PDF
+function SyllabusPDFContent({ formData, professoresList }) {
+  return (
+    <div style={{ 
+      padding: '10px 15px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#000',
+      backgroundColor: '#fff',
+      maxWidth: '100%',
+      width: '100%',
+      boxSizing: 'border-box'
+    }}>
+      {/* Cabeçalho */}
+      <div style={{ textAlign: 'center', marginBottom: '40px', borderBottom: '3px solid #235795', paddingBottom: '20px' }}>
+        <img src="/FGV_Logo.png" alt="FGV Logo" style={{ maxWidth: '180px', height: 'auto', marginBottom: '20px' }} />
+        <h1 style={{ fontSize: '28px', color: '#235795', marginBottom: '10px' }}>
+          SYLLABUS
+        </h1>
+        <h2 style={{ fontSize: '22px', color: '#333', fontWeight: 'normal' }}>
+          {formData.disciplina || 'Nome da Disciplina'}
+        </h2>
+      </div>
+
+      {/* Informações Gerais */}
+      <div style={{ marginBottom: '30px' }}>
+        <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+          INFORMAÇÕES GERAIS
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '14px', width: '100%' }}>
+          {formData.curso && (<div><strong>Curso:</strong> {formData.curso}</div>)}
+          {formData.semestre_ano && (<div><strong>Semestre/Ano:</strong> {formData.semestre_ano}</div>)}
+          {formData.linha && (<div><strong>Linha:</strong> {formData.linha}</div>)}
+          {formData.turma && (<div><strong>Turma:</strong> {formData.turma}</div>)}
+          {formData.departamento && (<div><strong>Departamento:</strong> {formData.departamento}</div>)}
+          {formData.num_creditos && (<div><strong>Nº Créditos:</strong> {formData.num_creditos}</div>)}
+          {formData.sem_curricular && (<div><strong>Semestre Curricular:</strong> {formData.sem_curricular}</div>)}
+          {formData.coordenador && (<div><strong>Líder de Disciplina:</strong> {formData.coordenador}</div>)}
+          {formData.idioma && (<div><strong>Idioma:</strong> {formData.idioma}</div>)}
+          {professoresList && professoresList.length > 0 && (
+            <div style={{ gridColumn: '1 / -1' }}>
+              <strong>Professores:</strong> {professoresList.join(', ')}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sobre a Disciplina */}
+      {formData.sobre_disciplina && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            SOBRE A DISCIPLINA
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.sobre_disciplina }}
+          />
+        </div>
+      )}
+
+      {/* Conteúdo */}
+      {formData.conteudo && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            CONTEÚDO
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.conteudo }}
+          />
+        </div>
+      )}
+
+      {/* Metodologia */}
+      {formData.metodologia && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            METODOLOGIA
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.metodologia }}
+          />
+        </div>
+      )}
+
+      {/* Critério de Avaliação */}
+      {formData.criterio_avaliacao && (() => {
+        try {
+          const parsed = typeof formData.criterio_avaliacao === 'string' 
+            ? JSON.parse(formData.criterio_avaliacao) 
+            : formData.criterio_avaliacao;
+          
+          if (parsed && parsed.rows && parsed.rows.length > 0) {
+            return (
+              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                  CRITÉRIO DE AVALIAÇÃO
+                </h3>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '14px' }}>
+                  <thead>
+                    <tr style={{ background: '#235795', color: 'white' }}>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Tipo</th>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Critério</th>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Peso</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parsed.rows.map((row, index) => (
+                      <tr key={index} style={{ borderBottom: '1px solid #e0e0e0' }}>
+                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                          {row.tipo || '-'}
+                        </td>
+                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                          {row.criterio || '-'}
+                        </td>
+                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                          {row.peso || '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {parsed.observacoes && parsed.observacoes.trim() !== '' && (
+                  <div style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '4px', fontSize: '14px', lineHeight: '1.6' }}>
+                    <strong>Observações Adicionais:</strong>
+                    <div style={{ marginTop: '8px' }} dangerouslySetInnerHTML={{ __html: parsed.observacoes }} />
+                  </div>
+                )}
+              </div>
+            );
+          }
+          // Fallback para formato antigo (rich text)
+          return (
+            <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+              <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                CRITÉRIO DE AVALIAÇÃO
+              </h3>
+              <div 
+                style={{ fontSize: '14px', lineHeight: '1.6' }}
+                dangerouslySetInnerHTML={{ __html: formData.criterio_avaliacao }}
+              />
+            </div>
+          );
+        } catch (e) {
+          // Se não for JSON, tratar como rich text antigo
+          return (
+            <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+              <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                CRITÉRIO DE AVALIAÇÃO
+              </h3>
+              <div 
+                style={{ fontSize: '14px', lineHeight: '1.6' }}
+                dangerouslySetInnerHTML={{ __html: formData.criterio_avaliacao }}
+              />
+            </div>
+          );
+        }
+      })()}
+
+
+      {/* Compromisso Ético */}
+      {formData.compromisso_etico && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            COMPROMISSO ÉTICO
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.compromisso_etico }}
+          />
+        </div>
+      )}
+
+      {/* Professores */}
+      {formData.professores_data && professoresList && professoresList.length > 0 && (() => {
+        try {
+          const professoresData = typeof formData.professores_data === 'string' 
+            ? JSON.parse(formData.professores_data) 
+            : formData.professores_data;
+          
+          const professoresComDados = professoresList.filter(prof => {
+            const data = professoresData[prof];
+            return data && (data.foto || data.descricao || data.linkedin || (data.outrosLinks && data.outrosLinks.length > 0));
+          });
+
+          if (professoresComDados.length > 0) {
+            return (
+              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                  PROFESSORES
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                  {professoresComDados.map((professorNome) => {
+                    const profData = professoresData[professorNome] || {};
+                    return (
+                      <div key={professorNome} style={{ 
+                        border: '1px solid #e0e0e0', 
+                        borderRadius: '8px', 
+                        padding: '15px',
+                        background: '#fff'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
+                          {profData.foto && (
+                            <img 
+                              src={profData.foto} 
+                              alt={professorNome}
+                              style={{ 
+                                width: '80px', 
+                                height: '80px', 
+                                borderRadius: '50%', 
+                                objectFit: 'cover',
+                                border: '2px solid #235795'
+                              }}
+                            />
+                          )}
+                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px' }}>{professorNome}</h4>
+                        </div>
+                        {profData.descricao && (
+                          <div 
+                            style={{ fontSize: '13px', lineHeight: '1.5', marginBottom: '12px', color: '#333' }}
+                            dangerouslySetInnerHTML={{ __html: profData.descricao }}
+                          />
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+                          {profData.linkedin && (
+                            <div>
+                              <strong>LinkedIn:</strong>{' '}
+                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5' }}>
+                                {profData.linkedin}
+                              </a>
+                            </div>
+                          )}
+                          {profData.outrosLinks && profData.outrosLinks.map((link, idx) => (
+                            link.url && (
+                              <div key={idx}>
+                                <strong>{link.label || 'Link'}:</strong>{' '}
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
+                                  {link.url}
+                                </a>
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+        } catch (e) {
+          return null;
+        }
+      })()}
+
+      {/* Contatos */}
+      {formData.contatos && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            CONTATOS
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.contatos }}
+          />
+        </div>
+      )}
+
+      {/* ODS */}
+      {formData.ods && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            OBJETIVOS DE DESENVOLVIMENTO SUSTENTÁVEL (ODS)
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.ods }}
+          />
+        </div>
+      )}
+
+      {/* Competências */}
+      {formData.competencias && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            COMPETÊNCIAS DA DISCIPLINA
+          </h3>
+          <CompetenciesTablePDF data={formData.competencias} />
+        </div>
+      )}
+
+      {/* Referências Bibliográficas */}
+      {formData.referencias && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            REFERÊNCIAS BIBLIOGRÁFICAS
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.referencias }}
+          />
+        </div>
+      )}
+
+      {/* Aba Personalizada */}
+      {formData.custom_tab_name && formData.custom_tab_content && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            {formData.custom_tab_name.toUpperCase()}
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default SyllabusPDFContent;
+
