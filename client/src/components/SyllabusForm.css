@@ -844,17 +844,17 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 30px;
+  height: 25px;
   background-color: #fff;
   border-bottom: 1px solid #e0e0e0;
-  padding: 3px 20px;
+  padding: 2px 20px;
   z-index: 1000;
   display: flex;
   align-items: center;
 }
 
 .pdf-container {
-  padding-top: 35px !important;
+  padding-top: 30px !important;
 }
 
 @media print {
@@ -1123,10 +1123,10 @@
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    height: 30px !important;
+    height: 25px !important;
     background-color: #fff !important;
     border-bottom: 1px solid #e0e0e0 !important;
-    padding: 3px 20px !important;
+    padding: 2px 20px !important;
     z-index: 1000 !important;
     display: flex !important;
     align-items: center !important;
@@ -1137,13 +1137,13 @@
   }
 
   .pdf-logo-header img {
-    max-height: 24px !important;
+    max-height: 20px !important;
     height: auto !important;
     width: auto !important;
   }
 
   .pdf-container {
-    padding-top: 35px !important;
+    padding-top: 30px !important;
   }
   
   /* Ajustar espaçamento superior em todas as páginas (especialmente após a primeira) */
@@ -1155,12 +1155,12 @@
   @page {
     size: A4;
     margin: 0;
-    margin-top: 50px; /* Espaço para o logo fixo em todas as páginas */
+    margin-top: 45px; /* Espaço para o logo fixo em todas as páginas */
   }
   
   /* Primeira página pode ter menos espaço */
   @page:first {
-    margin-top: 35px;
+    margin-top: 30px;
   }
   
   /* Remover cabeçalhos e rodapés do navegador */

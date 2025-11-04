@@ -438,10 +438,10 @@ function SyllabusForm() {
         @media print {
           @page {
             margin: 0 !important;
-            margin-top: 50px !important;
+            margin-top: 45px !important;
           }
           @page:first {
-            margin-top: 35px !important;
+            margin-top: 30px !important;
           }
           body {
             margin: 0 !important;

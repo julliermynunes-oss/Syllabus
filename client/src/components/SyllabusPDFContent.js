@@ -54,7 +54,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
   return (
     <div className="pdf-container" style={{ 
       padding: '10px 15px',
-      paddingTop: '35px', // Espaço para o logo fixo na primeira página
+      paddingTop: '30px', // Espaço para o logo fixo na primeira página
       fontFamily: 'Arial, sans-serif',
       color: '#000',
       backgroundColor: '#fff',
@@ -69,10 +69,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
         top: 0,
         left: 0,
         right: 0,
-        height: '30px',
+        height: '25px',
         backgroundColor: '#fff',
         borderBottom: '1px solid #e0e0e0',
-        padding: '3px 20px',
+        padding: '2px 20px',
         zIndex: 1000,
         display: 'flex',
         alignItems: 'center'
@@ -81,7 +81,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           src="/FGV LOGO NOVO.png" 
           alt="FGV Logo" 
           style={{ 
-            maxHeight: '24px', 
+            maxHeight: '20px', 
             height: 'auto',
             width: 'auto'
           }} 
