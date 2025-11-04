@@ -805,7 +805,7 @@ app.get('/api/search-dataverse', async (req, res) => {
           doi: dataset.persistentId || '',
           url: dataset.persistentUrl || `${dataverseUrl}/dataset.xhtml?persistentId=${dataset.persistentId || dataset.globalId}`
         });
-      });
+      }
     }
     
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
