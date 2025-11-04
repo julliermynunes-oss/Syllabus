@@ -178,9 +178,15 @@ const SyllabusForm = () => {
         ...response.data,
         semestre_ano: normalizeSemestreAno(response.data.semestre_ano),
         sem_curricular: normalizeSemCurricular(response.data.sem_curricular),
-        professores_data: response.data.professores_data || '',
-        contatos: response.data.contatos || ''
+        professores_data: response.data.professores_data || null || '',
+        contatos: response.data.contatos || null || ''
       };
+      
+      // Debug: verificar se os dados dos professores estão sendo carregados
+      if (normalized.professores_data) {
+        console.log('Dados dos professores carregados:', normalized.professores_data.substring(0, 100));
+      }
+      
       setFormData(normalized);
       
       // Converter string de professores em lista
