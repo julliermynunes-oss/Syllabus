@@ -1089,6 +1089,8 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.custom_tab_content}
                 onChange={(content) => setFormData(prev => ({ ...prev, custom_tab_content: content }))}
+                sourceLanguage={formData.idioma || 'Português'}
+                targetLanguage={getTargetLanguage(formData.idioma)}
               />
             </div>
           </div>
