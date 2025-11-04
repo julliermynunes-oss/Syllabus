@@ -8,6 +8,7 @@ import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
 import ProfessoresManager from './ProfessoresManager';
+import AvaliacaoTable from './AvaliacaoTable';
 import './SyllabusForm.css';
 
 const SyllabusForm = () => {
@@ -886,13 +887,10 @@ const SyllabusForm = () => {
           <div className="form-row full-width">
             <div className="form-field">
               <label>Critério de Avaliação:</label>
-              <TiptapEditor
-                content={formData.criterio_avaliacao}
+              <AvaliacaoTable
+                data={formData.criterio_avaliacao}
                 onChange={(content) => setFormData(prev => ({ ...prev, criterio_avaliacao: content }))}
               />
-              <p className="editor-note">
-                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
-              </p>
             </div>
           </div>
         )}
@@ -1151,17 +1149,78 @@ const SyllabusPDFContent = ({ formData, professoresList }) => {
       )}
 
       {/* Critério de Avaliação */}
-      {formData.criterio_avaliacao && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            CRITÉRIO DE AVALIAÇÃO
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.criterio_avaliacao }}
-          />
-        </div>
-      )}
+      {formData.criterio_avaliacao && (() => {
+        try {
+          const parsed = typeof formData.criterio_avaliacao === 'string' 
+            ? JSON.parse(formData.criterio_avaliacao) 
+            : formData.criterio_avaliacao;
+          
+          if (parsed && parsed.rows && parsed.rows.length > 0) {
+            return (
+              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                  CRITÉRIO DE AVALIAÇÃO
+                </h3>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '14px' }}>
+                  <thead>
+                    <tr style={{ background: '#235795', color: 'white' }}>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Tipo</th>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Critério</th>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Peso</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parsed.rows.map((row, index) => (
+                      <tr key={index} style={{ borderBottom: '1px solid #e0e0e0' }}>
+                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                          {row.tipo || '-'}
+                        </td>
+                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                          {row.criterio || '-'}
+                        </td>
+                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                          {row.peso || '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {parsed.observacoes && parsed.observacoes.trim() !== '' && (
+                  <div style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '4px', fontSize: '14px', lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>
+                    <strong>Observações Adicionais:</strong>
+                    <div style={{ marginTop: '8px' }}>{parsed.observacoes}</div>
+                  </div>
+                )}
+              </div>
+            );
+          }
+          // Fallback para formato antigo (rich text)
+          return (
+            <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+              <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                CRITÉRIO DE AVALIAÇÃO
+              </h3>
+              <div 
+                style={{ fontSize: '14px', lineHeight: '1.6' }}
+                dangerouslySetInnerHTML={{ __html: formData.criterio_avaliacao }}
+              />
+            </div>
+          );
+        } catch (e) {
+          // Se não for JSON, tratar como rich text antigo
+          return (
+            <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+              <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                CRITÉRIO DE AVALIAÇÃO
+              </h3>
+              <div 
+                style={{ fontSize: '14px', lineHeight: '1.6' }}
+                dangerouslySetInnerHTML={{ __html: formData.criterio_avaliacao }}
+              />
+            </div>
+          );
+        }
+      })()}
 
 
       {/* Compromisso Ético */}
