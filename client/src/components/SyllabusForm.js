@@ -432,8 +432,29 @@ function SyllabusForm() {
     
     // Aguardar um frame para renderização
     setTimeout(() => {
+      // Adicionar estilos para remover cabeçalhos/rodapés do navegador
+      const style = document.createElement('style');
+      style.textContent = `
+        @media print {
+          @page {
+            margin: 0 !important;
+            margin-top: 45px !important;
+          }
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+      
       // Imprimir
       window.print();
+      
+      // Remover estilo após impressão
+      setTimeout(() => {
+        document.head.removeChild(style);
+      }, 1000);
       
       // Restaurar estilos após impressão
       setTimeout(() => {

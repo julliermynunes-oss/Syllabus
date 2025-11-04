@@ -854,7 +854,7 @@
 }
 
 .pdf-container {
-  padding-top: 50px !important;
+  padding-top: 45px !important;
 }
 
 @media print {
@@ -1143,14 +1143,24 @@
   }
 
   .pdf-container {
-    padding-top: 50px !important;
+    padding-top: 45px !important;
   }
   
-  /* Configurações de página */
+  /* Configurações de página - Remove cabeçalhos e rodapés do navegador */
   @page {
     size: A4;
-    margin: 5mm;
-    margin-top: 15mm; /* Espaço para o logo fixo */
+    margin: 0;
+    margin-top: 45px; /* Espaço mínimo para o logo fixo */
+  }
+  
+  /* Remover cabeçalhos e rodapés do navegador */
+  @page {
+    @top-left { content: none; }
+    @top-center { content: none; }
+    @top-right { content: none; }
+    @bottom-left { content: none; }
+    @bottom-center { content: none; }
+    @bottom-right { content: none; }
   }
   
   /* Estilos para o conteúdo do PDF */
