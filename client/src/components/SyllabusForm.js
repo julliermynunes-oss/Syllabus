@@ -635,8 +635,6 @@ const SyllabusForm = () => {
               </div>
             )}
           </div>
-          </div>
-        </div>
 
         {/* Form Content Area */}
         <div className="form-content-area">
