@@ -514,6 +514,8 @@ const SyllabusList = () => {
 
 // Componente para renderizar o preview do syllabus
 const SyllabusPreviewContent = ({ formData, professoresList }) => {
+  const { t } = useTranslation();
+  
   return (
     <div style={{ 
       padding: '10px 15px',
@@ -538,21 +540,21 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {/* Informações Gerais */}
       <div style={{ marginBottom: '30px' }}>
         <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-          INFORMAÇÕES GERAIS
+          {t('generalInformation')}
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '14px', width: '100%' }}>
-          {formData.curso && (<div><strong>Curso:</strong> {formData.curso}</div>)}
-          {formData.semestre_ano && (<div><strong>Semestre/Ano:</strong> {formData.semestre_ano}</div>)}
-          {formData.linha && (<div><strong>Linha:</strong> {formData.linha}</div>)}
-          {formData.turma && (<div><strong>Turma:</strong> {formData.turma}</div>)}
-          {formData.departamento && (<div><strong>Departamento:</strong> {formData.departamento}</div>)}
-          {formData.num_creditos && (<div><strong>Nº Créditos:</strong> {formData.num_creditos}</div>)}
-          {formData.sem_curricular && (<div><strong>Semestre Curricular:</strong> {formData.sem_curricular}</div>)}
-          {formData.coordenador && (<div><strong>Líder de Disciplina:</strong> {formData.coordenador}</div>)}
-          {formData.idioma && (<div><strong>Idioma:</strong> {formData.idioma}</div>)}
+          {formData.curso && (<div><strong>{t('course')}:</strong> {formData.curso}</div>)}
+          {formData.semestre_ano && (<div><strong>{t('semesterYear')}:</strong> {formData.semestre_ano}</div>)}
+          {formData.linha && (<div><strong>{t('line')}:</strong> {formData.linha}</div>)}
+          {formData.turma && (<div><strong>{t('class')}:</strong> {formData.turma}</div>)}
+          {formData.departamento && (<div><strong>{t('department')}:</strong> {formData.departamento}</div>)}
+          {formData.num_creditos && (<div><strong>{t('credits')}:</strong> {formData.num_creditos}</div>)}
+          {formData.sem_curricular && (<div><strong>{t('curricularSemester')}:</strong> {formData.sem_curricular}</div>)}
+          {formData.coordenador && (<div><strong>{t('disciplineLeader')}:</strong> {formData.coordenador}</div>)}
+          {formData.idioma && (<div><strong>{t('language')}:</strong> {formData.idioma}</div>)}
           {professoresList && professoresList.length > 0 && (
             <div style={{ gridColumn: '1 / -1' }}>
-              <strong>Professores:</strong> {professoresList.join(', ')}
+              <strong>{t('professorsList')}:</strong> {professoresList.join(', ')}
             </div>
           )}
         </div>
@@ -562,7 +564,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.sobre_disciplina && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            SOBRE A DISCIPLINA
+            {t('aboutDisciplineTitle')}
           </h3>
           <div 
             style={{ 
@@ -579,7 +581,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.conteudo && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            CONTEÚDO
+            {t('contentTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -593,7 +595,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.metodologia && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            METODOLOGIA
+            {t('methodologyTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -614,14 +616,14 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             return (
               <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
                 <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-                  CRITÉRIO DE AVALIAÇÃO
+                  {t('evaluationCriteriaTitle')}
                 </h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '14px' }}>
                   <thead>
                     <tr style={{ background: '#235795', color: 'white' }}>
-                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Tipo</th>
-                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Critério</th>
-                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>Peso</th>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>{t('type')}</th>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>{t('criteria')}</th>
+                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>{t('weight')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -642,7 +644,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
                 </table>
                 {parsed.observacoes && parsed.observacoes.trim() !== '' && (
                   <div style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '4px', fontSize: '14px', lineHeight: '1.6' }}>
-                    <strong>Observações Adicionais:</strong>
+                    <strong>{t('additionalObservations')}</strong>
                     <div style={{ marginTop: '8px' }} className="preview-content" dangerouslySetInnerHTML={{ __html: parsed.observacoes }} />
                   </div>
                 )}
@@ -653,7 +655,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           return (
             <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
               <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-                CRITÉRIO DE AVALIAÇÃO
+                {t('evaluationCriteriaTitle')}
               </h3>
               <div 
                 style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -667,7 +669,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           return (
             <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
               <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-                CRITÉRIO DE AVALIAÇÃO
+                {t('evaluationCriteriaTitle')}
               </h3>
               <div 
                 style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -684,7 +686,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.compromisso_etico && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            COMPROMISSO ÉTICO
+            {t('ethicalCommitmentTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -710,7 +712,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             return (
               <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
                 <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-                  PROFESSORES
+                  {t('professorsTitle')}
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
                   {professoresComDados.map((professorNome) => {
@@ -781,7 +783,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.contatos && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            CONTATOS
+            {t('contactsTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -795,7 +797,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.ods && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            OBJETIVOS DE DESENVOLVIMENTO SUSTENTÁVEL (ODS)
+            {t('odsTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -809,7 +811,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.competencias && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            COMPETÊNCIAS DA DISCIPLINA
+            {t('competenciesTitle')}
           </h3>
           <CompetenciesTablePDF data={formData.competencias} />
         </div>
@@ -819,7 +821,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.referencias && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            REFERÊNCIAS BIBLIOGRÁFICAS
+            {t('referencesTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
@@ -859,16 +861,16 @@ const CompetenciesTablePDF = ({ data }) => {
     const rows = parsed.rows || parsed;
     
     if (!rows || rows.length === 0) {
-      return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>Nenhuma competência cadastrada.</div>;
+      return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
     }
     
     return (
       <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '12px' }}>
         <thead>
           <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>Competência</th>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>Descrição</th>
-            <th style={{ padding: '10px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '12px', width: '100px' }}>Grau de Contribuição</th>
+            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>{t('competence')}</th>
+            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>{t('descriptionField')}</th>
+            <th style={{ padding: '10px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '12px', width: '100px' }}>{t('contributionDegree')}</th>
           </tr>
         </thead>
         <tbody>
