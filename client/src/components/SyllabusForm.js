@@ -36,6 +36,22 @@ function SyllabusForm() {
     return map[value] || value;
   };
 
+  // Função para verificar se o curso é CGA, CGAP ou AFA
+  const isRestrictedCourse = (curso) => {
+    if (!curso) return false;
+    const cursoUpper = curso.toUpperCase();
+    // Verifica se contém as siglas ou nomes completos
+    return cursoUpper.includes('CGA - CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO') ||
+           cursoUpper.includes('CGAP - CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA') ||
+           cursoUpper.includes('AFA - 2ª GRADUAÇÃO EM CONTABILIDADE') ||
+           cursoUpper === 'CGA' ||
+           cursoUpper === 'CGAP' ||
+           cursoUpper === 'AFA' ||
+           cursoUpper.startsWith('CGA ') ||
+           cursoUpper.startsWith('CGAP ') ||
+           cursoUpper.startsWith('AFA ');
+  };
+
   // Função para gerar opções de semestre/ano (formato numérico: 1/2026, 2/2026)
   const generateSemestreAnoOptions = () => {
     const options = [];
@@ -537,7 +553,7 @@ function SyllabusForm() {
           >
             Contatos
           </button>
-          {!['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
+          {!isRestrictedCourse(formData.curso) && (
             <button
               className={`tab ${activeTab === 'ods' ? 'active' : ''}`}
               onClick={() => setActiveTab('ods')}
@@ -560,13 +576,13 @@ function SyllabusForm() {
           >
             Competências
           </button>
-          {!['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
+          {!isRestrictedCourse(formData.curso) && (
             <button
               className={`tab ${activeTab === 'o_que_e_esperado' ? 'active' : ''}`}
               onClick={() => setActiveTab('o_que_e_esperado')}
               type="button"
             >
-              O QUE É ESPERADO QUE O(A) ALUNO(A)
+              O que é esperado do aluno(a)
             </button>
           )}
           {formData.custom_tab_name && (
@@ -970,7 +986,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: ODS */}
-        {activeTab === 'ods' && !['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
+        {activeTab === 'ods' && !isRestrictedCourse(formData.curso) && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>Objetivos de Desenvolvimento Sustentável (ODS):</label>
@@ -1027,10 +1043,10 @@ function SyllabusForm() {
         )}
 
         {/* Aba: O QUE É ESPERADO QUE O(A) ALUNO(A) */}
-        {activeTab === 'o_que_e_esperado' && !['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
+        {activeTab === 'o_que_e_esperado' && !isRestrictedCourse(formData.curso) && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>O que é esperado que o(a) aluno(a):</label>
+              <label>O que é esperado do aluno(a):</label>
               <TiptapEditor
                 content={formData.o_que_e_esperado}
                 onChange={(content) => setFormData(prev => ({ ...prev, o_que_e_esperado: content }))}
