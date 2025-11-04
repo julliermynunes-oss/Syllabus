@@ -44,12 +44,17 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
       return;
     }
 
-    // Sincronizar com a lista de professores do cabeçalho
-    // Mas não sobrescrever dados existentes que foram carregados do servidor
-    const hasDataFromServer = professoresData && professoresData.trim() !== '';
-    
-    // Obter o estado atual atualizado
+    // Obter o estado atual atualizado usando função de atualização
     setProfessoresInfo(currentInfo => {
+      // Se temos dados do servidor, preservar os dados existentes
+      const hasDataFromServer = professoresData && String(professoresData).trim() !== '';
+      
+      // Se temos dados do servidor e o estado atual está vazio, não fazer nada ainda
+      // (esperar que o primeiro useEffect carregue os dados)
+      if (hasDataFromServer && Object.keys(currentInfo).length === 0) {
+        return currentInfo;
+      }
+
       const updated = { ...currentInfo };
       let hasChanges = false;
 
@@ -66,30 +71,29 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
         }
       });
 
-      // Remover professores que não estão mais na lista
-      Object.keys(updated).forEach(prof => {
-        if (!professoresList.includes(prof)) {
-          delete updated[prof];
-          hasChanges = true;
-        }
-      });
+      // Remover professores que não estão mais na lista (apenas se não tivermos dados do servidor)
+      if (!hasDataFromServer) {
+        Object.keys(updated).forEach(prof => {
+          if (!professoresList.includes(prof)) {
+            delete updated[prof];
+            hasChanges = true;
+          }
+        });
+      }
 
       // Só atualizar o formData se houver mudanças E não tivermos dados do servidor
-      // ou se for uma sincronização segura (apenas adicionar novos, não remover existentes)
+      // ou se for apenas adicionar novos professores
       if (hasChanges) {
-        // Se temos dados do servidor, apenas adicionar novos professores, não remover
-        if (hasDataFromServer) {
-          // Verificar se estamos apenas adicionando, não removendo
-          const onlyAdding = professoresList.every(prof => 
-            updated[prof] !== undefined || currentInfo[prof] === undefined
-          );
-          if (onlyAdding) {
-            // Apenas adicionar novos professores, preservar todos os existentes
-            onUpdate(JSON.stringify(updated));
-          }
-        } else {
+        if (!hasDataFromServer) {
           // Sem dados do servidor, pode fazer sincronização completa
           onUpdate(JSON.stringify(updated));
+        } else {
+          // Com dados do servidor, apenas atualizar se estivermos apenas adicionando
+          // (não remover professores existentes)
+          const wasOnlyAdding = professoresList.length >= Object.keys(currentInfo).length;
+          if (wasOnlyAdding) {
+            onUpdate(JSON.stringify(updated));
+          }
         }
       }
 
