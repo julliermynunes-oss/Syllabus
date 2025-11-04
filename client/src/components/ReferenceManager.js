@@ -229,6 +229,8 @@ const ReferenceManager = ({ content, onChange }) => {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault(); // Prevenir submit do formulário
+      e.stopPropagation(); // Parar propagação do evento
       performSearch();
     }
   };
@@ -291,6 +293,12 @@ const ReferenceManager = ({ content, onChange }) => {
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={handleKeyDown}
             className="reference-search-input"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+              }
+            }}
           />
           <button
             type="button"

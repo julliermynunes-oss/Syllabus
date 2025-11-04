@@ -819,6 +819,20 @@ app.get('/api/search-dataverse', async (req, res) => {
           }
         }
         
+        // Tentar extrair ano diretamente da citation string se disponível
+        if (!publicationDate && dataset.citation) {
+          // A citation pode vir como string completa do tipo "Autor, Ano, Título..."
+          const citationStr = typeof dataset.citation === 'string' ? dataset.citation : 
+                             (dataset.citation.citation || dataset.citation.text || '');
+          if (citationStr) {
+            // Procurar por padrão de data na citation (ex: ", 2022," ou ", 2022 ")
+            const yearMatch = citationStr.match(/,\s*(\d{4})\s*,/);
+            if (yearMatch) {
+              publicationDate = yearMatch[1];
+            }
+          }
+        }
+        
         // Se ainda não encontrou, tentar buscar no dataset completo via Native API
         if (!publicationDate && (dataset.globalId || dataset.persistentId)) {
           try {
@@ -849,6 +863,18 @@ app.get('/api/search-dataverse', async (req, res) => {
                 publicationDate = fullDataset.publicationDate || 
                                  fullDataset.dateOfDeposit || 
                                  fullDataset.distributionDate;
+              }
+              
+              // Tentar extrair da citation completa se disponível
+              if (!publicationDate && fullDataset.citation) {
+                const citationStr = typeof fullDataset.citation === 'string' ? fullDataset.citation : 
+                                   (fullDataset.citation.citation || fullDataset.citation.text || '');
+                if (citationStr) {
+                  const yearMatch = citationStr.match(/,\s*(\d{4})\s*,/);
+                  if (yearMatch) {
+                    publicationDate = yearMatch[1];
+                  }
+                }
               }
             }
           } catch (err) {
