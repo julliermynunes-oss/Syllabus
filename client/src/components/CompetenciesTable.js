@@ -10,17 +10,23 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
 
   // Carregar dados salvos primeiro (se houver)
   useEffect(() => {
-    if (!initializedRef.current && data && data.trim() !== '') {
+    if (data && data.trim() !== '') {
       try {
         const parsed = JSON.parse(data);
         if (parsed.rows && parsed.rows.length > 0) {
-          setRows(parsed.rows);
-          initializedRef.current = true;
-          console.log('Competências carregadas do banco:', parsed.rows.length, 'linhas');
+          // Só atualizar se não tivermos dados ou se os dados salvos são diferentes
+          if (rows.length === 0 || JSON.stringify(rows) !== JSON.stringify(parsed.rows)) {
+            setRows(parsed.rows);
+            initializedRef.current = true;
+            console.log('Competências carregadas do banco:', parsed.rows.length, 'linhas');
+          }
         }
       } catch (e) {
         console.error('Erro ao parsear competências salvas:', e);
       }
+    } else if (!initializedRef.current && curso) {
+      // Se não há dados salvos mas temos curso, carregar da API
+      loadCompetenciasFromAPI(curso);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -114,9 +120,9 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
     }
   };
 
-  // Salvar dados automaticamente quando mudarem
+  // Salvar dados automaticamente quando mudarem (mas não na primeira renderização)
   useEffect(() => {
-    if (initializedRef.current) {
+    if (initializedRef.current && rows.length > 0) {
       const dataObj = { rows };
       onChange(JSON.stringify(dataObj));
     }
