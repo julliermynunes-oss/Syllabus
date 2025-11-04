@@ -161,6 +161,9 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
       db.run(`ALTER TABLE syllabi ADD COLUMN contatos TEXT`, (err) => {
         // Ignore error if column already exists
       });
+      db.run(`ALTER TABLE syllabi ADD COLUMN ods TEXT`, (err) => {
+        // Ignore error if column already exists
+      });
 
       db.run(`CREATE TABLE IF NOT EXISTS programs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

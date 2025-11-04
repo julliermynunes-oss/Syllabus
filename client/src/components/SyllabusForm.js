@@ -94,7 +94,8 @@ const SyllabusForm = () => {
     custom_tab_name: '',
     custom_tab_content: '',
     professores_data: '',
-    contatos: ''
+    contatos: '',
+    ods: ''
   });
 
   const [programs, setPrograms] = useState([]);
@@ -180,7 +181,8 @@ const SyllabusForm = () => {
         semestre_ano: normalizeSemestreAno(response.data.semestre_ano),
         sem_curricular: normalizeSemCurricular(response.data.sem_curricular),
         professores_data: response.data.professores_data || null || '',
-        contatos: response.data.contatos || null || ''
+        contatos: response.data.contatos || null || '',
+        ods: response.data.ods || null || ''
       };
       
       // Debug: verificar se os dados dos professores estão sendo carregados
@@ -531,6 +533,13 @@ const SyllabusForm = () => {
             type="button"
           >
             Contatos
+          </button>
+          <button
+            className={`tab ${activeTab === 'ods' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ods')}
+            type="button"
+          >
+            ODS
           </button>
           <button
             className={`tab ${activeTab === 'referencias' ? 'active' : ''}`}
@@ -1327,6 +1336,19 @@ const SyllabusPDFContent = ({ formData, professoresList }) => {
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             dangerouslySetInnerHTML={{ __html: formData.contatos }}
+          />
+        </div>
+      )}
+
+      {/* ODS */}
+      {formData.ods && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            OBJETIVOS DE DESENVOLVIMENTO SUSTENTÁVEL (ODS)
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.ods }}
           />
         </div>
       )}

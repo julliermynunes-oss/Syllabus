@@ -769,6 +769,20 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </div>
       )}
 
+      {/* ODS */}
+      {formData.ods && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            OBJETIVOS DE DESENVOLVIMENTO SUSTENTÁVEL (ODS)
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            className="preview-content"
+            dangerouslySetInnerHTML={{ __html: formData.ods }}
+          />
+        </div>
+      )}
+
       {/* Competências */}
       {formData.competencias && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
