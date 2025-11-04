@@ -52,6 +52,21 @@
   width: 50%;
 }
 
+.criterio-editor-wrapper {
+  min-width: 300px;
+}
+
+.criterio-editor-wrapper .tiptap-wrapper {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.criterio-editor-wrapper .tiptap-editor-content {
+  min-height: 80px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
 .col-peso {
   width: 20%;
 }
@@ -75,22 +90,6 @@
   border-color: #235795;
 }
 
-.table-textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  resize: vertical;
-  min-height: 50px;
-  font-family: inherit;
-  transition: border-color 0.3s ease;
-}
-
-.table-textarea:focus {
-  outline: none;
-  border-color: #235795;
-}
 
 .remove-row-btn {
   background: #ff4444;

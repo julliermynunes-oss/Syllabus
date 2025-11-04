@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FaPlus, FaTrash } from 'react-icons/fa';
+import TiptapEditor from './TiptapEditor';
 import './AvaliacaoTable.css';
 
 const AvaliacaoTable = ({ data, onChange }) => {
   const [rows, setRows] = useState([]);
   const [observacoes, setObservacoes] = useState('');
+  const initializedRef = useRef(false);
+  const isInitializingRef = useRef(false);
 
-  // Inicializar dados quando receber props
+  // Inicializar dados quando receber props (apenas uma vez)
   useEffect(() => {
+    if (isInitializingRef.current) return;
+    
     if (data && data.trim() !== '') {
       try {
         const parsed = typeof data === 'string' ? JSON.parse(data) : data;
@@ -17,26 +22,34 @@ const AvaliacaoTable = ({ data, onChange }) => {
           setRows([{ tipo: '', criterio: '', peso: '' }]);
         }
         setObservacoes(parsed.observacoes || '');
+        initializedRef.current = true;
       } catch (e) {
         console.error('Erro ao parsear dados de avaliação:', e);
         setRows([{ tipo: '', criterio: '', peso: '' }]);
         setObservacoes('');
+        initializedRef.current = true;
       }
-    } else {
-      // Inicializar com pelo menos uma linha vazia
+    } else if (!initializedRef.current) {
+      // Inicializar com pelo menos uma linha vazia apenas na primeira vez
       setRows([{ tipo: '', criterio: '', peso: '' }]);
       setObservacoes('');
+      initializedRef.current = true;
     }
+    isInitializingRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  // Salvar dados automaticamente quando mudarem
+  // Salvar dados automaticamente quando mudarem (mas não durante inicialização)
   useEffect(() => {
-    const dataObj = {
-      rows: rows,
-      observacoes: observacoes
-    };
-    onChange(JSON.stringify(dataObj));
-  }, [rows, observacoes, onChange]);
+    if (initializedRef.current && rows.length > 0) {
+      const dataObj = {
+        rows: rows,
+        observacoes: observacoes
+      };
+      onChange(JSON.stringify(dataObj));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, observacoes]);
 
   const updateRow = (index, field, value) => {
     const newRows = rows.map((row, i) => {
@@ -46,6 +59,10 @@ const AvaliacaoTable = ({ data, onChange }) => {
       return row;
     });
     setRows(newRows);
+  };
+
+  const updateRowCriterio = (index, content) => {
+    updateRow(index, 'criterio', content);
   };
 
   const addRow = () => {
@@ -84,13 +101,12 @@ const AvaliacaoTable = ({ data, onChange }) => {
                   />
                 </td>
                 <td className="col-criterio">
-                  <textarea
-                    value={row.criterio || ''}
-                    onChange={(e) => updateRow(index, 'criterio', e.target.value)}
-                    placeholder="Descreva o critério de avaliação"
-                    className="table-textarea"
-                    rows="2"
-                  />
+                  <div className="criterio-editor-wrapper">
+                    <TiptapEditor
+                      content={row.criterio || ''}
+                      onChange={(content) => updateRowCriterio(index, content)}
+                    />
+                  </div>
                 </td>
                 <td className="col-peso">
                   <input
