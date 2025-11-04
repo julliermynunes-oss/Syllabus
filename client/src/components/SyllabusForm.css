@@ -997,6 +997,7 @@
   .export-pdf-btn,
   .preview-btn,
   .form-header,
+@media (max-width: 1024px) {
   .form-box-with-tabs {
     flex-direction: column;
   }
@@ -1038,9 +1039,10 @@
   .form-content-area {
     padding: 1.5rem;
   }
+}
 
-  @media (max-width: 768px) {
-    .form-box-with-tabs {
+@media print {
+  .form-box-with-tabs {
     display: none !important;
     visibility: hidden !important;
   }
