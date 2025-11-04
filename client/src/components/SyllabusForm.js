@@ -970,7 +970,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: ODS */}
-        {activeTab === 'ods' && (
+        {activeTab === 'ods' && !['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>Objetivos de Desenvolvimento Sustentável (ODS):</label>
@@ -1027,7 +1027,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: O QUE É ESPERADO QUE O(A) ALUNO(A) */}
-        {activeTab === 'o_que_e_esperado' && (
+        {activeTab === 'o_que_e_esperado' && !['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>O que é esperado que o(a) aluno(a):</label>
