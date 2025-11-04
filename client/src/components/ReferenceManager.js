@@ -149,6 +149,47 @@ const ReferenceManager = ({ content, onChange }) => {
     return (currentYear - year) > 10;
   };
 
+  const hasTitleAndAuthor = (item) => {
+    let hasTitle = false;
+    let hasAuthor = false;
+
+    // Verificar título
+    if (item.type === 'book') {
+      hasTitle = !!(item.volumeInfo?.title && item.volumeInfo.title.trim() !== '' && item.volumeInfo.title !== 'Sem título');
+    } else if (item.type === 'scholar' || item.type === 'dataverse') {
+      hasTitle = !!(item.title && item.title.trim() !== '' && item.title !== 'Sem título');
+    } else if (item.type === 'article') {
+      hasTitle = !!(item.title?.[0] && item.title[0].trim() !== '' && item.title[0] !== 'Sem título') ||
+                 !!(item['container-title']?.[0] && item['container-title'][0].trim() !== '');
+    }
+
+    // Verificar autor
+    if (item.type === 'book') {
+      hasAuthor = !!(item.volumeInfo?.authors && item.volumeInfo.authors.length > 0 && 
+                     item.volumeInfo.authors.some(a => a && a.trim() !== ''));
+    } else if (item.type === 'scholar') {
+      hasAuthor = !!(item.authors && item.authors.length > 0 && 
+                     item.authors.some(a => {
+                       const name = a.name || a;
+                       return name && name.trim() !== '' && name !== 'Autor não especificado';
+                     }));
+    } else if (item.type === 'dataverse') {
+      hasAuthor = !!(item.authors && item.authors.trim() !== '' && item.authors !== 'Autor não especificado');
+    } else if (item.type === 'article') {
+      if (item.author && Array.isArray(item.author) && item.author.length > 0) {
+        hasAuthor = item.author.some(author => {
+          const name = (author.given && author.family) ? `${author.given} ${author.family}`.trim() :
+                      author.family || author.given || author.name || author.literal || author.fullName || '';
+          return name && name.trim() !== '';
+        });
+      } else if (item.author && typeof item.author === 'string') {
+        hasAuthor = item.author.trim() !== '';
+      }
+    }
+
+    return hasTitle && hasAuthor;
+  };
+
   const formatReference = (item) => {
     if (item.type === 'book') {
       const volumeInfo = item.volumeInfo || {};
@@ -340,10 +381,10 @@ const ReferenceManager = ({ content, onChange }) => {
           </button>
         </div>
         
-        {searchResults.length > 0 && (
+        {searchResults.filter(hasTitleAndAuthor).length > 0 && (
           <div className="search-results">
             <h3 className="results-title">Resultados da busca:</h3>
-            {searchResults.map((item, index) => {
+            {searchResults.filter(hasTitleAndAuthor).map((item, index) => {
               const outdated = isOutdated(item);
               return (
                 <div key={index} className={`result-item ${outdated ? 'outdated' : ''}`}>
@@ -359,7 +400,7 @@ const ReferenceManager = ({ content, onChange }) => {
                       </strong>
                       {outdated && (
                         <span className="outdated-badge" title="Referência com mais de 10 anos">
-                          ⚠️ Desatualizado
+                          ⚠️ Antigo
                         </span>
                       )}
                     </div>
