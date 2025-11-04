@@ -652,7 +652,7 @@ app.get('/api/search-dataverse', async (req, res) => {
   const dataverseApiKey = process.env.DATAVERSE_API_KEY; // Opcional - algumas buscas públicas funcionam sem
 
   try {
-    // Construir URL da Search API
+    // Construir URL da Search API - incluir metadados de citação para ter acesso aos autores
     const searchUrl = `${dataverseUrl}/api/search?q=${encodeURIComponent(q)}&type=dataset&per_page=10`;
     
     const headers = {
@@ -669,16 +669,47 @@ app.get('/api/search-dataverse', async (req, res) => {
     // Transformar resposta do Dataverse para formato padronizado
     const items = [];
     if (response.data.data && response.data.data.items) {
-      response.data.data.items.forEach(item => {
+      // Processar cada item encontrado
+      for (const item of response.data.data.items) {
         const dataset = item;
-        const metadata = dataset.metadataBlocks?.citation?.fields || [];
+        let metadata = dataset.metadataBlocks?.citation?.fields || [];
+        
+        // Se não tiver metadados completos na busca, tentar buscar o dataset individual
+        // para obter os metadados completos (incluindo autores)
+        if (!metadata.length && (dataset.globalId || dataset.persistentId)) {
+          try {
+            const persistentId = encodeURIComponent(dataset.globalId || dataset.persistentId);
+            const datasetUrl = `${dataverseUrl}/api/datasets/:persistentId?persistentId=${persistentId}`;
+            const datasetHeaders = { 'Accept': 'application/json' };
+            if (dataverseApiKey) {
+              datasetHeaders['X-Dataverse-key'] = dataverseApiKey;
+            }
+            
+            const datasetResponse = await axios.get(datasetUrl, { headers: datasetHeaders });
+            if (datasetResponse.data?.data?.metadataBlocks?.citation?.fields) {
+              metadata = datasetResponse.data.data.metadataBlocks.citation.fields;
+            }
+          } catch (err) {
+            // Se falhar, continuar com os dados da busca
+            console.log('Não foi possível obter metadados completos do dataset:', err.message);
+          }
+        }
+        
+        // Tentar também extrair de outras estruturas possíveis
+        if (!metadata.length && dataset.citation) {
+          // Se houver uma citation pronta, tentar extrair dela
+          const citation = dataset.citation;
+          if (citation.author && citation.author.length > 0) {
+            metadata = [{ typeName: 'author', value: citation.author }];
+          }
+        }
         
         // Extrair informações relevantes dos metadados
         const getFieldValue = (fieldName) => {
           const field = metadata.find(f => f.typeName === fieldName || f.type === fieldName);
           if (field) {
             if (field.value) {
-              return Array.isArray(field.value) ? field.value[0] : field.value;
+              return Array.isArray(field.value) ? field.value : field.value;
             }
             return field.value;
           }
@@ -686,20 +717,81 @@ app.get('/api/search-dataverse', async (req, res) => {
         };
 
         const title = getFieldValue('title') || dataset.name || 'Sem título';
-        const authors = getFieldValue('author') || [];
-        const authorsStr = Array.isArray(authors) 
-          ? authors.map(a => a.authorName?.value || a || 'Autor desconhecido').join(', ')
-          : (authors.authorName?.value || authors || 'Autor desconhecido');
+        
+        // Extrair autores - pode ser um array de objetos compostos
+        let authorsStr = 'Autor não especificado';
+        const authorField = metadata.find(f => f.typeName === 'author');
+        
+        if (authorField && authorField.value) {
+          const authors = Array.isArray(authorField.value) ? authorField.value : [authorField.value];
+          const authorNames = authors
+            .map(authorObj => {
+              // authorObj pode ser um objeto com authorName dentro
+              if (typeof authorObj === 'object' && authorObj !== null) {
+                // Pode ter authorName como objeto com .value ou como string direta
+                if (authorObj.authorName) {
+                  if (typeof authorObj.authorName === 'object' && authorObj.authorName !== null) {
+                    return authorObj.authorName.value || authorObj.authorName.name || null;
+                  }
+                  return authorObj.authorName;
+                }
+                // Ou pode ter o nome diretamente em algum campo
+                return authorObj.value || authorObj.name || authorObj.author || null;
+              }
+              // Se for string direta
+              if (typeof authorObj === 'string') {
+                return authorObj;
+              }
+              return null;
+            })
+            .filter(name => name && name.trim() !== '' && name !== 'Autor desconhecido');
+          
+          if (authorNames.length > 0) {
+            authorsStr = authorNames.join(', ');
+          }
+        }
+        
+        // Fallback: tentar buscar em outras estruturas do dataset
+        if (authorsStr === 'Autor não especificado') {
+          // Tentar em dataset.citation
+          if (dataset.citation) {
+            const citationAuthors = dataset.citation.author || dataset.citation.authors;
+            if (citationAuthors) {
+              const names = Array.isArray(citationAuthors) 
+                ? citationAuthors.map(a => typeof a === 'string' ? a : (a.name || a.authorName || a)).filter(Boolean)
+                : [typeof citationAuthors === 'string' ? citationAuthors : (citationAuthors.name || citationAuthors.authorName || citationAuthors)];
+              if (names.length > 0) {
+                authorsStr = names.join(', ');
+              }
+            }
+          }
+          
+          // Tentar em dataset.author ou dataset.authors diretamente
+          if (authorsStr === 'Autor não especificado' && (dataset.author || dataset.authors)) {
+            const directAuthors = dataset.authors || (dataset.author ? [dataset.author] : []);
+            const names = directAuthors
+              .map(a => typeof a === 'string' ? a : (a.name || a.authorName || a.value || a))
+              .filter(Boolean);
+            if (names.length > 0) {
+              authorsStr = names.join(', ');
+            }
+          }
+        }
         
         const publicationDate = getFieldValue('datePublished') || 
                                getFieldValue('distributionDate') ||
-                               dataset.publicationDate;
+                               getFieldValue('dateOfDeposit') ||
+                               dataset.publicationDate ||
+                               dataset.dateOfDeposit;
         
-        const publisher = getFieldValue('publisher') || 'Dataverse';
+        const publisher = getFieldValue('publisher') || 
+                         getFieldValue('publisherName') || 
+                         'Dataverse';
+        
         const description = getFieldValue('dsDescription') || '';
         const descriptionStr = Array.isArray(description) 
-          ? description[0]?.dsDescriptionValue?.value || ''
-          : (description.dsDescriptionValue?.value || description || '');
+          ? (description[0]?.dsDescriptionValue?.value || description[0]?.value || '')
+          : (description?.dsDescriptionValue?.value || description?.value || description || '');
 
         items.push({
           type: 'dataverse',
