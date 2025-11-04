@@ -7,61 +7,100 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
   const [professoresInfo, setProfessoresInfo] = useState({});
 
   useEffect(() => {
-    // Inicializar dados dos professores apenas uma vez quando os dados são carregados
-    if (professoresData) {
+    // Inicializar dados dos professores quando os dados são carregados do servidor
+    if (professoresData && professoresData.trim() !== '') {
       try {
         const parsed = typeof professoresData === 'string' 
           ? JSON.parse(professoresData) 
           : professoresData;
-        if (parsed && Object.keys(parsed).length > 0) {
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+          // Só atualizar se realmente tiver dados válidos
           setProfessoresInfo(parsed);
-          return; // Não sincronizar se já temos dados
         }
       } catch (e) {
         console.error('Erro ao parsear dados dos professores:', e);
+        // Se der erro no parse, manter o estado atual se já tiver dados
+        if (Object.keys(professoresInfo).length === 0) {
+          setProfessoresInfo({});
+        }
+      }
+    } else if (!professoresData || professoresData === '') {
+      // Só inicializar vazio se realmente não tiver dados E se o estado também estiver vazio
+      // Isso evita limpar dados que já foram carregados
+      if (Object.keys(professoresInfo).length === 0) {
+        setProfessoresInfo({});
       }
     }
-    
-    // Só inicializar vazio se não tiver dados
-    if (Object.keys(professoresInfo).length === 0) {
-      setProfessoresInfo({});
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [professoresData]);
 
   useEffect(() => {
     // Sincronizar com a lista de professores do cabeçalho
-    // Mas não sobrescrever dados existentes
-    const updated = { ...professoresInfo };
-    let hasChanges = false;
+    // Mas não sobrescrever dados existentes que foram carregados do servidor
+    const hasDataFromServer = professoresData && professoresData.trim() !== '';
+    
+    // Se temos dados do servidor, não fazer sincronização automática
+    // Apenas adicionar novos professores que não existem
+    if (hasDataFromServer) {
+      const updated = { ...professoresInfo };
+      let hasChanges = false;
 
-    // Adicionar novos professores que não estão nos dados
-    professoresList.forEach(prof => {
-      if (!updated[prof]) {
-        updated[prof] = {
-          foto: '',
-          descricao: '',
-          linkedin: '',
-          outrosLinks: []
-        };
-        hasChanges = true;
+      // Adicionar novos professores que não estão nos dados (sem sobrescrever os existentes)
+      professoresList.forEach(prof => {
+        if (!updated[prof]) {
+          updated[prof] = {
+            foto: '',
+            descricao: '',
+            linkedin: '',
+            outrosLinks: []
+          };
+          hasChanges = true;
+        }
+      });
+
+      // Remover professores que não estão mais na lista (mas preservar dados do servidor)
+      Object.keys(updated).forEach(prof => {
+        if (!professoresList.includes(prof)) {
+          delete updated[prof];
+          hasChanges = true;
+        }
+      });
+
+      if (hasChanges) {
+        setProfessoresInfo(updated);
+        // Atualizar o formData para manter sincronizado
+        onUpdate(JSON.stringify(updated));
       }
-    });
+    } else {
+      // Se não temos dados do servidor, fazer sincronização normal
+      const updated = { ...professoresInfo };
+      let hasChanges = false;
 
-    // Remover professores que não estão mais na lista
-    Object.keys(updated).forEach(prof => {
-      if (!professoresList.includes(prof)) {
-        delete updated[prof];
-        hasChanges = true;
+      // Adicionar novos professores que não estão nos dados
+      professoresList.forEach(prof => {
+        if (!updated[prof]) {
+          updated[prof] = {
+            foto: '',
+            descricao: '',
+            linkedin: '',
+            outrosLinks: []
+          };
+          hasChanges = true;
+        }
+      });
+
+      // Remover professores que não estão mais na lista
+      Object.keys(updated).forEach(prof => {
+        if (!professoresList.includes(prof)) {
+          delete updated[prof];
+          hasChanges = true;
+        }
+      });
+
+      if (hasChanges) {
+        setProfessoresInfo(updated);
+        onUpdate(JSON.stringify(updated));
       }
-    });
-
-    // Só atualizar se houver mudanças E se não tivermos dados carregados do servidor
-    if (hasChanges && (!professoresData || professoresData === '')) {
-      setProfessoresInfo(updated);
-      onUpdate(JSON.stringify(updated));
-    } else if (hasChanges) {
-      // Se temos dados do servidor, apenas atualizar o estado local, não chamar onUpdate
-      setProfessoresInfo(updated);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [professoresList.join(',')]);
