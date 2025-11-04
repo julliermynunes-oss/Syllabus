@@ -161,6 +161,13 @@ export const translations = {
     errorLoading: 'Erro ao carregar',
     success: 'Sucesso',
     error: 'Erro',
+    errorDeleting: 'Erro ao deletar syllabus',
+    noPermissionDelete: 'Você não tem permissão para excluir este syllabus',
+    syllabusDuplicated: 'Syllabus duplicado com sucesso!',
+    errorDuplicating: 'Erro ao duplicar syllabus',
+    requestCreated: 'Requisição criada para:',
+    errorCreatingRequest: 'Erro ao criar requisição',
+    errorAcceptingRequest: 'Erro ao aceitar requisição',
   },
   en: {
     // Header e navegação
@@ -324,6 +331,13 @@ export const translations = {
     errorLoading: 'Error loading',
     success: 'Success',
     error: 'Error',
+    errorDeleting: 'Error deleting syllabus',
+    noPermissionDelete: 'You do not have permission to delete this syllabus',
+    syllabusDuplicated: 'Syllabus duplicated successfully!',
+    errorDuplicating: 'Error duplicating syllabus',
+    requestCreated: 'Request created for:',
+    errorCreatingRequest: 'Error creating request',
+    errorAcceptingRequest: 'Error accepting request',
   },
   es: {
     // Header e navegação
@@ -484,6 +498,13 @@ export const translations = {
     errorLoading: 'Error al cargar',
     success: 'Éxito',
     error: 'Error',
+    errorDeleting: 'Error al eliminar syllabus',
+    noPermissionDelete: 'No tiene permiso para eliminar este syllabus',
+    syllabusDuplicated: '¡Syllabus duplicado con éxito!',
+    errorDuplicating: 'Error al duplicar syllabus',
+    requestCreated: 'Solicitud creada para:',
+    errorCreatingRequest: 'Error al crear solicitud',
+    errorAcceptingRequest: 'Error al aceptar solicitud',
   },
 };
 
