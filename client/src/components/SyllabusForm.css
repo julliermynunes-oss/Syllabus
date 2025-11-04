@@ -1144,7 +1144,7 @@
   @page {
     size: A4;
     margin: 5mm;
-    margin-top: 75mm; /* Espaço para o logo fixo */
+    margin-top: 20mm; /* Espaço para o logo fixo */
   }
   
   /* Estilos para o conteúdo do PDF */
