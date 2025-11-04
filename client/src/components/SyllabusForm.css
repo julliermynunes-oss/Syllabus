@@ -1146,11 +1146,21 @@
     padding-top: 35px !important;
   }
   
+  /* Ajustar espaçamento superior em todas as páginas (especialmente após a primeira) */
+  .pdf-container > div {
+    padding-top: 15px !important;
+  }
+  
   /* Configurações de página - Remove cabeçalhos e rodapés do navegador */
   @page {
     size: A4;
     margin: 0;
-    margin-top: 35px; /* Espaço mínimo para o logo fixo */
+    margin-top: 50px; /* Espaço para o logo fixo em todas as páginas */
+  }
+  
+  /* Primeira página pode ter menos espaço */
+  @page:first {
+    margin-top: 35px;
   }
   
   /* Remover cabeçalhos e rodapés do navegador */

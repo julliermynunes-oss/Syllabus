@@ -438,11 +438,18 @@ function SyllabusForm() {
         @media print {
           @page {
             margin: 0 !important;
+            margin-top: 50px !important;
+          }
+          @page:first {
             margin-top: 35px !important;
           }
           body {
             margin: 0 !important;
             padding: 0 !important;
+          }
+          #pdf-content h3 {
+            margin-top: 20px !important;
+            padding-top: 10px !important;
           }
         }
       `;
