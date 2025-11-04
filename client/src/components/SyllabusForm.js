@@ -483,11 +483,10 @@ const SyllabusForm = () => {
         )}
       </div>
 
-      {/* Container unificado com sidebar e formulário */}
+      {/* Container unificado com abas e formulário */}
       <div className="form-box-with-tabs">
-        {/* Sidebar Navigation */}
-        <div className="sidebar-navigation">
-          <div className="tabs-container">
+        {/* Abas no topo */}
+        <div className="tabs-container">
           <button
             className={`tab ${activeTab === 'cabecalho' ? 'active' : ''}`}
             onClick={() => setActiveTab('cabecalho')}
