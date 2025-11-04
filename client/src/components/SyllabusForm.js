@@ -96,7 +96,8 @@ function SyllabusForm() {
     custom_tab_content: '',
     professores_data: '',
     contatos: '',
-    ods: ''
+    ods: '',
+    o_que_e_esperado: ''
   });
 
   const [programs, setPrograms] = useState([]);
@@ -183,7 +184,8 @@ function SyllabusForm() {
         sem_curricular: normalizeSemCurricular(response.data.sem_curricular),
         professores_data: response.data.professores_data || null || '',
         contatos: response.data.contatos || null || '',
-        ods: response.data.ods || null || ''
+        ods: response.data.ods || null || '',
+        o_que_e_esperado: response.data.o_que_e_esperado || null || ''
       };
       
       // Debug: verificar se os dados dos professores estão sendo carregados
@@ -535,13 +537,15 @@ function SyllabusForm() {
           >
             Contatos
           </button>
-          <button
-            className={`tab ${activeTab === 'ods' ? 'active' : ''}`}
-            onClick={() => setActiveTab('ods')}
-            type="button"
-          >
-            ODS
-          </button>
+          {!['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
+            <button
+              className={`tab ${activeTab === 'ods' ? 'active' : ''}`}
+              onClick={() => setActiveTab('ods')}
+              type="button"
+            >
+              ODS
+            </button>
+          )}
           <button
             className={`tab ${activeTab === 'referencias' ? 'active' : ''}`}
             onClick={() => setActiveTab('referencias')}
@@ -556,6 +560,15 @@ function SyllabusForm() {
           >
             Competências
           </button>
+          {!['CGA', 'CGAP', 'AFA'].includes(formData.curso) && (
+            <button
+              className={`tab ${activeTab === 'o_que_e_esperado' ? 'active' : ''}`}
+              onClick={() => setActiveTab('o_que_e_esperado')}
+              type="button"
+            >
+              O QUE É ESPERADO QUE O(A) ALUNO(A)
+            </button>
+          )}
           {formData.custom_tab_name && (
             <div className="tab-with-delete">
               <button
@@ -1009,6 +1022,22 @@ function SyllabusForm() {
                 onChange={(content) => setFormData(prev => ({ ...prev, competencias: content }))}
                 curso={formData.curso}
               />
+            </div>
+          </div>
+        )}
+
+        {/* Aba: O QUE É ESPERADO QUE O(A) ALUNO(A) */}
+        {activeTab === 'o_que_e_esperado' && (
+          <div className="form-row full-width">
+            <div className="form-field">
+              <label>O que é esperado que o(a) aluno(a):</label>
+              <TiptapEditor
+                content={formData.o_que_e_esperado}
+                onChange={(content) => setFormData(prev => ({ ...prev, o_que_e_esperado: content }))}
+              />
+              <p className="editor-note">
+                💡 <strong>Nota:</strong> Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas. Clique no botão "📊 Tabela" para inserir uma tabela.
+              </p>
             </div>
           </div>
         )}
