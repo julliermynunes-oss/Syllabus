@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { FaArrowLeft, FaFilePdf, FaTrash } from 'react-icons/fa';
@@ -15,6 +17,8 @@ import './SyllabusForm.css';
 function SyllabusForm() {
   const { id } = useParams();
   const { token, user } = useAuth();
+  const { t } = useTranslation();
+  const { language, changeLanguage } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const isEditing = !!id;
@@ -482,16 +486,37 @@ function SyllabusForm() {
     <div className="syllabus-form-container">
       <div className="form-header">
         <button className="back-btn" onClick={() => navigate('/syllabi')}>
-          <FaArrowLeft /> Voltar
+          <FaArrowLeft /> {t('back')}
         </button>
         <h1 className="form-title">
-          {isEditing ? 'Editar' : 'Criar'} Syllabus
+          {isEditing ? t('editSyllabus') : t('createSyllabus')}
         </h1>
-        {isEditing && (
-          <button className="export-pdf-btn" onClick={handleExportPDF} type="button">
-            <FaFilePdf /> Exportar PDF
-          </button>
-        )}
+        <div className="form-header-actions">
+          <select
+            value={language}
+            onChange={(e) => changeLanguage(e.target.value)}
+            style={{
+              padding: '0.5rem 1rem',
+              border: '2px solid #235795',
+              borderRadius: '8px',
+              background: 'white',
+              color: '#235795',
+              fontWeight: '600',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              marginRight: '1rem'
+            }}
+          >
+            <option value="pt">🇧🇷 Português</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="es">🇪🇸 Español</option>
+          </select>
+          {isEditing && (
+            <button className="export-pdf-btn" onClick={handleExportPDF} type="button">
+              <FaFilePdf /> {t('exportPDF')}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Container unificado com abas e formulário */}
@@ -503,56 +528,56 @@ function SyllabusForm() {
             onClick={() => setActiveTab('cabecalho')}
             type="button"
           >
-            Cabeçalho
+            {t('header')}
           </button>
           <button
             className={`tab ${activeTab === 'sobre' ? 'active' : ''}`}
             onClick={() => setActiveTab('sobre')}
             type="button"
           >
-            Sobre a Disciplina
+            {t('aboutDiscipline')}
           </button>
           <button
             className={`tab ${activeTab === 'conteudo' ? 'active' : ''}`}
             onClick={() => setActiveTab('conteudo')}
             type="button"
           >
-            Conteúdo
+            {t('content')}
           </button>
           <button
             className={`tab ${activeTab === 'metodologia' ? 'active' : ''}`}
             onClick={() => setActiveTab('metodologia')}
             type="button"
           >
-            Metodologia
+            {t('methodology')}
           </button>
           <button
             className={`tab ${activeTab === 'avaliacao' ? 'active' : ''}`}
             onClick={() => setActiveTab('avaliacao')}
             type="button"
           >
-            Avaliação
+            {t('evaluation')}
           </button>
           <button
             className={`tab ${activeTab === 'compromisso_etico' ? 'active' : ''}`}
             onClick={() => setActiveTab('compromisso_etico')}
             type="button"
           >
-            Ética
+            {t('ethics')}
           </button>
           <button
             className={`tab ${activeTab === 'professores' ? 'active' : ''}`}
             onClick={() => setActiveTab('professores')}
             type="button"
           >
-            Professores
+            {t('professors')}
           </button>
           <button
             className={`tab ${activeTab === 'contatos' ? 'active' : ''}`}
             onClick={() => setActiveTab('contatos')}
             type="button"
           >
-            Contatos
+            {t('contacts')}
           </button>
           {!isRestrictedCourse(formData.curso) && (
             <button
@@ -560,7 +585,7 @@ function SyllabusForm() {
               onClick={() => setActiveTab('ods')}
               type="button"
             >
-              ODS
+              {t('ods')}
             </button>
           )}
           <button
@@ -568,14 +593,14 @@ function SyllabusForm() {
             onClick={() => setActiveTab('referencias')}
             type="button"
           >
-            Referências
+            {t('references')}
           </button>
           <button
             className={`tab ${activeTab === 'competencias' ? 'active' : ''}`}
             onClick={() => setActiveTab('competencias')}
             type="button"
           >
-            Competências
+            {t('competencies')}
           </button>
           {!isRestrictedCourse(formData.curso) && (
             <button
@@ -583,7 +608,7 @@ function SyllabusForm() {
               onClick={() => setActiveTab('o_que_e_esperado')}
               type="button"
             >
-              O que é esperado do aluno(a)
+              {t('expectedFromStudent')}
             </button>
           )}
           {formData.custom_tab_name && (
@@ -602,7 +627,7 @@ function SyllabusForm() {
                   handleDeleteCustomTab();
                 }}
                 type="button"
-                title="Excluir aba personalizada"
+                title={t('deleteTabConfirm').replace('{name}', formData.custom_tab_name)}
               >
                 <FaTrash />
               </button>
@@ -615,9 +640,9 @@ function SyllabusForm() {
                 setShowCustomTabModal(true);
               }}
               type="button"
-              title="Adicionar aba personalizada"
+              title={t('addCustomTab')}
             >
-              + Nova Aba
+              {t('addCustomTab')}
             </button>
           )}
         </div>
@@ -630,14 +655,14 @@ function SyllabusForm() {
           <>
         <div className="form-row">
           <div className="form-field">
-            <label>Curso:</label>
+            <label>{t('course')}:</label>
             <div className="autocomplete-wrapper">
               <input
                 type="text"
                 name="curso"
                 value={formData.curso}
                 onChange={handleInputChange}
-                placeholder="Digite o curso ..."
+                placeholder={`${t('course')} ...`}
                 onBlur={() => setTimeout(() => setShowProgramDropdown(false), 200)}
               />
               {showProgramDropdown && filteredPrograms.length > 0 && (
@@ -657,14 +682,14 @@ function SyllabusForm() {
           </div>
 
           <div className="form-field">
-            <label>Disciplina:</label>
+            <label>{t('discipline')}:</label>
             <div className="autocomplete-wrapper">
               <input
                 type="text"
                 name="disciplina"
                 value={formData.disciplina}
                 onChange={handleInputChange}
-                placeholder="Digite a disciplina ..."
+                placeholder={`${t('discipline')} ...`}
                 onBlur={() => setTimeout(() => setShowDisciplineDropdown(false), 200)}
                 disabled={!formData.curso}
               />
@@ -688,23 +713,23 @@ function SyllabusForm() {
 
         <div className="form-row">
           <div className="form-field">
-            <label>Linha:</label>
+            <label>{t('line')}:</label>
             <input
               type="text"
               name="linha"
               value={formData.linha}
               onChange={handleInputChange}
-              placeholder="Digite a linha ..."
+              placeholder={`${t('line')} ...`}
             />
           </div>
           <div className="form-field">
-            <label>Semestre/Ano:</label>
+            <label>{t('semesterYear')}:</label>
             <select
               name="semestre_ano"
               value={formData.semestre_ano}
               onChange={handleInputChange}
             >
-              <option value="">Selecione o Semestre/Ano</option>
+              <option value="">{t('selectSemesterYear')}</option>
               {semestreAnoOptions.map((option, index) => (
                 <option key={index} value={option}>
                   {option}
@@ -716,23 +741,23 @@ function SyllabusForm() {
 
         <div className="form-row">
           <div className="form-field">
-            <label>Turma:</label>
+            <label>{t('class')}:</label>
             <input
               type="text"
               name="turma"
               value={formData.turma}
               onChange={handleInputChange}
-              placeholder="Digite nome/número da turma ..."
+              placeholder={`${t('class')} ...`}
             />
           </div>
           <div className="form-field">
-            <label>Departamento:</label>
+            <label>{t('department')}:</label>
             <select
               name="departamento"
               value={formData.departamento}
               onChange={handleInputChange}
             >
-              <option value="">Selecione o Departamento</option>
+              <option value="">{t('selectDepartment')}</option>
               {departamentoOptions.map((dep, idx) => (
                 <option key={idx} value={dep}>{dep}</option>
               ))}
@@ -742,23 +767,23 @@ function SyllabusForm() {
 
         <div className="form-row">
           <div className="form-field">
-            <label>Nº Créditos:</label>
+            <label>{t('credits')}:</label>
             <input
               type="text"
               name="num_creditos"
               value={formData.num_creditos}
               onChange={handleInputChange}
-              placeholder="Digite número de créditos ..."
+              placeholder={`${t('credits')} ...`}
             />
           </div>
           <div className="form-field">
-            <label>Idioma:</label>
+            <label>{t('language')}:</label>
             <select
               name="idioma"
               value={formData.idioma}
               onChange={handleInputChange}
             >
-              <option value="">Selecione o Idioma</option>
+              <option value="">{t('selectLanguage')}</option>
               <option value="Português">Português</option>
               <option value="English">English</option>
               <option value="Español">Español</option>
@@ -768,20 +793,20 @@ function SyllabusForm() {
 
         <div className="form-row">
           <div className="form-field">
-            <label>Sem. Curricular:</label>
+            <label>{t('curricularSemester')}:</label>
             <select
               name="sem_curricular"
               value={formData.sem_curricular}
               onChange={handleInputChange}
             >
-              <option value="">Selecione o Semestre Curricular</option>
+              <option value="">{t('selectCurricularSemester')}</option>
               {semestreCurricularOptions.map((option, index) => (
                 <option key={index} value={option}>{option}</option>
               ))}
             </select>
           </div>
           <div className="form-field">
-            <label>Líder de Disciplina:</label>
+            <label>{t('disciplineLeader')}:</label>
             <div className="autocomplete-wrapper">
               <input
                 type="text"
@@ -790,7 +815,7 @@ function SyllabusForm() {
                 onChange={handleLiderInputChange}
                 onFocus={() => formData.coordenador && setShowLiderDropdown(true)}
                 onBlur={() => setTimeout(() => setShowLiderDropdown(false), 200)}
-                placeholder="Digite o nome do líder de disciplina ..."
+                placeholder={`${t('disciplineLeader')} ...`}
                 className="form-input"
               />
               {showLiderDropdown && filteredLiderDisciplina.length > 0 && (
@@ -812,7 +837,7 @@ function SyllabusForm() {
 
         <div className="form-row">
           <div className="form-field" style={{ gridColumn: '1 / -1' }}>
-            <label>Professores:</label>
+            <label>{t('professorsList')}:</label>
             <div className="professores-container">
               <div className="professor-input-row">
                 <div className="autocomplete-wrapper" style={{ flex: 1 }}>
@@ -820,7 +845,7 @@ function SyllabusForm() {
                     type="text"
                     value={currentProfessor}
                     onChange={handleProfessorInputChange}
-                    placeholder={formData.departamento ? "Digite o nome do professor ..." : "Selecione um departamento primeiro"}
+                    placeholder={formData.departamento ? `${t('typeProfessorName')}` : t('selectDepartment')}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -853,7 +878,7 @@ function SyllabusForm() {
                   onClick={addProfessor}
                   disabled={!formData.departamento}
                 >
-                  Adicionar
+                  {t('addProfessorButton')}
                 </button>
               </div>
               {professoresList.length > 0 && (
