@@ -1133,7 +1133,6 @@ const SyllabusForm = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };
