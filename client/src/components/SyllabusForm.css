@@ -1127,8 +1127,8 @@
   /* Configurações de página - Remove cabeçalhos e rodapés do navegador */
   @page {
     size: A4;
-    margin: 0;
-    margin-top: 40px; /* Espaço para o logo fixo nas páginas seguintes */
+    margin: 0 !important;
+    margin-top: 0 !important;
     @top-left { content: none; }
     @top-center { content: none; }
     @top-right { content: none; }
@@ -1139,7 +1139,7 @@
   
   /* Primeira página pode ter menos espaço */
   @page:first {
-    margin-top: 10px; /* Reduzido para começar mais acima */
+    margin-top: 0 !important;
   }
   
   /* Reset - não aplicar padding por padrão */

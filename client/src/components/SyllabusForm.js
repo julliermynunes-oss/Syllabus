@@ -495,7 +495,7 @@ function SyllabusForm() {
           @page {
             size: A4;
             margin: 0 !important;
-            margin-top: 40px !important;
+            margin-top: 0 !important;
             @top-left { content: none; }
             @top-center { content: none; }
             @top-right { content: none; }
@@ -504,7 +504,7 @@ function SyllabusForm() {
             @bottom-right { content: none; }
           }
           @page:first {
-            margin-top: 10px !important;
+            margin-top: 0 !important;
           }
           body {
             margin: 0 !important;
@@ -530,7 +530,9 @@ function SyllabusForm() {
           }
           .pdf-container {
             padding-top: 10px !important;
-            padding: 10px 15px !important;
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+            padding-bottom: 10px !important;
             margin: 0 !important;
             box-sizing: border-box !important;
           }
@@ -548,6 +550,10 @@ function SyllabusForm() {
             padding-top: 0 !important;
             margin-bottom: 15px !important;
             margin-top: 0 !important;
+          }
+          .pdf-container > div:nth-child(2) {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
           }
           .pdf-container > div > h3:first-child {
             margin-top: 0 !important;
