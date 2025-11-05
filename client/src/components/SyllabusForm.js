@@ -524,13 +524,21 @@ function SyllabusForm() {
             width: 210mm !important;
             max-width: 210mm !important;
             background: white !important;
-            padding: 10px 15px !important;
+            padding: 0 !important;
             margin: 0 !important;
             box-sizing: border-box !important;
           }
           .pdf-container {
             padding-top: 10px !important;
             padding: 10px 15px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+          }
+          .pdf-container[style*="padding"] {
+            padding-top: 10px !important;
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+            padding-bottom: 10px !important;
           }
           .pdf-container > div {
             padding-top: 0 !important;
@@ -539,6 +547,7 @@ function SyllabusForm() {
           .pdf-container > div:first-child {
             padding-top: 0 !important;
             margin-bottom: 15px !important;
+            margin-top: 0 !important;
           }
           .pdf-container > div > h3:first-child {
             margin-top: 0 !important;
