@@ -133,6 +133,9 @@ export const translations = {
     newCustomTab: 'Nova Aba Personalizada',
     enterTabName: 'Digite o nome da nova aba:',
     createTab: 'Criar Aba',
+    selectTabPosition: 'Posição da aba:',
+    afterTab: 'Após',
+    end: 'No final',
     deleteTabConfirm: 'Tem certeza que deseja excluir a aba "{name}"? Todo o conteúdo será perdido.',
     
     // PDF/Preview
@@ -304,6 +307,9 @@ export const translations = {
     newCustomTab: 'New Custom Tab',
     enterTabName: 'Type the name of the new tab:',
     createTab: 'Create Tab',
+    selectTabPosition: 'Tab position:',
+    afterTab: 'After',
+    end: 'At the end',
     deleteTabConfirm: 'Are you sure you want to delete the tab "{name}"? All content will be lost.',
     
     // PDF/Preview

@@ -115,6 +115,7 @@ function SyllabusForm() {
     competencias: '',
     custom_tab_name: '',
     custom_tab_content: '',
+    custom_tab_position: 'end', // Posição padrão: no final
     professores_data: '',
     contatos: '',
     ods: '',
@@ -136,6 +137,7 @@ function SyllabusForm() {
   const [showLiderDropdown, setShowLiderDropdown] = useState(false);
   const [showCustomTabModal, setShowCustomTabModal] = useState(false);
   const [customTabNameInput, setCustomTabNameInput] = useState('');
+  const [customTabPositionInput, setCustomTabPositionInput] = useState('end');
 
   useEffect(() => {
     fetchPrograms();
@@ -206,7 +208,8 @@ function SyllabusForm() {
         professores_data: response.data.professores_data || null || '',
         contatos: response.data.contatos || null || '',
         ods: response.data.ods || null || '',
-        o_que_e_esperado: response.data.o_que_e_esperado || null || ''
+        o_que_e_esperado: response.data.o_que_e_esperado || null || '',
+        custom_tab_position: response.data.custom_tab_position || 'end'
       };
       
       // Debug: verificar se os dados dos professores estão sendo carregados
@@ -318,10 +321,12 @@ function SyllabusForm() {
       setFormData(prev => ({
         ...prev,
         custom_tab_name: customTabNameInput.trim(),
-        custom_tab_content: prev.custom_tab_content || ''
+        custom_tab_content: prev.custom_tab_content || '',
+        custom_tab_position: customTabPositionInput
       }));
       setShowCustomTabModal(false);
       setCustomTabNameInput('');
+      setCustomTabPositionInput('end');
       setActiveTab('custom');
     }
   };
@@ -331,13 +336,62 @@ function SyllabusForm() {
       setFormData(prev => ({
         ...prev,
         custom_tab_name: '',
-        custom_tab_content: ''
+        custom_tab_content: '',
+        custom_tab_position: 'end'
       }));
       // Se a aba custom estava ativa, mudar para outra aba
       if (activeTab === 'custom') {
         setActiveTab('cabecalho');
       }
     }
+  };
+
+  // Função para obter a lista de abas ordenadas
+  const getOrderedTabs = () => {
+    const tabs = [
+      { id: 'cabecalho', label: t('header') },
+      { id: 'sobre', label: t('aboutDiscipline') },
+      { id: 'conteudo', label: t('content') },
+      { id: 'metodologia', label: t('methodology') },
+      { id: 'avaliacao', label: t('evaluation') },
+      { id: 'compromisso_etico', label: t('ethics') },
+      { id: 'professores', label: t('professors') },
+      { id: 'contatos', label: t('contacts') }
+    ];
+
+    // Adicionar ODS se não for curso restrito
+    if (!isRestrictedCourse(formData.curso)) {
+      tabs.push({ id: 'ods', label: t('ods') });
+    }
+
+    tabs.push({ id: 'referencias', label: t('references') });
+    tabs.push({ id: 'competencias', label: t('competencies') });
+
+    // Adicionar "O que é esperado" se não for curso restrito
+    if (!isRestrictedCourse(formData.curso)) {
+      tabs.push({ id: 'o_que_e_esperado', label: t('expectedFromStudent') });
+    }
+
+    // Inserir a aba personalizada na posição correta
+    if (formData.custom_tab_name) {
+      const customTab = { id: 'custom', label: formData.custom_tab_name, isCustom: true };
+      const position = formData.custom_tab_position || 'end';
+      
+      if (position === 'end') {
+        tabs.push(customTab);
+      } else {
+        // Encontrar o índice da aba após a qual inserir
+        const afterIndex = tabs.findIndex(tab => tab.id === position);
+        if (afterIndex !== -1) {
+          tabs.splice(afterIndex + 1, 0, customTab);
+        } else {
+          // Se não encontrar, adicionar no final
+          tabs.push(customTab);
+        }
+      }
+    }
+
+    return tabs;
   };
 
   const selectDiscipline = (discipline) => {
@@ -551,116 +605,42 @@ function SyllabusForm() {
       <div className="form-box-with-tabs">
         {/* Abas no topo */}
         <div className="tabs-container">
-          <button
-            className={`tab ${activeTab === 'cabecalho' ? 'active' : ''}`}
-            onClick={() => setActiveTab('cabecalho')}
-            type="button"
-          >
-            {t('header')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'sobre' ? 'active' : ''}`}
-            onClick={() => setActiveTab('sobre')}
-            type="button"
-          >
-            {t('aboutDiscipline')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'conteudo' ? 'active' : ''}`}
-            onClick={() => setActiveTab('conteudo')}
-            type="button"
-          >
-            {t('content')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'metodologia' ? 'active' : ''}`}
-            onClick={() => setActiveTab('metodologia')}
-            type="button"
-          >
-            {t('methodology')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'avaliacao' ? 'active' : ''}`}
-            onClick={() => setActiveTab('avaliacao')}
-            type="button"
-          >
-            {t('evaluation')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'compromisso_etico' ? 'active' : ''}`}
-            onClick={() => setActiveTab('compromisso_etico')}
-            type="button"
-          >
-            {t('ethics')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'professores' ? 'active' : ''}`}
-            onClick={() => setActiveTab('professores')}
-            type="button"
-          >
-            {t('professors')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'contatos' ? 'active' : ''}`}
-            onClick={() => setActiveTab('contatos')}
-            type="button"
-          >
-            {t('contacts')}
-          </button>
-          {!isRestrictedCourse(formData.curso) && (
-            <button
-              className={`tab ${activeTab === 'ods' ? 'active' : ''}`}
-              onClick={() => setActiveTab('ods')}
-              type="button"
-            >
-              {t('ods')}
-            </button>
-          )}
-          <button
-            className={`tab ${activeTab === 'referencias' ? 'active' : ''}`}
-            onClick={() => setActiveTab('referencias')}
-            type="button"
-          >
-            {t('references')}
-          </button>
-          <button
-            className={`tab ${activeTab === 'competencias' ? 'active' : ''}`}
-            onClick={() => setActiveTab('competencias')}
-            type="button"
-          >
-            {t('competencies')}
-          </button>
-          {!isRestrictedCourse(formData.curso) && (
-            <button
-              className={`tab ${activeTab === 'o_que_e_esperado' ? 'active' : ''}`}
-              onClick={() => setActiveTab('o_que_e_esperado')}
-              type="button"
-            >
-              {t('expectedFromStudent')}
-            </button>
-          )}
-          {formData.custom_tab_name && (
-            <div className="tab-with-delete">
+          {getOrderedTabs().map((tab) => {
+            if (tab.isCustom) {
+              return (
+                <div key={tab.id} className="tab-with-delete">
+                  <button
+                    className={`tab custom-tab ${activeTab === tab.id ? 'active' : ''}`}
+                    onClick={() => setActiveTab(tab.id)}
+                    type="button"
+                  >
+                    {tab.label}
+                  </button>
+                  <button
+                    className="delete-custom-tab-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCustomTab();
+                    }}
+                    type="button"
+                    title={t('deleteTabConfirm').replace('{name}', formData.custom_tab_name)}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              );
+            }
+            return (
               <button
-                className={`tab custom-tab ${activeTab === 'custom' ? 'active' : ''}`}
-                onClick={() => setActiveTab('custom')}
+                key={tab.id}
+                className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.id)}
                 type="button"
               >
-                {formData.custom_tab_name}
+                {tab.label}
               </button>
-              <button
-                className="delete-custom-tab-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteCustomTab();
-                }}
-                type="button"
-                title={t('deleteTabConfirm').replace('{name}', formData.custom_tab_name)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          )}
+            );
+          })}
           {!formData.custom_tab_name && (
             <button
               className="tab add-custom-tab-btn"
@@ -1147,47 +1127,93 @@ function SyllabusForm() {
       </div>
 
       {/* Modal para criar aba personalizada */}
-      {showCustomTabModal && (
-        <div className="modal-overlay" onClick={() => setShowCustomTabModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>{t('newCustomTab')}</h2>
-            <p>{t('enterTabName')}</p>
-            <input
-              type="text"
-              value={customTabNameInput}
-              onChange={(e) => setCustomTabNameInput(e.target.value)}
-              placeholder="Ex: Material Complementar, Bibliografia Extensa, etc."
-              className="modal-input"
-              autoFocus
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleCreateCustomTab();
-                }
-              }}
-            />
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="modal-btn-confirm"
-                onClick={handleCreateCustomTab}
-                disabled={!customTabNameInput.trim()}
-              >
-                {t('createTab')}
-              </button>
-              <button
-                type="button"
-                className="modal-btn-cancel"
-                onClick={() => {
-                  setShowCustomTabModal(false);
-                  setCustomTabNameInput('');
+      {showCustomTabModal && (() => {
+        // Obter lista de abas disponíveis para posicionamento (sem a custom)
+        const availableTabs = [
+          { id: 'cabecalho', label: t('header') },
+          { id: 'sobre', label: t('aboutDiscipline') },
+          { id: 'conteudo', label: t('content') },
+          { id: 'metodologia', label: t('methodology') },
+          { id: 'avaliacao', label: t('evaluation') },
+          { id: 'compromisso_etico', label: t('ethics') },
+          { id: 'professores', label: t('professors') },
+          { id: 'contatos', label: t('contacts') }
+        ];
+
+        if (!isRestrictedCourse(formData.curso)) {
+          availableTabs.push({ id: 'ods', label: t('ods') });
+        }
+
+        availableTabs.push(
+          { id: 'referencias', label: t('references') },
+          { id: 'competencias', label: t('competencies') }
+        );
+
+        if (!isRestrictedCourse(formData.curso)) {
+          availableTabs.push({ id: 'o_que_e_esperado', label: t('expectedFromStudent') });
+        }
+
+        return (
+          <div className="modal-overlay" onClick={() => setShowCustomTabModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h2>{t('newCustomTab')}</h2>
+              <p>{t('enterTabName')}</p>
+              <input
+                type="text"
+                value={customTabNameInput}
+                onChange={(e) => setCustomTabNameInput(e.target.value)}
+                placeholder="Ex: Material Complementar, Bibliografia Extensa, etc."
+                className="modal-input"
+                autoFocus
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleCreateCustomTab();
+                  }
                 }}
-              >
-                {t('cancel')}
-              </button>
+              />
+              <div style={{ marginTop: '15px', marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  {t('selectTabPosition') || 'Posição da aba:'}
+                </label>
+                <select
+                  value={customTabPositionInput}
+                  onChange={(e) => setCustomTabPositionInput(e.target.value)}
+                  className="modal-input"
+                  style={{ width: '100%', padding: '8px' }}
+                >
+                  {availableTabs.map((tab) => (
+                    <option key={tab.id} value={tab.id}>
+                      {t('afterTab') || 'Após'} {tab.label}
+                    </option>
+                  ))}
+                  <option value="end">{t('end') || 'No final'}</option>
+                </select>
+              </div>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="modal-btn-confirm"
+                  onClick={handleCreateCustomTab}
+                  disabled={!customTabNameInput.trim()}
+                >
+                  {t('createTab')}
+                </button>
+                <button
+                  type="button"
+                  className="modal-btn-cancel"
+                  onClick={() => {
+                    setShowCustomTabModal(false);
+                    setCustomTabNameInput('');
+                    setCustomTabPositionInput('end');
+                  }}
+                >
+                  {t('cancel')}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

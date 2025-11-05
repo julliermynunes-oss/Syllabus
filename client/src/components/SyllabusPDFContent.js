@@ -43,130 +43,119 @@ const CompetenciesTablePDF = ({ data }) => {
     );
   } catch (e) {
     console.error('Erro ao renderizar competências:', e, 'Data:', data);
-    return <div style={{ fontSize: '14px', color: '#f00' }}>{t('errorLoadingCompetencies')}</div>;
+    return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('errorLoadingCompetencies')}</div>;
   }
 };
 
 // Componente separado para a visualização do PDF
 function SyllabusPDFContent({ formData, professoresList }) {
   const { t } = useTranslation();
-  
-  return (
-    <div className="pdf-container" style={{ 
-      padding: '10px 15px',
-      paddingTop: '30px', // Espaço para o logo fixo na primeira página
-      fontFamily: 'Arial, sans-serif',
-      color: '#000',
-      backgroundColor: '#fff',
-      maxWidth: '100%',
-      width: '100%',
-      boxSizing: 'border-box',
-      position: 'relative'
-    }}>
-      {/* Logo fixo que aparecerá em todas as páginas */}
-      <div className="pdf-logo-header" style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '25px',
-        backgroundColor: '#fff',
-        borderBottom: '1px solid #e0e0e0',
-        padding: '2px 20px',
-        zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <img 
-          src="/FGV LOGO NOVO.png" 
-          alt="FGV Logo" 
-          style={{ 
-            maxHeight: '20px', 
-            height: 'auto',
-            width: 'auto'
-          }} 
-        />
-      </div>
 
-      {/* 1. Informações Gerais - Layout vertical (um abaixo do outro) */}
-      <div style={{ marginBottom: '30px' }}>
-        <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-          {t('generalInformation')}
-        </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', width: '100%' }}>
-          {formData.disciplina && (
-            <div>
-              <strong>{t('discipline')}:</strong> {formData.disciplina}
-            </div>
-          )}
-          {formData.curso && (
-            <div>
-              <strong>{t('course')}:</strong> {formData.curso}
-            </div>
-          )}
-          {formData.semestre_ano && (
-            <div>
-              <strong>{t('semesterYear')}:</strong> {formData.semestre_ano}
-            </div>
-          )}
-          {formData.linha && (
-            <div>
-              <strong>{t('line')}:</strong> {formData.linha}
-            </div>
-          )}
-          {formData.turma && (
-            <div>
-              <strong>{t('class')}:</strong> {formData.turma}
-            </div>
-          )}
-          {formData.departamento && (
-            <div>
-              <strong>{t('department')}:</strong> {formData.departamento}
-            </div>
-          )}
-          {formData.num_creditos && (
-            <div>
-              <strong>{t('credits')}:</strong> {formData.num_creditos}
-            </div>
-          )}
-          {formData.sem_curricular && (
-            <div>
-              <strong>{t('curricularSemester')}:</strong> {formData.sem_curricular}
-            </div>
-          )}
-          {formData.coordenador && (
-            <div>
-              <strong>{t('disciplineLeader')}:</strong> {formData.coordenador}
-            </div>
-          )}
-          {formData.idioma && (
-            <div>
-              <strong>{t('language')}:</strong> {formData.idioma}
-            </div>
-          )}
-          {professoresList && professoresList.length > 0 && (
-            <div>
-              <strong>{t('professorsList')}:</strong> {professoresList.join(', ')}
-            </div>
-          )}
+  // Função auxiliar para verificar se o curso é restrito
+  const isRestrictedCourse = (curso) => {
+    if (!curso) return false;
+    const cursoUpper = curso.toUpperCase();
+    return cursoUpper.includes('CGA - CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO') ||
+           cursoUpper.includes('CGAP - CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA') ||
+           cursoUpper.includes('AFA - 2ª GRADUAÇÃO EM CONTABILIDADE') ||
+           cursoUpper === 'CGA' ||
+           cursoUpper === 'CGAP' ||
+           cursoUpper === 'AFA' ||
+           cursoUpper.startsWith('CGA ') ||
+           cursoUpper.startsWith('CGAP ') ||
+           cursoUpper.startsWith('AFA ');
+  };
+
+  // Função para obter seções ordenadas
+  const getOrderedSections = () => {
+    const sections = [];
+
+    // 1. Informações Gerais (sempre primeiro)
+    sections.push({
+      id: 'info_gerais',
+      component: (
+        <div key="info_gerais" style={{ marginBottom: '30px' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            {t('generalInformation')}
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', width: '100%' }}>
+            {formData.disciplina && (
+              <div>
+                <strong>{t('discipline')}:</strong> {formData.disciplina}
+              </div>
+            )}
+            {formData.curso && (
+              <div>
+                <strong>{t('course')}:</strong> {formData.curso}
+              </div>
+            )}
+            {formData.semestre_ano && (
+              <div>
+                <strong>{t('semesterYear')}:</strong> {formData.semestre_ano}
+              </div>
+            )}
+            {formData.linha && (
+              <div>
+                <strong>{t('line')}:</strong> {formData.linha}
+              </div>
+            )}
+            {formData.turma && (
+              <div>
+                <strong>{t('class')}:</strong> {formData.turma}
+              </div>
+            )}
+            {formData.departamento && (
+              <div>
+                <strong>{t('department')}:</strong> {formData.departamento}
+              </div>
+            )}
+            {formData.num_creditos && (
+              <div>
+                <strong>{t('credits')}:</strong> {formData.num_creditos}
+              </div>
+            )}
+            {formData.sem_curricular && (
+              <div>
+                <strong>{t('curricularSemester')}:</strong> {formData.sem_curricular}
+              </div>
+            )}
+            {formData.coordenador && (
+              <div>
+                <strong>{t('disciplineLeader')}:</strong> {formData.coordenador}
+              </div>
+            )}
+            {formData.idioma && (
+              <div>
+                <strong>{t('language')}:</strong> {formData.idioma}
+              </div>
+            )}
+            {professoresList && professoresList.length > 0 && (
+              <div>
+                <strong>{t('professorsList')}:</strong> {professoresList.join(', ')}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )
+    });
 
-      {/* 2. Informações do Professor */}
-      {formData.professores_data && professoresList && professoresList.length > 0 && (() => {
-        try {
-          const professoresData = typeof formData.professores_data === 'string' 
-            ? JSON.parse(formData.professores_data) 
-            : formData.professores_data;
-          
-          const professoresComDados = professoresList.filter(prof => {
-            const data = professoresData[prof];
-            return data && (data.foto || data.descricao || data.linkedin || data.lattes || (data.outrosLinks && data.outrosLinks.length > 0));
-          });
+    // 2. Professores (sempre segundo)
+    if (formData.professores_data && professoresList && professoresList.length > 0) {
+      try {
+        const professoresData = typeof formData.professores_data === 'string' 
+          ? JSON.parse(formData.professores_data) 
+          : formData.professores_data;
+        
+        const professoresComDados = professoresList.filter(prof => {
+          const data = professoresData[prof];
+          return data && (data.foto || data.descricao || data.linkedin || data.lattes || (data.outrosLinks && data.outrosLinks.length > 0));
+        });
 
-          if (professoresComDados.length > 0) {
-            return (
-              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+        if (professoresComDados.length > 0) {
+          sections.push({
+            id: 'professores',
+            component: (
+              <div key="professores" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
                 <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
                   {t('professorsTitle')}
                 </h3>
@@ -235,64 +224,86 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   })}
                 </div>
               </div>
-            );
-          }
-        } catch (e) {
-          return null;
+            )
+          });
         }
-      })()}
+      } catch (e) {
+        // Ignorar erro
+      }
+    }
 
-      {/* 3. Sobre a Disciplina */}
-      {formData.sobre_disciplina && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('aboutDisciplineTitle')}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.sobre_disciplina }}
-          />
-        </div>
-      )}
+    // 3. Sobre a Disciplina
+    if (formData.sobre_disciplina) {
+      sections.push({
+        id: 'sobre',
+        component: (
+          <div key="sobre" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('aboutDisciplineTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.sobre_disciplina }}
+            />
+          </div>
+        )
+      });
+    }
 
-      {/* 4. Competências da Disciplina */}
-      {formData.competencias && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('competenciesTitle')}
-          </h3>
-          <CompetenciesTablePDF data={formData.competencias} />
-        </div>
-      )}
+    // 4. Competências
+    if (formData.competencias) {
+      sections.push({
+        id: 'competencias',
+        component: (
+          <div key="competencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('competenciesTitle')}
+            </h3>
+            <CompetenciesTablePDF data={formData.competencias} />
+          </div>
+        )
+      });
+    }
 
-      {/* 5. Objetivo de Desenvolvimento Sustentável */}
-      {formData.ods && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('odsTitle')}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.ods }}
-          />
-        </div>
-      )}
+    // 5. ODS (se não for curso restrito)
+    if (formData.ods && !isRestrictedCourse(formData.curso)) {
+      sections.push({
+        id: 'ods',
+        component: (
+          <div key="ods" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('odsTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.ods }}
+            />
+          </div>
+        )
+      });
+    }
 
-      {/* 6. Metodologia */}
-      {formData.metodologia && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('methodologyTitle')}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.metodologia }}
-          />
-        </div>
-      )}
+    // 6. Metodologia
+    if (formData.metodologia) {
+      sections.push({
+        id: 'metodologia',
+        component: (
+          <div key="metodologia" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('methodologyTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.metodologia }}
+            />
+          </div>
+        )
+      });
+    }
 
-      {/* 7. Avaliação */}
-      {formData.criterio_avaliacao && (() => {
+    // 7. Avaliação
+    if (formData.criterio_avaliacao) {
+      const avaliacaoComponent = (() => {
         try {
           const parsed = typeof formData.criterio_avaliacao === 'string' 
             ? JSON.parse(formData.criterio_avaliacao) 
@@ -363,59 +374,143 @@ function SyllabusPDFContent({ formData, professoresList }) {
             </div>
           );
         }
-      })()}
+      })();
 
-      {/* 8. Conteúdo do Curso */}
-      {formData.conteudo && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('contentTitle')}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.conteudo }}
-          />
-        </div>
-      )}
+      sections.push({
+        id: 'avaliacao',
+        component: avaliacaoComponent
+      });
+    }
 
-      {/* 9. O que esperar do aluno */}
-      {formData.o_que_e_esperado && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('expectedFromStudentTitle')}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.o_que_e_esperado }}
-          />
-        </div>
-      )}
+    // 8. Conteúdo
+    if (formData.conteudo) {
+      sections.push({
+        id: 'conteudo',
+        component: (
+          <div key="conteudo" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('contentTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.conteudo }}
+            />
+          </div>
+        )
+      });
+    }
 
-      {/* 10. Aba Personalizada */}
-      {formData.custom_tab_name && formData.custom_tab_content && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {formData.custom_tab_name.toUpperCase()}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
-          />
-        </div>
-      )}
+    // 9. O que é esperado do aluno (se não for curso restrito)
+    if (formData.o_que_e_esperado && !isRestrictedCourse(formData.curso)) {
+      sections.push({
+        id: 'o_que_e_esperado',
+        component: (
+          <div key="o_que_e_esperado" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('expectedFromStudentTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.o_que_e_esperado }}
+            />
+          </div>
+        )
+      });
+    }
 
-      {/* 11. Referências Bibliográficas */}
-      {formData.referencias && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('referencesTitle')}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            dangerouslySetInnerHTML={{ __html: formData.referencias }}
-          />
-        </div>
-      )}
+    // Inserir a aba personalizada na posição correta
+    if (formData.custom_tab_name && formData.custom_tab_content) {
+      const customSection = {
+        id: 'custom',
+        component: (
+          <div key="custom" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {formData.custom_tab_name.toUpperCase()}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
+            />
+          </div>
+        )
+      };
+
+      const position = formData.custom_tab_position || 'end';
+      
+      if (position === 'end') {
+        sections.push(customSection);
+      } else {
+        // Encontrar o índice da seção após a qual inserir
+        const afterIndex = sections.findIndex(section => section.id === position);
+        if (afterIndex !== -1) {
+          sections.splice(afterIndex + 1, 0, customSection);
+        } else {
+          // Se não encontrar, adicionar no final
+          sections.push(customSection);
+        }
+      }
+    }
+
+    // 10. Referências (sempre por último)
+    if (formData.referencias) {
+      sections.push({
+        id: 'referencias',
+        component: (
+          <div key="referencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('referencesTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.referencias }}
+            />
+          </div>
+        )
+      });
+    }
+
+    return sections;
+  };
+  
+  return (
+    <div className="pdf-container" style={{ 
+      padding: '10px 15px',
+      paddingTop: '30px',
+      fontFamily: 'Arial, sans-serif',
+      color: '#000',
+      backgroundColor: '#fff',
+      maxWidth: '100%',
+      width: '100%',
+      boxSizing: 'border-box',
+      position: 'relative'
+    }}>
+      {/* Logo fixo que aparecerá em todas as páginas */}
+      <div className="pdf-logo-header" style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '25px',
+        backgroundColor: '#fff',
+        borderBottom: '1px solid #e0e0e0',
+        padding: '2px 20px',
+        zIndex: 1000,
+        display: 'flex',
+        alignItems: 'center'
+      }}>
+        <img 
+          src="/FGV LOGO NOVO.png" 
+          alt="FGV Logo" 
+          style={{ 
+            maxHeight: '20px', 
+            height: 'auto',
+            width: 'auto'
+          }} 
+        />
+      </div>
+
+      {/* Renderizar seções na ordem correta */}
+      {getOrderedSections().map(section => section.component)}
     </div>
   );
 }
