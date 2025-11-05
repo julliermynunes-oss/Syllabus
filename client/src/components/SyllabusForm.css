@@ -1151,7 +1151,7 @@
   @page {
     size: A4;
     margin: 0;
-    margin-top: 35px; /* Espaço reduzido para o logo fixo nas páginas seguintes */
+    margin-top: 40px; /* Espaço para o logo fixo nas páginas seguintes */
     @top-left { content: none; }
     @top-center { content: none; }
     @top-right { content: none; }
@@ -1165,10 +1165,9 @@
     margin-top: 10px; /* Reduzido para começar mais acima */
   }
   
-  /* Adicionar padding-top aos elementos que podem começar em novas páginas */
-  /* Isso garante que o conteúdo não fique coberto pelo cabeçalho fixo */
+  /* Reset - não aplicar padding por padrão */
   .pdf-container > div {
-    padding-top: 30px !important; /* Espaço aumentado para evitar que o cabeçalho fixo cubra conteúdo */
+    padding-top: 0 !important;
     margin-top: 0 !important;
   }
   
@@ -1183,20 +1182,25 @@
     margin-top: 0 !important;
   }
   
-  /* Quando uma seção começa com título h3 no topo, reduzir padding do container */
-  /* pois o título já tem seu próprio espaçamento visual */
+  /* Quando uma seção começa com título h3, adicionar espaço antes do título */
   .pdf-container > div > h3:first-child {
     margin-top: 0 !important;
-    padding-top: 0 !important;
+    padding-top: 15px !important; /* Espaço para o cabeçalho fixo quando há título */
   }
   
-  /* Reduzir padding quando há título no início (menos espaço necessário) */
-  .pdf-container > div > h3:first-child ~ * {
-    /* Se houver conteúdo após o título, manter o padding padrão */
+  /* Quando conteúdo começa diretamente (sem título), adicionar padding-top */
+  /* Detectando quando o primeiro filho não é h3 */
+  .pdf-container > div > *:first-child:not(h3) {
+    padding-top: 30px !important; /* Espaço extra quando não há título */
   }
   
-  /* Para seções que começam diretamente com conteúdo (sem título), manter padding maior */
-  /* Isso é o padrão de 30px definido acima */
+  /* Para listas que começam diretamente (como referências quebradas), garantir espaço */
+  .pdf-container > div > ul:first-child,
+  .pdf-container > div > ol:first-child,
+  .pdf-container > div > div:first-child:not(:has(h3)) {
+    padding-top: 30px !important;
+    margin-top: 0 !important;
+  }
   
   /* Estilos para o conteúdo do PDF */
   #pdf-content h1,
