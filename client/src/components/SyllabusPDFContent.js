@@ -214,8 +214,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
                           {profData.lattes && (
                             <div>
                               <strong>Currículo Lattes:</strong>{' '}
-                              <a href={profData.lattes} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
-                                {profData.lattes}
+                              <a href={profData.lattes} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
+                                Ver currículo
                               </a>
                             </div>
                           )}

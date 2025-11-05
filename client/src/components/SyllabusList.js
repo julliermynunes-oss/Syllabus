@@ -751,16 +751,16 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
                           {profData.linkedin && (
                             <div>
                               <strong>LinkedIn:</strong>{' '}
-                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5' }}>
-                                {profData.linkedin}
+                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', textDecoration: 'underline' }}>
+                                Ver perfil
                               </a>
                             </div>
                           )}
                           {profData.lattes && (
                             <div>
                               <strong>Currículo Lattes:</strong>{' '}
-                              <a href={profData.lattes} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
-                                {profData.lattes}
+                              <a href={profData.lattes} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
+                                Ver currículo
                               </a>
                             </div>
                           )}
@@ -768,8 +768,8 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
                             link.url && (
                               <div key={idx}>
                                 <strong>{link.label || 'Link'}:</strong>{' '}
-                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
-                                  {link.url}
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
+                                  {link.label || 'Acessar link'}
                                 </a>
                               </div>
                             )
