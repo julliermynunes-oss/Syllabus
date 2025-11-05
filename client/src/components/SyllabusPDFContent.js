@@ -74,7 +74,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '30px', marginTop: '0' }}>
+        <div key="info_gerais" style={{ marginBottom: '15px', marginTop: '0' }}>
           {/* Logo apenas na primeira página */}
           <div style={{ 
             display: 'flex', 
@@ -186,9 +186,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
                         border: '1px solid #e0e0e0', 
                         borderRadius: '8px', 
                         padding: '15px',
-                        background: '#fff'
+                        background: '#fff',
+                        pageBreakInside: 'avoid',
+                        breakInside: 'avoid'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px', pageBreakInside: 'avoid' }}>
                           {profData.foto && (
                             <img 
                               src={profData.foto} 
@@ -202,11 +204,19 @@ function SyllabusPDFContent({ formData, professoresList }) {
                               }}
                             />
                           )}
-                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px' }}>{professorNome}</h4>
+                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px', pageBreakAfter: 'avoid' }}>{professorNome}</h4>
                         </div>
                         {profData.descricao && (
                           <div 
-                            style={{ fontSize: '13px', lineHeight: '1.5', marginBottom: '12px', color: '#333' }}
+                            style={{ 
+                              fontSize: '13px', 
+                              lineHeight: '1.5', 
+                              marginBottom: '12px', 
+                              color: '#333',
+                              pageBreakInside: 'avoid',
+                              orphans: 3,
+                              widows: 3
+                            }}
                             dangerouslySetInnerHTML={{ __html: profData.descricao }}
                           />
                         )}

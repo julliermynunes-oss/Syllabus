@@ -1186,6 +1186,25 @@
     page-break-after: avoid;
   }
   
+  /* Evitar quebra de página dentro de parágrafos e divs com texto */
+  .pdf-container p,
+  .pdf-container div[style*="fontSize"] {
+    page-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+  
+  /* Evitar quebra de página dentro de cards de professores */
+  .pdf-container > div > div[style*="border"] {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  
+  /* Garantir que parágrafos não sejam cortados */
+  .pdf-container p {
+    page-break-inside: avoid;
+  }
+  
   #pdf-content table {
     page-break-inside: avoid;
   }
