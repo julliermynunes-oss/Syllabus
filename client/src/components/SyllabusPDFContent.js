@@ -74,8 +74,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '30px' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+        <div key="info_gerais" style={{ marginBottom: '30px', marginTop: '0' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px', marginTop: '0', paddingTop: '0' }}>
             {t('generalInformation')}
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', width: '100%' }}>
