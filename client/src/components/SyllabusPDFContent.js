@@ -178,7 +178,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
                 <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
                   {t('professorsTitle')}
                 </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   {professoresComDados.map((professorNome) => {
                     const profData = professoresData[professorNome] || {};
                     return (
