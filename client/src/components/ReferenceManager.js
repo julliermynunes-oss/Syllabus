@@ -9,7 +9,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
-  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'dataverse', 'arxiv'
+  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'dataverse', 'arxiv', 'openalex'
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [pendingReference, setPendingReference] = useState(null);
   const [pendingIndex, setPendingIndex] = useState(null);
@@ -175,6 +175,78 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     }
   };
 
+  const searchOpenAlex = async () => {
+    if (!searchTerm.trim()) return;
+
+    setIsSearching(true);
+    try {
+      // OpenAlex API - boa cobertura de conteúdo brasileiro e português
+      const response = await axios.get(
+        `https://api.openalex.org/works`,
+        {
+          params: {
+            search: searchTerm,
+            per_page: 10,
+            filter: 'language:pt' // Filtrar por português quando possível
+          },
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const items = (response.data.results || []).map(item => {
+        // Extrair autores
+        let authors = 'Autor não especificado';
+        if (item.authorships && item.authorships.length > 0) {
+          const authorNames = item.authorships.map(auth => {
+            const author = auth.author;
+            if (author && author.display_name) {
+              return author.display_name;
+            }
+            return null;
+          }).filter(name => name);
+          
+          if (authorNames.length > 0) {
+            authors = authorNames.join(', ');
+          }
+        }
+
+        // Extrair ano
+        const year = item.publication_year || '';
+        
+        // Extrair título
+        const title = item.title || 'Sem título';
+        
+        // Extrair journal/venue
+        const venue = item.primary_location?.source?.display_name || 
+                     item.venues?.[0]?.display_name || 
+                     item.locations?.[0]?.source?.display_name || '';
+        
+        // Extrair DOI
+        const doi = item.doi || '';
+        
+        return {
+          type: 'openalex',
+          title: title,
+          authors: authors,
+          year: year,
+          venue: venue,
+          doi: doi,
+          language: item.language || 'pt'
+        };
+      });
+
+      setSearchResults(items);
+    } catch (error) {
+      console.error('Erro ao buscar na API do OpenAlex:', error);
+      window.alert('Erro ao buscar no OpenAlex. Tente novamente.');
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const performSearch = () => {
     if (searchType === 'articles') {
       searchCrossRef();
@@ -186,6 +258,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       searchDataverse();
     } else if (searchType === 'arxiv') {
       searcharXiv();
+    } else if (searchType === 'openalex') {
+      searchOpenAlex();
     }
   };
 
@@ -204,6 +278,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       year = publishedDate ? parseInt(publishedDate.match(/\d{4}/)?.[0] || publishedDate) : null;
     } else if (item.type === 'arxiv') {
       year = item.year ? parseInt(item.year) : null;
+    } else if (item.type === 'openalex') {
+      year = item.year ? parseInt(item.year) : null;
     } else {
       year = item.published?.['date-parts']?.[0]?.[0] || item.created?.['date-parts']?.[0]?.[0];
     }
@@ -220,7 +296,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     // Verificar título
     if (item.type === 'book') {
       hasTitle = !!(item.volumeInfo?.title && item.volumeInfo.title.trim() !== '' && item.volumeInfo.title !== 'Sem título');
-    } else if (item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv') {
+    } else if (item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex') {
       hasTitle = !!(item.title && item.title.trim() !== '' && item.title !== 'Sem título');
     } else if (item.type === 'article') {
       hasTitle = !!(item.title?.[0] && item.title[0].trim() !== '' && item.title[0] !== 'Sem título') ||
@@ -237,9 +313,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                        const name = a.name || a;
                        return name && name.trim() !== '' && name !== 'Autor não especificado';
                      }));
-    } else if (item.type === 'dataverse') {
-      hasAuthor = !!(item.authors && item.authors.trim() !== '' && item.authors !== 'Autor não especificado');
-    } else if (item.type === 'arxiv') {
+    } else if (item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex') {
       hasAuthor = !!(item.authors && item.authors.trim() !== '' && item.authors !== 'Autor não especificado');
     } else if (item.type === 'article') {
       if (item.author && Array.isArray(item.author) && item.author.length > 0) {
@@ -309,6 +383,14 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       const arxivId = item.arxivId ? `arXiv:${item.arxivId}` : '';
       
       return `${authors} (${year}). ${title}. ${arxivId}`;
+    } else if (item.type === 'openalex') {
+      const authors = item.authors || 'Autor não especificado';
+      const title = item.title || 'Sem título';
+      const year = item.year || '';
+      const venue = item.venue || '';
+      const doi = item.doi ? `DOI: ${item.doi}` : '';
+      
+      return `${authors} (${year}). ${title}. ${venue ? venue + '. ' : ''}${doi}`;
     } else {
       // Artigo (Crossref)
       let authors = 'Autor não especificado';
@@ -459,6 +541,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       return 'Pesquisar datasets no Dataverse (Harvard)...';
     } else if (searchType === 'arxiv') {
       return 'Pesquisar pré-publicações no arXiv...';
+    } else if (searchType === 'openalex') {
+      return 'Pesquisar artigos (inclui conteúdo brasileiro/português)...';
     } else {
       return 'Pesquisar por título, autor ou DOI na API do Crossref...';
     }
@@ -508,6 +592,14 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           >
             <FaFlask /> arXiv
           </button>
+          <button
+            type="button"
+            className={`search-type-btn ${searchType === 'openalex' ? 'active' : ''}`}
+            onClick={() => setSearchType('openalex')}
+            title="Buscar no OpenAlex (inclui conteúdo brasileiro)"
+          >
+            <FaFileAlt /> OpenAlex
+          </button>
         </div>
         
         <div className="search-input-group">
@@ -547,7 +639,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                       <strong>
                         {item.type === 'book' 
                           ? (item.volumeInfo?.title || 'Sem título')
-                          : item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv'
+                          : item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex'
                           ? (item.title || 'Sem título')
                           : (item.title?.[0] || 'Sem título')
                         }
@@ -563,7 +655,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                         ? (item.volumeInfo?.authors?.join(', ') || 'Autor não especificado')
                         : item.type === 'scholar'
                         ? (item.authors?.map(a => a.name || a).join(', ') || 'Autor não especificado')
-                        : item.type === 'dataverse' || item.type === 'arxiv'
+                        : item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex'
                         ? (item.authors || 'Autor não especificado')
                         : item.type === 'article'
                         ? (() => {
@@ -604,6 +696,12 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                       }
                       {item.type === 'arxiv' && item.arxivId && 
                         ` - arXiv:${item.arxivId}`
+                      }
+                      {item.type === 'openalex' && item.year && 
+                        ` (${item.year})`
+                      }
+                      {item.type === 'openalex' && item.venue && 
+                        ` - ${item.venue}`
                       }
                       {item.type === 'article' && item.published && 
                         ` (${item.published['date-parts']?.[0]?.[0] || ''})`
