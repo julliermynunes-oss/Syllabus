@@ -423,7 +423,8 @@ export const translations = {
     course: 'Curso',
     discipline: 'Disciplina',
     line: 'Línea',
-    semesterYear: 'Semestre/Año',
+    semesterYear: 'Semestre/Año', // Mantido para compatibilidade
+    period: 'Período',
     class: 'Clase',
     department: 'Departamento',
     selectDepartment: 'Seleccione el Departamento',
@@ -432,7 +433,7 @@ export const translations = {
     selectCurricularSemester: 'Seleccione el Semestre Curricular',
     language: 'Idioma',
     selectLanguage: 'Seleccione el Idioma',
-    selectSemesterYear: 'Seleccione el Semestre/Año',
+    selectSemesterYear: 'Seleccione el Período',
     disciplineLeader: 'Líder de Disciplina',
     professorsList: 'Profesores',
     addProfessorButton: 'Agregar',
