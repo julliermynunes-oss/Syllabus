@@ -223,8 +223,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
                             link.url && (
                               <div key={idx}>
                                 <strong>{link.label || 'Link'}:</strong>{' '}
-                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
-                                  {link.url}
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
+                                  {link.label || 'Acessar link'}
                                 </a>
                               </div>
                             )
