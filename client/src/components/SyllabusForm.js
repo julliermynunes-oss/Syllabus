@@ -488,24 +488,87 @@ function SyllabusForm() {
     
     // Aguardar um frame para renderização
     setTimeout(() => {
-      // Adicionar estilos para remover cabeçalhos/rodapés do navegador
+      // Adicionar estilos para remover cabeçalhos/rodapés do navegador e aplicar estilos corretos
       const style = document.createElement('style');
+      style.id = 'pdf-print-styles';
       style.textContent = `
         @media print {
           @page {
+            size: A4;
             margin: 0 !important;
-            margin-top: 45px !important;
+            margin-top: 40px !important;
+            @top-left { content: none; }
+            @top-center { content: none; }
+            @top-right { content: none; }
+            @bottom-left { content: none; }
+            @bottom-center { content: none; }
+            @bottom-right { content: none; }
           }
           @page:first {
-            margin-top: 30px !important;
+            margin-top: 10px !important;
           }
           body {
             margin: 0 !important;
             padding: 0 !important;
           }
-          #pdf-content h3 {
-            margin-top: 20px !important;
+          body * {
+            visibility: hidden;
+          }
+          #pdf-content,
+          #pdf-content * {
+            visibility: visible;
+          }
+          #pdf-content {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            max-width: 210mm !important;
+            background: white !important;
+            padding: 10px 15px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+          }
+          .pdf-container {
             padding-top: 10px !important;
+            padding: 10px 15px !important;
+          }
+          .pdf-container > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+          }
+          .pdf-container > div:first-child {
+            padding-top: 0 !important;
+            margin-bottom: 15px !important;
+          }
+          .pdf-container > div > h3:first-child {
+            margin-top: 0 !important;
+            padding-top: 15px !important;
+          }
+          .pdf-container > div > *:first-child:not(h3) {
+            padding-top: 30px !important;
+          }
+          .pdf-container p,
+          .pdf-container div[style*="fontSize"] {
+            page-break-inside: avoid !important;
+            orphans: 3 !important;
+            widows: 3 !important;
+          }
+          .pdf-container > div > div[style*="border"] {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .preview-modal-overlay,
+          .preview-modal-content,
+          .preview-modal-header,
+          .close-btn,
+          .back-btn,
+          .export-pdf-btn,
+          .preview-btn,
+          .form-header,
+          .form-box-with-tabs {
+            display: none !important;
+            visibility: hidden !important;
           }
         }
       `;
@@ -516,7 +579,10 @@ function SyllabusForm() {
       
       // Remover estilo após impressão
       setTimeout(() => {
-        document.head.removeChild(style);
+        const styleElement = document.getElementById('pdf-print-styles');
+        if (styleElement) {
+          document.head.removeChild(styleElement);
+        }
       }, 1000);
       
       // Restaurar estilos após impressão
