@@ -1188,4 +1188,28 @@
     max-width: 100%;
     page-break-inside: avoid;
   }
+  
+  /* Estilos para listas no PDF - aumentar recuo */
+  #pdf-content ul,
+  #pdf-content ol {
+    padding-left: 30px !important;
+    margin-left: 0 !important;
+  }
+  
+  #pdf-content li {
+    padding-left: 8px !important;
+    margin-bottom: 4px !important;
+  }
+}
+
+/* Estilos para listas no PDF container (SyllabusPDFContent) */
+.pdf-container ul,
+.pdf-container ol {
+  padding-left: 30px !important;
+  margin-left: 0 !important;
+}
+
+.pdf-container li {
+  padding-left: 8px !important;
+  margin-bottom: 4px !important;
 }

@@ -547,3 +547,15 @@
   text-align: right;
 }
 
+/* Estilos para listas no preview - aumentar recuo */
+.preview-content ul,
+.preview-content ol {
+  padding-left: 30px !important;
+  margin-left: 0 !important;
+}
+
+.preview-content li {
+  padding-left: 8px !important;
+  margin-bottom: 4px !important;
+}
+
