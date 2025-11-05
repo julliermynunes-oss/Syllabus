@@ -112,6 +112,7 @@ function SyllabusForm() {
     compromisso_etico: '',
     sobre_professor: '',
     referencias: '',
+    referencias_layout: 'lista', // 'lista' ou 'categorizado'
     competencias: '',
     custom_tab_name: '',
     custom_tab_content: '',
@@ -209,7 +210,8 @@ function SyllabusForm() {
         contatos: response.data.contatos || null || '',
         ods: response.data.ods || null || '',
         o_que_e_esperado: response.data.o_que_e_esperado || null || '',
-        custom_tab_position: response.data.custom_tab_position || 'end'
+        custom_tab_position: response.data.custom_tab_position || 'end',
+        referencias_layout: response.data.referencias_layout || 'lista'
       };
       
       // Debug: verificar se os dados dos professores estão sendo carregados
@@ -1039,11 +1041,25 @@ function SyllabusForm() {
         {activeTab === 'referencias' && (
           <div className="form-row full-width">
             <div className="form-field">
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#235795' }}>
+                  {t('referencesLayout') || 'Layout das Referências:'}
+                </label>
+                <select
+                  value={formData.referencias_layout || 'lista'}
+                  onChange={(e) => setFormData(prev => ({ ...prev, referencias_layout: e.target.value }))}
+                  style={{ padding: '8px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', minWidth: '250px' }}
+                >
+                  <option value="lista">{t('listLayout') || 'Lista (todas as referências juntas)'}</option>
+                  <option value="categorizado">{t('categorizedLayout') || 'Categorizado (Obrigatória/Opcional)'}</option>
+                </select>
+              </div>
               <h3 style={{ marginBottom: '1.5rem', color: '#235795' }}>
                 {t('searchReferences')}
               </h3>
               <ReferenceManager
                 content={formData.referencias}
+                layout={formData.referencias_layout || 'lista'}
                 onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
               />
               <div style={{ marginTop: '2rem' }}>

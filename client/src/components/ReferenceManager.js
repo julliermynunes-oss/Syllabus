@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase } from 'react-icons/fa';
 import './ReferenceManager.css';
 
-const ReferenceManager = ({ content, onChange }) => {
+const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
   const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'dataverse'
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [pendingReference, setPendingReference] = useState(null);
+  const [pendingIndex, setPendingIndex] = useState(null);
 
   const searchCrossRef = async () => {
     if (!searchTerm.trim()) return;
@@ -283,19 +286,89 @@ const ReferenceManager = ({ content, onChange }) => {
     }
   };
 
+  // Função para parsear referências do conteúdo
+  const parseReferences = () => {
+    if (!content) return [];
+    
+    try {
+      // Tentar parsear como JSON (layout categorizado)
+      const parsed = JSON.parse(content);
+      if (parsed.references && Array.isArray(parsed.references)) {
+        return parsed.references;
+      }
+    } catch (e) {
+      // Se não for JSON, tentar parsear HTML (layout lista)
+      if (layout === 'lista') {
+        // Extrair referências do HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        const paragraphs = tempDiv.querySelectorAll('p');
+        return Array.from(paragraphs).map(p => ({
+          text: p.textContent || p.innerText,
+          category: 'obrigatoria' // Padrão para layout lista
+        }));
+      }
+    }
+    return [];
+  };
+
+  // Carregar referências do conteúdo quando o componente monta ou quando content/layout muda
+  useEffect(() => {
+    if (content) {
+      const refs = parseReferences();
+      setAddedReferences(refs);
+    } else {
+      setAddedReferences([]);
+    }
+  }, [content, layout]);
+
   const addReference = (item, index) => {
     const formattedRef = formatReference(item);
-    const currentRefs = [...addedReferences, formattedRef];
+    
+    if (layout === 'categorizado') {
+      // Abrir modal para escolher categoria
+      setPendingReference(formattedRef);
+      setPendingIndex(index);
+      setShowCategoryModal(true);
+    } else {
+      // Layout lista: adicionar diretamente
+      const currentRefs = [...addedReferences, { text: formattedRef, category: 'obrigatoria' }];
+      setAddedReferences(currentRefs);
+      
+      // Adicionar ao conteúdo do editor (HTML simples)
+      const currentContent = content || '';
+      const separator = currentContent ? '<br>' : '';
+      const newContent = currentContent + separator + '<p>' + formattedRef + '</p>';
+      onChange(newContent);
+      
+      // Remover da lista de resultados
+      setSearchResults(searchResults.filter((_, i) => i !== index));
+    }
+  };
+
+  const confirmAddReference = (category) => {
+    if (!pendingReference) return;
+    
+    const newRef = { text: pendingReference, category };
+    const currentRefs = [...addedReferences, newRef];
     setAddedReferences(currentRefs);
     
-    // Adicionar ao conteúdo do editor
-    const currentContent = content || '';
-    const separator = currentContent ? '<br>' : '';
-    const newContent = currentContent + separator + '<p>' + formattedRef + '</p>';
-    onChange(newContent);
+    // Atualizar conteúdo como JSON
+    const referencesData = {
+      layout: 'categorizado',
+      references: currentRefs
+    };
+    onChange(JSON.stringify(referencesData));
     
     // Remover da lista de resultados
-    setSearchResults(searchResults.filter((_, i) => i !== index));
+    if (pendingIndex !== null) {
+      setSearchResults(searchResults.filter((_, i) => i !== pendingIndex));
+    }
+    
+    // Fechar modal
+    setShowCategoryModal(false);
+    setPendingReference(null);
+    setPendingIndex(null);
   };
 
   const handleKeyDown = (e) => {
@@ -469,16 +542,85 @@ const ReferenceManager = ({ content, onChange }) => {
         <label>Referências Adicionadas (use o rich text abaixo para editar):</label>
         <div className="added-references">
           {addedReferences.length > 0 ? (
-            <ul>
-              {addedReferences.map((ref, index) => (
-                <li key={index}>{ref}</li>
-              ))}
-            </ul>
+            layout === 'categorizado' ? (
+              <div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Leitura Obrigatória:</h4>
+                  <ul>
+                    {addedReferences
+                      .filter(ref => ref.category === 'obrigatoria')
+                      .map((ref, index) => (
+                        <li key={index}>{ref.text}</li>
+                      ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Leitura Opcional/Complementar:</h4>
+                  <ul>
+                    {addedReferences
+                      .filter(ref => ref.category === 'opcional')
+                      .map((ref, index) => (
+                        <li key={index}>{ref.text}</li>
+                      ))}
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <ul>
+                {addedReferences.map((ref, index) => (
+                  <li key={index}>{typeof ref === 'string' ? ref : ref.text}</li>
+                ))}
+              </ul>
+            )
           ) : (
             <p className="no-references">Nenhuma referência adicionada ainda. Use a busca acima para encontrar e adicionar referências.</p>
           )}
         </div>
       </div>
+
+      {/* Modal para escolher categoria */}
+      {showCategoryModal && (
+        <div className="modal-overlay" onClick={() => {
+          setShowCategoryModal(false);
+          setPendingReference(null);
+          setPendingIndex(null);
+        }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Selecionar Categoria</h2>
+            <p>Em qual categoria esta referência deve ser adicionada?</p>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button
+                type="button"
+                className="modal-btn-confirm"
+                onClick={() => confirmAddReference('obrigatoria')}
+                style={{ flex: 1 }}
+              >
+                Leitura Obrigatória
+              </button>
+              <button
+                type="button"
+                className="modal-btn-confirm"
+                onClick={() => confirmAddReference('opcional')}
+                style={{ flex: 1, backgroundColor: '#28a745' }}
+              >
+                Leitura Opcional/Complementar
+              </button>
+            </div>
+            <button
+              type="button"
+              className="modal-btn-cancel"
+              onClick={() => {
+                setShowCategoryModal(false);
+                setPendingReference(null);
+                setPendingIndex(null);
+              }}
+              style={{ marginTop: '1rem', width: '100%' }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

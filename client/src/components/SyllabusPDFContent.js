@@ -453,6 +453,59 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 10. Referências (sempre por último)
     if (formData.referencias) {
+      const renderReferences = () => {
+        const layout = formData.referencias_layout || 'lista';
+        
+        if (layout === 'categorizado') {
+          try {
+            const parsed = JSON.parse(formData.referencias);
+            if (parsed.references && Array.isArray(parsed.references)) {
+              const obrigatorias = parsed.references.filter(ref => ref.category === 'obrigatoria');
+              const opcionais = parsed.references.filter(ref => ref.category === 'opcional');
+              
+              return (
+                <div>
+                  {obrigatorias.length > 0 && (
+                    <div style={{ marginBottom: '20px' }}>
+                      <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
+                        {t('requiredReading') || 'Leitura Obrigatória:'}
+                      </h4>
+                      <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
+                        {obrigatorias.map((ref, idx) => (
+                          <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {opcionais.length > 0 && (
+                    <div>
+                      <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
+                        {t('optionalReading') || 'Leitura Opcional/Complementar:'}
+                      </h4>
+                      <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
+                        {opcionais.map((ref, idx) => (
+                          <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+          } catch (e) {
+            // Se não for JSON válido, renderizar como HTML
+          }
+        }
+        
+        // Layout lista ou fallback
+        return (
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            dangerouslySetInnerHTML={{ __html: formData.referencias }}
+          />
+        );
+      };
+
       sections.push({
         id: 'referencias',
         component: (
@@ -460,10 +513,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
               {t('referencesTitle')}
             </h3>
-            <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
-              dangerouslySetInnerHTML={{ __html: formData.referencias }}
-            />
+            {renderReferences()}
           </div>
         )
       });
