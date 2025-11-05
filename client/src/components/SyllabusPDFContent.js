@@ -74,7 +74,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '15px', marginTop: '0' }}>
+        <div key="info_gerais" style={{ marginBottom: '10px', marginTop: '0', paddingBottom: '0' }}>
           {/* Logo apenas na primeira página */}
           <div style={{ 
             display: 'flex', 

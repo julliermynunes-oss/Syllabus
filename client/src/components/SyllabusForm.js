@@ -548,12 +548,14 @@ function SyllabusForm() {
           }
           .pdf-container > div:first-child {
             padding-top: 0 !important;
-            margin-bottom: 15px !important;
+            margin-bottom: 10px !important;
             margin-top: 0 !important;
+            padding-bottom: 0 !important;
           }
           .pdf-container > div:nth-child(2) {
             margin-top: 0 !important;
             padding-top: 0 !important;
+            margin-bottom: 20px !important;
           }
           .pdf-container > div > h3:first-child {
             margin-top: 0 !important;
@@ -569,6 +571,13 @@ function SyllabusForm() {
             widows: 3 !important;
           }
           .pdf-container > div > div[style*="border"] {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            -webkit-break-inside: avoid !important;
+            page-break-before: auto !important;
+            page-break-after: auto !important;
+          }
+          .pdf-container > div > div[style*="border"] > div {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
           }
