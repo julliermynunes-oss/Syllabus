@@ -237,6 +237,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
 
     try {
       // Buscar em todas as APIs simultaneamente (com append=true para acumular resultados)
+      // Cada função com append=true não vai chamar setIsSearching, então controlamos aqui
       await Promise.allSettled([
         searchCrossRef(true).catch(err => {
           console.error('Erro no Crossref:', err);
