@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase } from 'react-icons/fa';
+import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase, FaFlask } from 'react-icons/fa';
 import './ReferenceManager.css';
 
 const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
@@ -9,7 +9,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
-  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'dataverse'
+  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'dataverse', 'arxiv'
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [pendingReference, setPendingReference] = useState(null);
   const [pendingIndex, setPendingIndex] = useState(null);
@@ -118,6 +118,63 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     }
   };
 
+  const searcharXiv = async () => {
+    if (!searchTerm.trim()) return;
+
+    setIsSearching(true);
+    try {
+      // arXiv API usa formato Atom XML
+      const response = await axios.get(
+        `http://export.arxiv.org/api/query`,
+        {
+          params: {
+            search_query: `all:${encodeURIComponent(searchTerm)}`,
+            start: 0,
+            max_results: 10
+          },
+          headers: {
+            'Accept': 'application/atom+xml'
+          },
+          responseType: 'text' // Importante: axios precisa receber como texto para parsear XML
+        }
+      );
+
+      // Parsear XML
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(response.data, 'text/xml');
+      const entries = xmlDoc.querySelectorAll('entry');
+
+      const items = Array.from(entries).map(entry => {
+        const title = entry.querySelector('title')?.textContent || 'Sem título';
+        const authors = Array.from(entry.querySelectorAll('author name')).map(a => a.textContent).join(', ') || 'Autor não especificado';
+        const published = entry.querySelector('published')?.textContent || '';
+        const year = published ? published.split('-')[0] : '';
+        const summary = entry.querySelector('summary')?.textContent || '';
+        const arxivId = entry.querySelector('id')?.textContent?.split('/').pop() || '';
+        const pdfLink = entry.querySelector('link[type="application/pdf"]')?.getAttribute('href') || '';
+        
+        return {
+          type: 'arxiv',
+          title: title,
+          authors: authors,
+          year: year,
+          published: published,
+          summary: summary,
+          arxivId: arxivId,
+          pdfLink: pdfLink
+        };
+      });
+
+      setSearchResults(items);
+    } catch (error) {
+      console.error('Erro ao buscar na API do arXiv:', error);
+      window.alert('Erro ao buscar no arXiv. Tente novamente.');
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const performSearch = () => {
     if (searchType === 'articles') {
       searchCrossRef();
@@ -127,6 +184,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       searchGoogleScholar();
     } else if (searchType === 'dataverse') {
       searchDataverse();
+    } else if (searchType === 'arxiv') {
+      searcharXiv();
     }
   };
 
@@ -143,6 +202,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     } else if (item.type === 'dataverse') {
       const publishedDate = item.publicationDate || '';
       year = publishedDate ? parseInt(publishedDate.match(/\d{4}/)?.[0] || publishedDate) : null;
+    } else if (item.type === 'arxiv') {
+      year = item.year ? parseInt(item.year) : null;
     } else {
       year = item.published?.['date-parts']?.[0]?.[0] || item.created?.['date-parts']?.[0]?.[0];
     }
@@ -159,7 +220,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     // Verificar título
     if (item.type === 'book') {
       hasTitle = !!(item.volumeInfo?.title && item.volumeInfo.title.trim() !== '' && item.volumeInfo.title !== 'Sem título');
-    } else if (item.type === 'scholar' || item.type === 'dataverse') {
+    } else if (item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv') {
       hasTitle = !!(item.title && item.title.trim() !== '' && item.title !== 'Sem título');
     } else if (item.type === 'article') {
       hasTitle = !!(item.title?.[0] && item.title[0].trim() !== '' && item.title[0] !== 'Sem título') ||
@@ -177,6 +238,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                        return name && name.trim() !== '' && name !== 'Autor não especificado';
                      }));
     } else if (item.type === 'dataverse') {
+      hasAuthor = !!(item.authors && item.authors.trim() !== '' && item.authors !== 'Autor não especificado');
+    } else if (item.type === 'arxiv') {
       hasAuthor = !!(item.authors && item.authors.trim() !== '' && item.authors !== 'Autor não especificado');
     } else if (item.type === 'article') {
       if (item.author && Array.isArray(item.author) && item.author.length > 0) {
@@ -239,6 +302,13 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       const doi = item.doi || item.persistentId ? `DOI: ${item.doi || item.persistentId}` : '';
       
       return `${authors} (${year}). ${title}. ${publisher}. ${doi}`;
+    } else if (item.type === 'arxiv') {
+      const authors = item.authors || 'Autor não especificado';
+      const title = item.title || 'Sem título';
+      const year = item.year || '';
+      const arxivId = item.arxivId ? `arXiv:${item.arxivId}` : '';
+      
+      return `${authors} (${year}). ${title}. ${arxivId}`;
     } else {
       // Artigo (Crossref)
       let authors = 'Autor não especificado';
@@ -387,6 +457,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       return 'Pesquisar artigos no Google Scholar...';
     } else if (searchType === 'dataverse') {
       return 'Pesquisar datasets no Dataverse (Harvard)...';
+    } else if (searchType === 'arxiv') {
+      return 'Pesquisar pré-publicações no arXiv...';
     } else {
       return 'Pesquisar por título, autor ou DOI na API do Crossref...';
     }
@@ -428,6 +500,14 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           >
             <FaDatabase /> Dataverse
           </button>
+          <button
+            type="button"
+            className={`search-type-btn ${searchType === 'arxiv' ? 'active' : ''}`}
+            onClick={() => setSearchType('arxiv')}
+            title="Buscar Pré-publicações no arXiv"
+          >
+            <FaFlask /> arXiv
+          </button>
         </div>
         
         <div className="search-input-group">
@@ -467,7 +547,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                       <strong>
                         {item.type === 'book' 
                           ? (item.volumeInfo?.title || 'Sem título')
-                          : item.type === 'scholar' || item.type === 'dataverse'
+                          : item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv'
                           ? (item.title || 'Sem título')
                           : (item.title?.[0] || 'Sem título')
                         }
@@ -483,7 +563,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                         ? (item.volumeInfo?.authors?.join(', ') || 'Autor não especificado')
                         : item.type === 'scholar'
                         ? (item.authors?.map(a => a.name || a).join(', ') || 'Autor não especificado')
-                        : item.type === 'dataverse'
+                        : item.type === 'dataverse' || item.type === 'arxiv'
                         ? (item.authors || 'Autor não especificado')
                         : item.type === 'article'
                         ? (() => {
@@ -518,6 +598,12 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                       }
                       {item.type === 'dataverse' && item.publisher && 
                         ` - ${item.publisher}`
+                      }
+                      {item.type === 'arxiv' && item.year && 
+                        ` (${item.year})`
+                      }
+                      {item.type === 'arxiv' && item.arxivId && 
+                        ` - arXiv:${item.arxivId}`
                       }
                       {item.type === 'article' && item.published && 
                         ` (${item.published['date-parts']?.[0]?.[0] || ''})`
