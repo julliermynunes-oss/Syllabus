@@ -1142,26 +1142,47 @@
     width: auto !important;
   }
 
+  /* Primeira página - menos espaço no topo */
   .pdf-container {
-    padding-top: 30px !important;
-  }
-  
-  /* Ajustar espaçamento superior em todas as páginas (especialmente após a primeira) */
-  .pdf-container > div {
-    padding-top: 15px !important;
+    padding-top: 10px !important;
   }
   
   /* Configurações de página - Remove cabeçalhos e rodapés do navegador */
   @page {
     size: A4;
     margin: 0;
-    margin-top: 45px; /* Espaço para o logo fixo em todas as páginas */
+    margin-top: 50px; /* Espaço para o logo fixo nas páginas seguintes */
   }
   
   /* Primeira página pode ter menos espaço */
   @page:first {
-    margin-top: 30px;
+    margin-top: 10px; /* Reduzido para começar mais acima */
   }
+  
+  /* Adicionar padding-top aos elementos que podem começar em novas páginas */
+  /* Isso garante que o conteúdo não fique coberto pelo cabeçalho fixo */
+  .pdf-container > div {
+    padding-top: 0 !important;
+  }
+  
+  /* Primeira seção na primeira página não precisa de padding extra */
+  .pdf-container > div:first-child {
+    padding-top: 0 !important;
+  }
+  
+  /* Adicionar espaço antes dos títulos h3 que podem aparecer em novas páginas */
+  .pdf-container h3 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Garantir que as seções tenham espaço suficiente quando começam em nova página */
+  .pdf-container > div {
+    margin-top: 0 !important;
+  }
+  
+  /* Adicionar espaço superior para seções que podem começar em novas páginas */
+  /* Isso é tratado pelo margin-top da @page nas páginas seguintes */
   
   /* Remover cabeçalhos e rodapés do navegador */
   @page {

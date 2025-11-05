@@ -577,7 +577,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
   return (
     <div className="pdf-container" style={{ 
       padding: '10px 15px',
-      paddingTop: '30px',
+      paddingTop: '10px',
       fontFamily: 'Arial, sans-serif',
       color: '#000',
       backgroundColor: '#fff',
