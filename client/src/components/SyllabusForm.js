@@ -733,7 +733,7 @@ function SyllabusForm() {
             />
           </div>
           <div className="form-field">
-            <label>{t('semesterYear')}:</label>
+            <label>{t('period')}:</label>
             <select
               name="semestre_ano"
               value={formData.semestre_ano}
