@@ -705,7 +705,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           
           const professoresComDados = professoresList.filter(prof => {
             const data = professoresData[prof];
-            return data && (data.foto || data.descricao || data.linkedin || (data.outrosLinks && data.outrosLinks.length > 0));
+            return data && (data.foto || data.descricao || data.linkedin || data.lattes || (data.outrosLinks && data.outrosLinks.length > 0));
           });
 
           if (professoresComDados.length > 0) {
@@ -753,6 +753,14 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
                               <strong>LinkedIn:</strong>{' '}
                               <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5' }}>
                                 {profData.linkedin}
+                              </a>
+                            </div>
+                          )}
+                          {profData.lattes && (
+                            <div>
+                              <strong>Currículo Lattes:</strong>{' '}
+                              <a href={profData.lattes} target="_blank" rel="noopener noreferrer" style={{ color: '#235795' }}>
+                                {profData.lattes}
                               </a>
                             </div>
                           )}

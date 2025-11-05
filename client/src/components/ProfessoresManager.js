@@ -65,6 +65,7 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
             foto: '',
             descricao: '',
             linkedin: '',
+            lattes: '',
             outrosLinks: []
           };
           hasChanges = true;
@@ -183,6 +184,7 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
             foto: '',
             descricao: '',
             linkedin: '',
+            lattes: '',
             outrosLinks: []
           };
 
@@ -241,6 +243,19 @@ const ProfessoresManager = ({ professoresList, professoresData, onUpdate }) => {
                     placeholder="https://linkedin.com/in/..."
                     value={profData.linkedin || ''}
                     onChange={(e) => updateProfessor(professorNome, 'linkedin', e.target.value)}
+                  />
+                </div>
+
+                {/* Currículo Lattes */}
+                <div className="professor-link-section">
+                  <label>
+                    <FaLink /> Currículo Lattes:
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="http://lattes.cnpq.br/..."
+                    value={profData.lattes || ''}
+                    onChange={(e) => updateProfessor(professorNome, 'lattes', e.target.value)}
                   />
                 </div>
 
