@@ -320,6 +320,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     } else {
       setAddedReferences([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, layout]);
 
   const addReference = (item, index) => {
