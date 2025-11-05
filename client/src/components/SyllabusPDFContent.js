@@ -206,8 +206,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
                           {profData.linkedin && (
                             <div>
                               <strong>LinkedIn:</strong>{' '}
-                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5' }}>
-                                {profData.linkedin}
+                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', textDecoration: 'underline' }}>
+                                Ver perfil
                               </a>
                             </div>
                           )}
