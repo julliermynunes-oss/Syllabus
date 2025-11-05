@@ -593,12 +593,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
         right: '10px',
         height: '20px',
         width: 'auto',
-        backgroundColor: 'transparent',
         padding: '0',
         zIndex: 1000,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end'
+        display: 'block',
+        pointerEvents: 'none'
       }}>
         <img 
           src="/FGV LOGO NOVO.png" 
@@ -607,7 +605,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
             maxHeight: '20px', 
             height: '20px',
             width: 'auto',
-            display: 'block'
+            display: 'block',
+            opacity: '1',
+            visibility: 'visible'
           }} 
         />
       </div>

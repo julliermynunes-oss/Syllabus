@@ -1124,13 +1124,10 @@
     right: 10px !important;
     height: 20px !important;
     width: auto !important;
-    background-color: transparent !important;
-    border: none !important;
     padding: 0 !important;
     z-index: 1000 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
+    display: block !important;
+    pointer-events: none !important;
     page-break-after: avoid !important;
     page-break-inside: avoid !important;
     -webkit-print-color-adjust: exact !important;
@@ -1142,6 +1139,10 @@
     height: 20px !important;
     width: auto !important;
     display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Primeira página - menos espaço no topo */
