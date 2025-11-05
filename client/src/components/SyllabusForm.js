@@ -467,144 +467,138 @@ function SyllabusForm() {
       return;
     }
 
-    // Salvar estilos originais
-    const originalStyles = {
-      display: element.style.display,
-      position: element.style.position,
-      left: element.style.left,
-      width: element.style.width,
-      maxWidth: element.style.maxWidth,
-      background: element.style.background,
-      padding: element.style.padding,
-      margin: element.style.margin,
-      boxSizing: element.style.boxSizing,
-      height: element.style.height,
-      zIndex: element.style.zIndex,
-      top: element.style.top
-    };
+    // Tornar o elemento visível temporariamente
+    const originalDisplay = element.style.display;
+    const originalPosition = element.style.position;
+    const originalLeft = element.style.left;
+    const originalWidth = element.style.width;
     
-    // Tornar o elemento visível e posicionado corretamente
     element.style.display = 'block';
-    element.style.position = 'relative';
-    element.style.left = '0';
+    element.style.position = 'fixed';
     element.style.top = '0';
+    element.style.left = '0';
     element.style.width = '210mm';
     element.style.maxWidth = '210mm';
     element.style.background = '#fff';
-    element.style.padding = '10px 15px';
-    element.style.margin = '0 auto';
+    element.style.zIndex = '999999';
+    element.style.padding = '0';
+    element.style.margin = '0';
     element.style.boxSizing = 'border-box';
-    element.style.zIndex = '1';
     
-    // Adicionar classe para identificação
-    element.classList.add('printing-pdf');
-    
-    // Aguardar renderização completa
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        // Adicionar estilos para impressão
-        const style = document.createElement('style');
-        style.id = 'pdf-print-styles';
-        style.textContent = `
-          @media print {
-            @page {
-              size: A4;
-              margin: 0 !important;
-              margin-top: 40px !important;
-            }
-            @page:first {
-              margin-top: 10px !important;
-            }
-            body {
-              margin: 0 !important;
-              padding: 0 !important;
-              background: white !important;
-            }
-            * {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-              color-adjust: exact !important;
-            }
-            body > *:not(#pdf-content) {
-              display: none !important;
-            }
-            #pdf-content {
-              display: block !important;
-              position: relative !important;
-              left: 0 !important;
-              top: 0 !important;
-              width: 210mm !important;
-              max-width: 210mm !important;
-              margin: 0 auto !important;
-              padding: 10px 15px !important;
-              background: white !important;
-              box-sizing: border-box !important;
-              page-break-after: auto !important;
-            }
-            #pdf-content * {
-              visibility: visible !important;
-            }
-            .pdf-container {
-              padding-top: 10px !important;
-              padding: 10px 15px !important;
-              margin: 0 !important;
-            }
-            .pdf-container > div {
-              padding-top: 0 !important;
-              margin-top: 0 !important;
-            }
-            .pdf-container > div:first-child {
-              padding-top: 0 !important;
-              margin-bottom: 15px !important;
-            }
-            .pdf-container > div > h3:first-child {
-              margin-top: 0 !important;
-              padding-top: 15px !important;
-            }
-            .pdf-container > div > *:first-child:not(h3) {
-              padding-top: 30px !important;
-            }
-            .pdf-container p,
-            .pdf-container div[style*="fontSize"] {
-              page-break-inside: avoid !important;
-              orphans: 3 !important;
-              widows: 3 !important;
-            }
-            .pdf-container > div > div[style*="border"] {
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-            }
+    // Aguardar um frame para renderização
+    setTimeout(() => {
+      // Adicionar estilos para remover cabeçalhos/rodapés do navegador
+      const style = document.createElement('style');
+      style.id = 'pdf-print-styles';
+      style.textContent = `
+        @media print {
+          @page {
+            size: A4;
+            margin: 0 !important;
+            margin-top: 40px !important;
+            @top-left { content: none; }
+            @top-center { content: none; }
+            @top-right { content: none; }
+            @bottom-left { content: none; }
+            @bottom-center { content: none; }
+            @bottom-right { content: none; }
           }
-        `;
-        document.head.appendChild(style);
-        
-        // Aguardar um pouco mais para garantir que os estilos foram aplicados
-        setTimeout(() => {
-          window.print();
-          
-          // Limpar após impressão
-          setTimeout(() => {
-            // Remover estilo
-            const styleElement = document.getElementById('pdf-print-styles');
-            if (styleElement) {
-              document.head.removeChild(styleElement);
-            }
-            
-            // Remover classe
-            element.classList.remove('printing-pdf');
-            
-            // Restaurar estilos originais
-            Object.keys(originalStyles).forEach(key => {
-              if (originalStyles[key]) {
-                element.style[key] = originalStyles[key];
-              } else {
-                element.style[key] = '';
-              }
-            });
-          }, 500);
-        }, 100);
-      });
-    });
+          @page:first {
+            margin-top: 10px !important;
+          }
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          body * {
+            visibility: hidden;
+          }
+          #pdf-content,
+          #pdf-content * {
+            visibility: visible;
+          }
+          #pdf-content {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+            max-width: 210mm !important;
+            background: white !important;
+            padding: 10px 15px !important;
+            margin: 0 !important;
+            box-sizing: border-box !important;
+          }
+          .pdf-container {
+            padding-top: 10px !important;
+            padding: 10px 15px !important;
+          }
+          .pdf-container > div {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+          }
+          .pdf-container > div:first-child {
+            padding-top: 0 !important;
+            margin-bottom: 15px !important;
+          }
+          .pdf-container > div > h3:first-child {
+            margin-top: 0 !important;
+            padding-top: 15px !important;
+          }
+          .pdf-container > div > *:first-child:not(h3) {
+            padding-top: 30px !important;
+          }
+          .pdf-container p,
+          .pdf-container div[style*="fontSize"] {
+            page-break-inside: avoid !important;
+            orphans: 3 !important;
+            widows: 3 !important;
+          }
+          .pdf-container > div > div[style*="border"] {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .preview-modal-overlay,
+          .preview-modal-content,
+          .preview-modal-header,
+          .close-btn,
+          .back-btn,
+          .export-pdf-btn,
+          .preview-btn,
+          .form-header,
+          .form-box-with-tabs {
+            display: none !important;
+            visibility: hidden !important;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Imprimir
+      window.print();
+      
+      // Remover estilo após impressão
+      setTimeout(() => {
+        const styleElement = document.getElementById('pdf-print-styles');
+        if (styleElement) {
+          document.head.removeChild(styleElement);
+        }
+      }, 1000);
+      
+      // Restaurar estilos após impressão
+      setTimeout(() => {
+        element.style.display = originalDisplay;
+        element.style.position = originalPosition;
+        element.style.left = originalLeft;
+        element.style.top = '';
+        element.style.width = originalWidth;
+        element.style.maxWidth = '';
+        element.style.background = '';
+        element.style.padding = '';
+        element.style.zIndex = '';
+        element.style.margin = '';
+        element.style.boxSizing = '';
+      }, 1000);
+    }, 300);
   };
 
   const handleSubmit = async (e) => {
