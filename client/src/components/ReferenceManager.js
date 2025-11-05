@@ -181,13 +181,15 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     setIsSearching(true);
     try {
       // OpenAlex API - boa cobertura de conteúdo brasileiro e português
+      // Nota: OpenAlex tem ótima cobertura de conteúdo brasileiro mesmo sem filtrar por idioma
       const response = await axios.get(
         `https://api.openalex.org/works`,
         {
           params: {
             search: searchTerm,
-            per_page: 10,
-            filter: 'language:pt' // Filtrar por português quando possível
+            per_page: 10
+            // Não usar filtro de idioma aqui - OpenAlex já retorna resultados relevantes em português
+            // quando a busca é feita em português
           },
           headers: {
             'Accept': 'application/json'
