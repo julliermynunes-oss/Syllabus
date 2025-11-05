@@ -1117,33 +1117,7 @@
     visibility: hidden !important;
   }
   
-  /* Logo fixo em todas as páginas */
-  .pdf-logo-header {
-    position: fixed !important;
-    top: 5px !important;
-    right: 10px !important;
-    height: 20px !important;
-    width: auto !important;
-    padding: 0 !important;
-    z-index: 1000 !important;
-    display: block !important;
-    pointer-events: none !important;
-    page-break-after: avoid !important;
-    page-break-inside: avoid !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  .pdf-logo-header img {
-    max-height: 20px !important;
-    height: 20px !important;
-    width: auto !important;
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
+  /* Logo removido - agora está apenas na primeira página como parte do conteúdo */
 
   /* Primeira página - menos espaço no topo */
   .pdf-container {
