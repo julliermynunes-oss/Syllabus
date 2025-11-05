@@ -440,25 +440,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       });
     }
 
-    // 8. Conteúdo
-    if (formData.conteudo) {
-      sections.push({
-        id: 'conteudo',
-        component: (
-          <div key="conteudo" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-              {t('contentTitle')}
-            </h3>
-            <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
-              dangerouslySetInnerHTML={{ __html: formData.conteudo }}
-            />
-          </div>
-        )
-      });
-    }
-
-    // 9. O que é esperado do aluno (se não for curso restrito)
+    // 8. O que é esperado do aluno (se não for curso restrito)
     if (formData.o_que_e_esperado && !isRestrictedCourse(formData.curso)) {
       sections.push({
         id: 'o_que_e_esperado',
