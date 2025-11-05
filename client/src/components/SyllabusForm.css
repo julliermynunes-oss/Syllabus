@@ -1120,16 +1120,16 @@
   /* Logo fixo em todas as páginas */
   .pdf-logo-header {
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
+    top: 5px !important;
+    right: 10px !important;
     height: 20px !important;
+    width: auto !important;
     background-color: transparent !important;
     border: none !important;
     padding: 0 !important;
     z-index: 1000 !important;
     display: flex !important;
-    align-items: flex-start !important;
+    align-items: center !important;
     justify-content: flex-end !important;
     page-break-after: avoid !important;
     page-break-inside: avoid !important;
@@ -1139,10 +1139,9 @@
 
   .pdf-logo-header img {
     max-height: 20px !important;
-    height: auto !important;
+    height: 20px !important;
     width: auto !important;
-    margin-right: 10px !important;
-    margin-top: 0 !important;
+    display: block !important;
   }
 
   /* Primeira página - menos espaço no topo */

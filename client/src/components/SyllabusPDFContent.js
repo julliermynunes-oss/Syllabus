@@ -589,15 +589,15 @@ function SyllabusPDFContent({ formData, professoresList }) {
       {/* Logo fixo que aparecerá em todas as páginas */}
       <div className="pdf-logo-header" style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
+        top: '5px',
+        right: '10px',
         height: '20px',
+        width: 'auto',
         backgroundColor: 'transparent',
         padding: '0',
         zIndex: 1000,
         display: 'flex',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'flex-end'
       }}>
         <img 
@@ -605,10 +605,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
           alt="FGV Logo" 
           style={{ 
             maxHeight: '20px', 
-            height: 'auto',
+            height: '20px',
             width: 'auto',
-            marginRight: '10px',
-            marginTop: '0'
+            display: 'block'
           }} 
         />
       </div>
