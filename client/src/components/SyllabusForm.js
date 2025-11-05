@@ -1062,16 +1062,27 @@ function SyllabusForm() {
                 layout={formData.referencias_layout || 'lista'}
                 onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
               />
-              <div style={{ marginTop: '2rem' }}>
-                <label>{t('manualEditor')}</label>
-                <TiptapEditor
-                  content={formData.referencias}
-                  onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
-                />
-                <p className="editor-note">
-                  {t('referencesNote')}
-                </p>
-              </div>
+              {formData.referencias_layout === 'categorizado' ? (
+                <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f0f8ff', borderRadius: '8px', border: '1px solid #235795' }}>
+                  <p style={{ margin: 0, color: '#235795', fontWeight: 'bold' }}>
+                    {t('categorizedModeNote') || 'No modo categorizado, as referências são gerenciadas através da busca acima. Use o botão "+" ao lado de cada resultado para adicionar e escolher a categoria.'}
+                  </p>
+                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: '#666' }}>
+                    {t('categorizedModeNote2') || 'Para editar manualmente, altere o layout para "Lista".'}
+                  </p>
+                </div>
+              ) : (
+                <div style={{ marginTop: '2rem' }}>
+                  <label>{t('manualEditor')}</label>
+                  <TiptapEditor
+                    content={formData.referencias}
+                    onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
+                  />
+                  <p className="editor-note">
+                    {t('referencesNote')}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}

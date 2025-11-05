@@ -91,6 +91,8 @@ export const translations = {
     categorizedLayout: 'Categorizado (Obrigatória/Opcional)',
     requiredReading: 'Leitura Obrigatória:',
     optionalReading: 'Leitura Opcional/Complementar:',
+    categorizedModeNote: 'No modo categorizado, as referências são gerenciadas através da busca acima. Use o botão "+" ao lado de cada resultado para adicionar e escolher a categoria.',
+    categorizedModeNote2: 'Para editar manualmente, altere o layout para "Lista".',
     competenciesLabel: 'Competências da Disciplina',
     expectedFromStudentLabel: 'O que é esperado do aluno(a):',
     
@@ -270,6 +272,8 @@ export const translations = {
     categorizedLayout: 'Categorized (Required/Optional)',
     requiredReading: 'Required Reading:',
     optionalReading: 'Optional/Complementary Reading:',
+    categorizedModeNote: 'In categorized mode, references are managed through the search above. Use the "+" button next to each result to add and choose the category.',
+    categorizedModeNote2: 'To edit manually, change the layout to "List".',
     competenciesLabel: 'Discipline Competencies',
     expectedFromStudentLabel: 'What is expected from the student:',
     
@@ -446,6 +450,8 @@ export const translations = {
     categorizedLayout: 'Categorizado (Obligatoria/Opcional)',
     requiredReading: 'Lectura Obligatoria:',
     optionalReading: 'Lectura Opcional/Complementaria:',
+    categorizedModeNote: 'En modo categorizado, las referencias se gestionan a través de la búsqueda anterior. Use el botón "+" junto a cada resultado para agregar y elegir la categoría.',
+    categorizedModeNote2: 'Para editar manualmente, cambie el diseño a "Lista".',
     competenciesLabel: 'Competencias de la Disciplina',
     expectedFromStudentLabel: 'Lo que se espera del estudiante:',
     
