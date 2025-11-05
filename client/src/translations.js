@@ -20,7 +20,7 @@ export const translations = {
     // Lista de Syllabi
     notifications: 'Notificações',
     noNotifications: 'Nenhuma notificação pendente',
-    newSyllabus: '+ Novo Syllabus',
+    newSyllabus: 'Novo Syllabus',
     search: 'Buscar',
     searchByCourse: 'Digite o Curso',
     searchByDiscipline: 'Digite a Disciplina',
@@ -193,7 +193,7 @@ export const translations = {
     // Lista de Syllabi
     notifications: 'Notifications',
     noNotifications: 'No pending notifications',
-    newSyllabus: '+ New Syllabus',
+    newSyllabus: 'New Syllabus',
     search: 'Search',
     searchByCourse: 'Type the Course',
     searchByDiscipline: 'Type the Discipline',
@@ -367,7 +367,7 @@ export const translations = {
     // Lista de Syllabi
     notifications: 'Notificaciones',
     noNotifications: 'No hay notificaciones pendientes',
-    newSyllabus: '+ Nuevo Syllabus',
+    newSyllabus: 'Nuevo Syllabus',
     search: 'Buscar',
     searchByCourse: 'Escriba el Curso',
     searchByDiscipline: 'Escriba la Disciplina',
