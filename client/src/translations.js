@@ -91,8 +91,8 @@ export const translations = {
     categorizedLayout: 'Categorizado (Obrigatória/Opcional)',
     requiredReading: 'Leitura Obrigatória:',
     optionalReading: 'Leitura Opcional/Complementar:',
-    categorizedModeNote: 'No modo categorizado, as referências são gerenciadas através da busca acima. Use o botão "+" ao lado de cada resultado para adicionar e escolher a categoria.',
-    categorizedModeNote2: 'Para editar manualmente, altere o layout para "Lista".',
+    categorizedModeNote: 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para preservar a categorização.',
+    categorizedEditorNote: '💡 Dica: Use títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.',
     competenciesLabel: 'Competências da Disciplina',
     expectedFromStudentLabel: 'O que é esperado do aluno(a):',
     
@@ -272,8 +272,8 @@ export const translations = {
     categorizedLayout: 'Categorized (Required/Optional)',
     requiredReading: 'Required Reading:',
     optionalReading: 'Optional/Complementary Reading:',
-    categorizedModeNote: 'In categorized mode, references are managed through the search above. Use the "+" button next to each result to add and choose the category.',
-    categorizedModeNote2: 'To edit manually, change the layout to "List".',
+    categorizedModeNote: 'In categorized mode, you can edit manually below. Keep the format with "Required Reading:" and "Optional/Complementary Reading:" titles to preserve categorization.',
+    categorizedEditorNote: '💡 Tip: Use "Required Reading:" and "Optional/Complementary Reading:" titles to maintain categorization. References can be in list or paragraph format.',
     competenciesLabel: 'Discipline Competencies',
     expectedFromStudentLabel: 'What is expected from the student:',
     
@@ -450,8 +450,8 @@ export const translations = {
     categorizedLayout: 'Categorizado (Obligatoria/Opcional)',
     requiredReading: 'Lectura Obligatoria:',
     optionalReading: 'Lectura Opcional/Complementaria:',
-    categorizedModeNote: 'En modo categorizado, las referencias se gestionan a través de la búsqueda anterior. Use el botón "+" junto a cada resultado para agregar y elegir la categoría.',
-    categorizedModeNote2: 'Para editar manualmente, cambie el diseño a "Lista".',
+    categorizedModeNote: 'En modo categorizado, puede editar manualmente a continuación. Mantenga el formato con títulos "Lectura Obligatoria:" y "Lectura Opcional/Complementaria:" para preservar la categorización.',
+    categorizedEditorNote: '💡 Consejo: Use títulos "Lectura Obligatoria:" y "Lectura Opcional/Complementaria:" para mantener la categorización. Las referencias pueden estar en formato de lista o párrafos.',
     competenciesLabel: 'Competencias de la Disciplina',
     expectedFromStudentLabel: 'Lo que se espera del estudiante:',
     

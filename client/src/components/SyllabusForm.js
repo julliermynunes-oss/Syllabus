@@ -1062,27 +1062,130 @@ function SyllabusForm() {
                 layout={formData.referencias_layout || 'lista'}
                 onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
               />
-              {formData.referencias_layout === 'categorizado' ? (
-                <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f0f8ff', borderRadius: '8px', border: '1px solid #235795' }}>
-                  <p style={{ margin: 0, color: '#235795', fontWeight: 'bold' }}>
-                    {t('categorizedModeNote') || 'No modo categorizado, as referências são gerenciadas através da busca acima. Use o botão "+" ao lado de cada resultado para adicionar e escolher a categoria.'}
-                  </p>
-                  <p style={{ margin: '0.5rem 0 0 0', fontSize: '0.9rem', color: '#666' }}>
-                    {t('categorizedModeNote2') || 'Para editar manualmente, altere o layout para "Lista".'}
-                  </p>
-                </div>
-              ) : (
-                <div style={{ marginTop: '2rem' }}>
-                  <label>{t('manualEditor')}</label>
-                  <TiptapEditor
-                    content={formData.referencias}
-                    onChange={(content) => setFormData(prev => ({ ...prev, referencias: content }))}
-                  />
-                  <p className="editor-note">
-                    {t('referencesNote')}
-                  </p>
-                </div>
-              )}
+              <div style={{ marginTop: '2rem' }}>
+                {formData.referencias_layout === 'categorizado' && (
+                  <div style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#f0f8ff', borderRadius: '8px', border: '1px solid #235795' }}>
+                    <p style={{ margin: 0, color: '#235795', fontSize: '0.9rem' }}>
+                      {t('categorizedModeNote') || 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para preservar a categorização.'}
+                    </p>
+                  </div>
+                )}
+                <label>{t('manualEditor')}</label>
+                <TiptapEditor
+                  content={(() => {
+                    // Se for categorizado e o conteúdo for JSON, converter para HTML formatado
+                    if (formData.referencias_layout === 'categorizado' && formData.referencias) {
+                      try {
+                        const parsed = JSON.parse(formData.referencias);
+                        if (parsed.references && Array.isArray(parsed.references)) {
+                          const obrigatorias = parsed.references.filter(ref => ref.category === 'obrigatoria');
+                          const opcionais = parsed.references.filter(ref => ref.category === 'opcional');
+                          
+                          let html = '';
+                          if (obrigatorias.length > 0) {
+                            html += `<h4><strong>Leitura Obrigatória:</strong></h4><ul>`;
+                            obrigatorias.forEach(ref => {
+                              html += `<li><p>${ref.text}</p></li>`;
+                            });
+                            html += `</ul>`;
+                          }
+                          if (opcionais.length > 0) {
+                            html += `<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul>`;
+                            opcionais.forEach(ref => {
+                              html += `<li><p>${ref.text}</p></li>`;
+                            });
+                            html += `</ul>`;
+                          }
+                          return html;
+                        }
+                      } catch (e) {
+                        // Se não for JSON, retornar o conteúdo como está
+                      }
+                    }
+                    return formData.referencias || '';
+                  })()}
+                  onChange={(content) => {
+                    // Se for categorizado, tentar converter HTML de volta para JSON
+                    if (formData.referencias_layout === 'categorizado') {
+                      try {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = content;
+                        
+                        const references = [];
+                        
+                        // Buscar seção "Leitura Obrigatória"
+                        const obrigatoriaHeading = Array.from(tempDiv.querySelectorAll('h4, h3, h2, h1, strong')).find(el => {
+                          const text = el.textContent || el.innerText || '';
+                          return text.toLowerCase().includes('obrigatória') || text.toLowerCase().includes('obrigatoria');
+                        });
+                        
+                        if (obrigatoriaHeading) {
+                          let current = obrigatoriaHeading.nextSibling;
+                          while (current && current.nodeName !== 'H4' && current.nodeName !== 'H3' && current.nodeName !== 'H2' && current.nodeName !== 'H1') {
+                            if (current.nodeName === 'UL' || current.nodeName === 'OL') {
+                              const items = current.querySelectorAll('li');
+                              items.forEach(li => {
+                                const text = li.textContent || li.innerText || '';
+                                if (text.trim()) {
+                                  references.push({ text: text.trim(), category: 'obrigatoria' });
+                                }
+                              });
+                            } else if (current.nodeName === 'P' && current.textContent && current.textContent.trim()) {
+                              references.push({ text: current.textContent.trim(), category: 'obrigatoria' });
+                            }
+                            current = current.nextSibling;
+                          }
+                        }
+                        
+                        // Buscar seção "Leitura Opcional"
+                        const opcionalHeading = Array.from(tempDiv.querySelectorAll('h4, h3, h2, h1, strong')).find(el => {
+                          const text = el.textContent || el.innerText || '';
+                          return text.toLowerCase().includes('opcional') || text.toLowerCase().includes('complementar');
+                        });
+                        
+                        if (opcionalHeading) {
+                          let current = opcionalHeading.nextSibling;
+                          while (current) {
+                            if (current.nodeName === 'UL' || current.nodeName === 'OL') {
+                              const items = current.querySelectorAll('li');
+                              items.forEach(li => {
+                                const text = li.textContent || li.innerText || '';
+                                if (text.trim()) {
+                                  references.push({ text: text.trim(), category: 'opcional' });
+                                }
+                              });
+                            } else if (current.nodeName === 'P' && current.textContent && current.textContent.trim()) {
+                              references.push({ text: current.textContent.trim(), category: 'opcional' });
+                            }
+                            current = current.nextSibling;
+                          }
+                        }
+                        
+                        // Se encontrou referências categorizadas, salvar como JSON
+                        if (references.length > 0) {
+                          const jsonData = {
+                            layout: 'categorizado',
+                            references: references
+                          };
+                          setFormData(prev => ({ ...prev, referencias: JSON.stringify(jsonData) }));
+                          return;
+                        }
+                      } catch (e) {
+                        console.error('Erro ao converter HTML para JSON:', e);
+                      }
+                    }
+                    
+                    // Se não conseguir converter ou não for categorizado, salvar como HTML
+                    setFormData(prev => ({ ...prev, referencias: content }));
+                  }}
+                />
+                <p className="editor-note">
+                  {formData.referencias_layout === 'categorizado' 
+                    ? (t('categorizedEditorNote') || '💡 Dica: Use títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.')
+                    : t('referencesNote')
+                  }
+                </p>
+              </div>
             </div>
           </div>
         )}
