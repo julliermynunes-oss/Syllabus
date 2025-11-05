@@ -478,6 +478,9 @@ export const translations = {
     newCustomTab: 'Nueva Pestaña Personalizada',
     enterTabName: 'Escriba el nombre de la nueva pestaña:',
     createTab: 'Crear Pestaña',
+    selectTabPosition: 'Posición de la pestaña:',
+    afterTab: 'Después de',
+    end: 'Al final',
     deleteTabConfirm: '¿Está seguro de que desea eliminar la pestaña "{name}"? Todo el contenido se perderá.',
     
     // PDF/Preview
