@@ -112,6 +112,14 @@
   cursor: not-allowed;
 }
 
+.reference-search-all-btn {
+  background: #28a745 !important;
+}
+
+.reference-search-all-btn:hover:not(:disabled) {
+  background: #218838 !important;
+}
+
 .reference-search-btn .spinner {
   animation: spin 1s linear infinite;
 }
@@ -186,6 +194,18 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
+}
+
+.source-badge {
+  background: #6c757d;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .result-content strong {

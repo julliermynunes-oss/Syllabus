@@ -29,7 +29,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       );
 
       const items = response.data.message.items || [];
-      setSearchResults(items.map(item => ({ ...item, type: 'article' })));
+      setSearchResults(items.map(item => ({ ...item, type: 'article', source: 'Crossref' })));
     } catch (error) {
       console.error('Erro ao buscar na API do Crossref:', error);
       window.alert('Erro ao buscar referências. Tente novamente.');
@@ -55,7 +55,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       const items = (response.data.items || []).map(item => ({
         type: 'book',
         volumeInfo: item.volumeInfo,
-        id: item.id
+        id: item.id,
+        source: 'Google Books'
       }));
       setSearchResults(items);
     } catch (error) {
@@ -107,7 +108,11 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
         }
       );
 
-      setSearchResults(response.data);
+      const items = (response.data || []).map(item => ({
+        ...item,
+        source: item.source || 'Dataverse'
+      }));
+      setSearchResults(items);
     } catch (error) {
       console.error('Erro ao buscar na API do Dataverse:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar no Dataverse. Tente novamente.';
@@ -123,52 +128,26 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
 
     setIsSearching(true);
     try {
-      // arXiv API usa formato Atom XML
+      // arXiv API via backend para evitar CORS
       const response = await axios.get(
-        `http://export.arxiv.org/api/query`,
+        `${API_URL}/api/search-arxiv`,
         {
-          params: {
-            search_query: `all:${encodeURIComponent(searchTerm)}`,
-            start: 0,
-            max_results: 10
-          },
+          params: { q: searchTerm },
           headers: {
-            'Accept': 'application/atom+xml'
-          },
-          responseType: 'text' // Importante: axios precisa receber como texto para parsear XML
+            'Accept': 'application/json'
+          }
         }
       );
 
-      // Parsear XML
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(response.data, 'text/xml');
-      const entries = xmlDoc.querySelectorAll('entry');
-
-      const items = Array.from(entries).map(entry => {
-        const title = entry.querySelector('title')?.textContent || 'Sem título';
-        const authors = Array.from(entry.querySelectorAll('author name')).map(a => a.textContent).join(', ') || 'Autor não especificado';
-        const published = entry.querySelector('published')?.textContent || '';
-        const year = published ? published.split('-')[0] : '';
-        const summary = entry.querySelector('summary')?.textContent || '';
-        const arxivId = entry.querySelector('id')?.textContent?.split('/').pop() || '';
-        const pdfLink = entry.querySelector('link[type="application/pdf"]')?.getAttribute('href') || '';
-        
-        return {
-          type: 'arxiv',
-          title: title,
-          authors: authors,
-          year: year,
-          published: published,
-          summary: summary,
-          arxivId: arxivId,
-          pdfLink: pdfLink
-        };
-      });
-
+      const items = (response.data || []).map(item => ({
+        ...item,
+        source: item.source || 'arXiv'
+      }));
       setSearchResults(items);
     } catch (error) {
       console.error('Erro ao buscar na API do arXiv:', error);
-      window.alert('Erro ao buscar no arXiv. Tente novamente.');
+      const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar no arXiv. Tente novamente.';
+      window.alert(`Erro: ${errorMsg}`);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
@@ -235,7 +214,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           year: year,
           venue: venue,
           doi: doi,
-          language: item.language || 'pt'
+          language: item.language || 'pt',
+          source: 'OpenAlex'
         };
       });
 
@@ -246,6 +226,290 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       setSearchResults([]);
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const searchAll = async () => {
+    if (!searchTerm.trim()) return;
+
+    setIsSearching(true);
+    setSearchResults([]); // Limpar resultados anteriores
+
+    try {
+      // Buscar em todas as APIs simultaneamente (com append=true para acumular resultados)
+      await Promise.allSettled([
+        searchCrossRef(true).catch(err => {
+          console.error('Erro no Crossref:', err);
+        }),
+        searchGoogleBooks(true).catch(err => {
+          console.error('Erro no Google Books:', err);
+        }),
+        searchGoogleScholar(true).catch(err => {
+          console.error('Erro no Google Scholar:', err);
+        }),
+        searchDataverse(true).catch(err => {
+          console.error('Erro no Dataverse:', err);
+        }),
+        searcharXiv(true).catch(err => {
+          console.error('Erro no arXiv:', err);
+        }),
+        searchOpenAlex(true).catch(err => {
+          console.error('Erro no OpenAlex:', err);
+        })
+      ]);
+    } catch (error) {
+      console.error('Erro ao buscar em todas as APIs:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Funções individuais ajustadas para não limpar resultados quando usado em searchAll
+  const searchCrossRef = async (append = false) => {
+    if (!searchTerm.trim()) return;
+
+    if (!append) setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `https://api.crossref.org/works?query=${encodeURIComponent(searchTerm)}&rows=10`,
+        {
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const items = response.data.message.items || [];
+      const newItems = items.map(item => ({ ...item, type: 'article', source: 'Crossref' }));
+      
+      if (append) {
+        setSearchResults(prev => [...prev, ...newItems]);
+      } else {
+        setSearchResults(newItems);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar na API do Crossref:', error);
+      if (!append) {
+        window.alert('Erro ao buscar referências. Tente novamente.');
+      }
+    } finally {
+      if (!append) setIsSearching(false);
+    }
+  };
+
+  const searchGoogleBooks = async (append = false) => {
+    if (!searchTerm.trim()) return;
+
+    if (!append) setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchTerm)}&maxResults=10`,
+        {
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const items = (response.data.items || []).map(item => ({
+        type: 'book',
+        volumeInfo: item.volumeInfo,
+        id: item.id,
+        source: 'Google Books'
+      }));
+      
+      if (append) {
+        setSearchResults(prev => [...prev, ...items]);
+      } else {
+        setSearchResults(items);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar na API do Google Books:', error);
+      if (!append) {
+        window.alert('Erro ao buscar livros. Tente novamente.');
+      }
+    } finally {
+      if (!append) setIsSearching(false);
+    }
+  };
+
+  const searchGoogleScholar = async (append = false) => {
+    if (!searchTerm.trim()) return;
+
+    if (!append) setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/search-scholar`,
+        {
+          params: { q: searchTerm },
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const items = (response.data || []).map(item => ({
+        ...item,
+        source: item.source || 'Google Scholar'
+      }));
+      
+      if (append) {
+        setSearchResults(prev => [...prev, ...items]);
+      } else {
+        setSearchResults(items);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar na API do Google Scholar:', error);
+      if (!append) {
+        const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar no Google Scholar. Tente novamente.';
+        window.alert(`Erro: ${errorMsg}`);
+      }
+      if (!append) setSearchResults([]);
+    } finally {
+      if (!append) setIsSearching(false);
+    }
+  };
+
+  const searchDataverse = async (append = false) => {
+    if (!searchTerm.trim()) return;
+
+    if (!append) setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/search-dataverse`,
+        {
+          params: { q: searchTerm },
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const items = (response.data || []).map(item => ({
+        ...item,
+        source: item.source || 'Dataverse'
+      }));
+      
+      if (append) {
+        setSearchResults(prev => [...prev, ...items]);
+      } else {
+        setSearchResults(items);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar na API do Dataverse:', error);
+      if (!append) {
+        const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar no Dataverse. Tente novamente.';
+        window.alert(`Erro: ${errorMsg}`);
+      }
+      if (!append) setSearchResults([]);
+    } finally {
+      if (!append) setIsSearching(false);
+    }
+  };
+
+  const searcharXiv = async (append = false) => {
+    if (!searchTerm.trim()) return;
+
+    if (!append) setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/search-arxiv`,
+        {
+          params: { q: searchTerm },
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const items = (response.data || []).map(item => ({
+        ...item,
+        source: item.source || 'arXiv'
+      }));
+      
+      if (append) {
+        setSearchResults(prev => [...prev, ...items]);
+      } else {
+        setSearchResults(items);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar na API do arXiv:', error);
+      if (!append) {
+        const errorMsg = error.response?.data?.message || error.message || 'Erro ao buscar no arXiv. Tente novamente.';
+        window.alert(`Erro: ${errorMsg}`);
+      }
+      if (!append) setSearchResults([]);
+    } finally {
+      if (!append) setIsSearching(false);
+    }
+  };
+
+  const searchOpenAlex = async (append = false) => {
+    if (!searchTerm.trim()) return;
+
+    if (!append) setIsSearching(true);
+    try {
+      const response = await axios.get(
+        `https://api.openalex.org/works`,
+        {
+          params: {
+            search: searchTerm,
+            per_page: 10
+          },
+          headers: {
+            'Accept': 'application/json'
+          }
+        }
+      );
+
+      const items = (response.data.results || []).map(item => {
+        let authors = 'Autor não especificado';
+        if (item.authorships && item.authorships.length > 0) {
+          const authorNames = item.authorships.map(auth => {
+            const author = auth.author;
+            if (author && author.display_name) {
+              return author.display_name;
+            }
+            return null;
+          }).filter(name => name);
+          
+          if (authorNames.length > 0) {
+            authors = authorNames.join(', ');
+          }
+        }
+
+        const year = item.publication_year || '';
+        const title = item.title || 'Sem título';
+        const venue = item.primary_location?.source?.display_name || 
+                     item.venues?.[0]?.display_name || 
+                     item.locations?.[0]?.source?.display_name || '';
+        const doi = item.doi || '';
+        
+        return {
+          type: 'openalex',
+          title: title,
+          authors: authors,
+          year: year,
+          venue: venue,
+          doi: doi,
+          language: item.language || 'pt',
+          source: 'OpenAlex'
+        };
+      });
+      
+      if (append) {
+        setSearchResults(prev => [...prev, ...items]);
+      } else {
+        setSearchResults(items);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar na API do OpenAlex:', error);
+      if (!append) {
+        window.alert('Erro ao buscar no OpenAlex. Tente novamente.');
+      }
+      if (!append) setSearchResults([]);
+    } finally {
+      if (!append) setIsSearching(false);
     }
   };
 
@@ -627,6 +891,15 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           >
             {isSearching ? <FaSpinner className="spinner" /> : <FaSearch />}
           </button>
+          <button
+            type="button"
+            onClick={searchAll}
+            disabled={isSearching}
+            className="reference-search-btn reference-search-all-btn"
+            title="Buscar em todas as APIs"
+          >
+            {isSearching ? <FaSpinner className="spinner" /> : '🔍 Todas'}
+          </button>
         </div>
         
         {searchResults.filter(hasTitleAndAuthor).length > 0 && (
@@ -638,19 +911,26 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                 <div key={index} className={`result-item ${outdated ? 'outdated' : ''}`}>
                     <div className="result-content">
                     <div className="result-header">
-                      <strong>
-                        {item.type === 'book' 
-                          ? (item.volumeInfo?.title || 'Sem título')
-                          : item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex'
-                          ? (item.title || 'Sem título')
-                          : (item.title?.[0] || 'Sem título')
-                        }
-                      </strong>
-                      {outdated && (
-                        <span className="outdated-badge" title="Referência com mais de 10 anos">
-                          ⚠️ Antigo
-                        </span>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <strong>
+                          {item.type === 'book' 
+                            ? (item.volumeInfo?.title || 'Sem título')
+                            : item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex'
+                            ? (item.title || 'Sem título')
+                            : (item.title?.[0] || 'Sem título')
+                          }
+                        </strong>
+                        {item.source && (
+                          <span className="source-badge" title={`Fonte: ${item.source}`}>
+                            {item.source}
+                          </span>
+                        )}
+                        {outdated && (
+                          <span className="outdated-badge" title="Referência com mais de 10 anos">
+                            ⚠️ Antigo
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <p className="result-details">
                       {item.type === 'book' 

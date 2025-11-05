@@ -656,6 +656,7 @@ app.get('/api/search-scholar', async (req, res) => {
       title: item.title,
       link: item.link,
       snippet: item.snippet,
+      source: 'Google Scholar',
       publication_info: item.publication_info,
       authors: item.publication_info?.authors || []
     }));
@@ -672,6 +673,81 @@ app.get('/api/search-scholar', async (req, res) => {
 });
 
 // Dataverse endpoint (Harvard Dataverse Search API)
+app.get('/api/search-arxiv', async (req, res) => {
+  const { q } = req.query;
+  
+  if (!q) {
+    return res.status(400).json({ error: 'Query é obrigatória' });
+  }
+
+  try {
+    // arXiv API usa formato Atom XML - fazer via backend para evitar CORS
+    const response = await axios.get(
+      `http://export.arxiv.org/api/query`,
+      {
+        params: {
+          search_query: `all:${encodeURIComponent(q)}`,
+          start: 0,
+          max_results: 10
+        },
+        headers: {
+          'Accept': 'application/atom+xml'
+        },
+        responseType: 'text'
+      }
+    );
+
+    // Parsear XML usando xml2js ou simples parsing manual
+    const items = [];
+    const xmlText = response.data;
+    
+    // Parsear XML manualmente (simples e eficiente)
+    const entryMatches = xmlText.match(/<entry[^>]*>([\s\S]*?)<\/entry>/g);
+    
+    if (entryMatches) {
+      entryMatches.forEach(entryXml => {
+        const titleMatch = entryXml.match(/<title[^>]*>([\s\S]*?)<\/title>/);
+        const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, '').trim() : 'Sem título';
+        
+        const authorMatches = entryXml.match(/<author>[\s\S]*?<name>([\s\S]*?)<\/name>[\s\S]*?<\/author>/g);
+        const authors = authorMatches 
+          ? authorMatches.map(a => {
+              const nameMatch = a.match(/<name>([\s\S]*?)<\/name>/);
+              return nameMatch ? nameMatch[1].trim() : '';
+            }).filter(n => n).join(', ')
+          : 'Autor não especificado';
+        
+        const publishedMatch = entryXml.match(/<published>([^<]+)<\/published>/);
+        const published = publishedMatch ? publishedMatch[1] : '';
+        const year = published ? published.split('-')[0] : '';
+        
+        const idMatch = entryXml.match(/<id>([^<]+)<\/id>/);
+        const arxivId = idMatch ? idMatch[1].split('/').pop() : '';
+        
+        if (title && title !== 'Sem título' && authors && authors !== 'Autor não especificado') {
+          items.push({
+            type: 'arxiv',
+            title: title,
+            authors: authors,
+            year: year,
+            published: published,
+            arxivId: arxivId,
+            source: 'arXiv'
+          });
+        }
+      });
+    }
+
+    res.json(items);
+  } catch (error) {
+    console.error('Erro ao buscar na API do arXiv:', error);
+    res.status(500).json({ 
+      error: 'Erro ao buscar no arXiv',
+      message: error.message 
+    });
+  }
+});
+
 app.get('/api/search-dataverse', async (req, res) => {
   const { q } = req.query;
   
@@ -931,6 +1007,7 @@ app.get('/api/search-dataverse', async (req, res) => {
           publicationDate: publicationDate,
           publisher: publisher,
           description: descriptionStr,
+          source: 'Dataverse',
           persistentId: dataset.persistentId || dataset.globalId,
           doi: dataset.persistentId || '',
           url: dataset.persistentUrl || `${dataverseUrl}/dataset.xhtml?persistentId=${dataset.persistentId || dataset.globalId}`
