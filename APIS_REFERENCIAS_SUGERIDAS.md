@@ -141,8 +141,6 @@
 
 ### Média Prioridade:
 3. **Semantic Scholar** - Popular, dados ricos, sem API key (com rate limit)
-
-### Média Prioridade:
 4. **PubMed** - Essencial para área biomédica, mas formato XML mais complexo
 5. **DOAJ** - Boa para revistas de acesso aberto
 
