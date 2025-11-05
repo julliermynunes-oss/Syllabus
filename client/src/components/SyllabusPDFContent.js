@@ -252,6 +252,19 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 4. Competências
     if (formData.competencias) {
+      const getCursoSigla = (cursoNome) => {
+        if (!cursoNome) return '';
+        const cursoUpper = cursoNome.toUpperCase();
+        if (cursoUpper.includes('CGA') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO')) {
+          return 'CGA';
+        } else if (cursoUpper.includes('CGAP') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA')) {
+          return 'CGAP';
+        } else if (cursoUpper.includes('AFA') || cursoUpper.includes('2ª GRADUAÇÃO')) {
+          return 'AFA';
+        }
+        return cursoNome.trim();
+      };
+      
       sections.push({
         id: 'competencias',
         component: (
@@ -259,6 +272,14 @@ function SyllabusPDFContent({ formData, professoresList }) {
             <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
               {t('competenciesTitle')}
             </h3>
+            {formData.curso && (
+              <div style={{ marginBottom: '15px', padding: '10px 15px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#4a5568', lineHeight: '1.6' }}>
+                  Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
+                  demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(formData.curso)}.
+                </p>
+              </div>
+            )}
             <CompetenciesTablePDF data={formData.competencias} />
           </div>
         )
@@ -451,7 +472,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       }
     }
 
-    // 10. Referências (sempre por último)
+    // 10. Referências
     if (formData.referencias) {
       const renderReferences = () => {
         const layout = formData.referencias_layout || 'lista';
@@ -462,6 +483,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             if (parsed.references && Array.isArray(parsed.references)) {
               const obrigatorias = parsed.references.filter(ref => ref.category === 'obrigatoria');
               const opcionais = parsed.references.filter(ref => ref.category === 'opcional');
+              const outras = parsed.references.filter(ref => ref.category === 'outras');
               
               return (
                 <div>
@@ -478,12 +500,24 @@ function SyllabusPDFContent({ formData, professoresList }) {
                     </div>
                   )}
                   {opcionais.length > 0 && (
-                    <div>
+                    <div style={{ marginBottom: '20px' }}>
                       <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
                         {t('optionalReading') || 'Leitura Opcional/Complementar:'}
                       </h4>
                       <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
                         {opcionais.map((ref, idx) => (
+                          <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {outras.length > 0 && (
+                    <div>
+                      <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
+                        Outras Referências:
+                      </h4>
+                      <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
+                        {outras.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
                       </ul>
@@ -514,6 +548,24 @@ function SyllabusPDFContent({ formData, professoresList }) {
               {t('referencesTitle')}
             </h3>
             {renderReferences()}
+          </div>
+        )
+      });
+    }
+
+    // 11. Contatos (sempre por último)
+    if (formData.contatos) {
+      sections.push({
+        id: 'contatos',
+        component: (
+          <div key="contatos" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('contactsTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.contatos }}
+            />
           </div>
         )
       });

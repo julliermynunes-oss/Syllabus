@@ -808,11 +808,21 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                       ))}
                   </ul>
                 </div>
-                <div>
+                <div style={{ marginBottom: '1rem' }}>
                   <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Leitura Opcional/Complementar:</h4>
                   <ul>
                     {addedReferences
                       .filter(ref => ref.category === 'opcional')
+                      .map((ref, index) => (
+                        <li key={index}>{ref.text}</li>
+                      ))}
+                  </ul>
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Outras Referências:</h4>
+                  <ul>
+                    {addedReferences
+                      .filter(ref => ref.category === 'outras')
                       .map((ref, index) => (
                         <li key={index}>{ref.text}</li>
                       ))}
@@ -842,12 +852,12 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>Selecionar Categoria</h2>
             <p>Em qual categoria esta referência deve ser adicionada?</p>
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="modal-btn-confirm"
                 onClick={() => confirmAddReference('obrigatoria')}
-                style={{ flex: 1 }}
+                style={{ flex: 1, minWidth: '150px' }}
               >
                 Leitura Obrigatória
               </button>
@@ -855,9 +865,17 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                 type="button"
                 className="modal-btn-confirm"
                 onClick={() => confirmAddReference('opcional')}
-                style={{ flex: 1, backgroundColor: '#28a745' }}
+                style={{ flex: 1, backgroundColor: '#28a745', minWidth: '150px' }}
               >
                 Leitura Opcional/Complementar
+              </button>
+              <button
+                type="button"
+                className="modal-btn-confirm"
+                onClick={() => confirmAddReference('outras')}
+                style={{ flex: 1, backgroundColor: '#6c757d', minWidth: '150px' }}
+              >
+                Outras Referências
               </button>
             </div>
             <button

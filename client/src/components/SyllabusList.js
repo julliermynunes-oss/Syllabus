@@ -516,6 +516,21 @@ const SyllabusList = () => {
 const SyllabusPreviewContent = ({ formData, professoresList }) => {
   const { t } = useTranslation();
   
+  // Função auxiliar para verificar se o curso é restrito
+  const isRestrictedCourse = (curso) => {
+    if (!curso) return false;
+    const cursoUpper = curso.toUpperCase();
+    return cursoUpper.includes('CGA - CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO') ||
+           cursoUpper.includes('CGAP - CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA') ||
+           cursoUpper.includes('AFA - 2ª GRADUAÇÃO EM CONTABILIDADE') ||
+           cursoUpper === 'CGA' ||
+           cursoUpper === 'CGAP' ||
+           cursoUpper === 'AFA' ||
+           cursoUpper.startsWith('CGA ') ||
+           cursoUpper.startsWith('CGAP ') ||
+           cursoUpper.startsWith('AFA ');
+  };
+  
   return (
     <div style={{ 
       padding: '10px 15px',
@@ -560,6 +575,97 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </div>
       </div>
 
+      {/* Professores */}
+      {formData.professores_data && professoresList && professoresList.length > 0 && (() => {
+        try {
+          const professoresData = typeof formData.professores_data === 'string' 
+            ? JSON.parse(formData.professores_data) 
+            : formData.professores_data;
+          
+          const professoresComDados = professoresList.filter(prof => {
+            const data = professoresData[prof];
+            return data && (data.foto || data.descricao || data.linkedin || data.lattes || (data.outrosLinks && data.outrosLinks.length > 0));
+          });
+
+          if (professoresComDados.length > 0) {
+            return (
+              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                  {t('professorsTitle')}
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                  {professoresComDados.map((professorNome) => {
+                    const profData = professoresData[professorNome] || {};
+                    return (
+                      <div key={professorNome} style={{ 
+                        border: '1px solid #e0e0e0', 
+                        borderRadius: '8px', 
+                        padding: '15px',
+                        background: '#fff'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
+                          {profData.foto && (
+                            <img 
+                              src={profData.foto} 
+                              alt={professorNome}
+                              style={{ 
+                                width: '80px', 
+                                height: '80px', 
+                                borderRadius: '50%', 
+                                objectFit: 'cover',
+                                border: '2px solid #235795'
+                              }}
+                            />
+                          )}
+                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px' }}>{professorNome}</h4>
+                        </div>
+                        {profData.descricao && (
+                          <div 
+                            style={{ fontSize: '13px', lineHeight: '1.5', marginBottom: '12px', color: '#333' }}
+                            className="preview-content"
+                            dangerouslySetInnerHTML={{ __html: profData.descricao }}
+                          />
+                        )}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+                          {profData.linkedin && (
+                            <div>
+                              <strong>LinkedIn:</strong>{' '}
+                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', textDecoration: 'underline' }}>
+                                Ver perfil
+                              </a>
+                            </div>
+                          )}
+                          {profData.lattes && (
+                            <div>
+                              <strong>Currículo Lattes:</strong>{' '}
+                              <a href={profData.lattes} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
+                                Ver currículo
+                              </a>
+                            </div>
+                          )}
+                          {profData.outrosLinks && profData.outrosLinks.map((link, idx) => (
+                            link.url && (
+                              <div key={idx}>
+                                <strong>{link.label || 'Link'}:</strong>{' '}
+                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
+                                  {link.label || 'Acessar link'}
+                                </a>
+                              </div>
+                            )
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          }
+        } catch (e) {
+          return null;
+        }
+      })()}
+
       {/* Sobre a Disciplina */}
       {formData.sobre_disciplina && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
@@ -577,16 +683,49 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </div>
       )}
 
-      {/* Conteúdo */}
-      {formData.conteudo && (
+      {/* Competências */}
+      {formData.competencias && (() => {
+        const getCursoSigla = (cursoNome) => {
+          if (!cursoNome) return '';
+          const cursoUpper = cursoNome.toUpperCase();
+          if (cursoUpper.includes('CGA') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO')) {
+            return 'CGA';
+          } else if (cursoUpper.includes('CGAP') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA')) {
+            return 'CGAP';
+          } else if (cursoUpper.includes('AFA') || cursoUpper.includes('2ª GRADUAÇÃO')) {
+            return 'AFA';
+          }
+          return cursoNome.trim();
+        };
+        
+        return (
+          <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('competenciesTitle')}
+            </h3>
+            {formData.curso && (
+              <div style={{ marginBottom: '15px', padding: '10px 15px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#4a5568', lineHeight: '1.6' }}>
+                  Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
+                  demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(formData.curso)}.
+                </p>
+              </div>
+            )}
+            <CompetenciesTablePDF data={formData.competencias} />
+          </div>
+        );
+      })()}
+
+      {/* ODS (se não for curso restrito) */}
+      {formData.ods && !isRestrictedCourse(formData.curso) && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('contentTitle')}
+            {t('odsTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.conteudo }}
+            dangerouslySetInnerHTML={{ __html: formData.ods }}
           />
         </div>
       )}
@@ -681,147 +820,45 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         }
       })()}
 
-
-      {/* Compromisso Ético */}
-      {formData.compromisso_etico && (
+      {/* Conteúdo */}
+      {formData.conteudo && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('ethicalCommitmentTitle')}
+            {t('contentTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.compromisso_etico }}
+            dangerouslySetInnerHTML={{ __html: formData.conteudo }}
           />
         </div>
       )}
 
-      {/* Professores */}
-      {formData.professores_data && professoresList && professoresList.length > 0 && (() => {
-        try {
-          const professoresData = typeof formData.professores_data === 'string' 
-            ? JSON.parse(formData.professores_data) 
-            : formData.professores_data;
-          
-          const professoresComDados = professoresList.filter(prof => {
-            const data = professoresData[prof];
-            return data && (data.foto || data.descricao || data.linkedin || data.lattes || (data.outrosLinks && data.outrosLinks.length > 0));
-          });
-
-          if (professoresComDados.length > 0) {
-            return (
-              <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-                  {t('professorsTitle')}
-                </h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-                  {professoresComDados.map((professorNome) => {
-                    const profData = professoresData[professorNome] || {};
-                    return (
-                      <div key={professorNome} style={{ 
-                        border: '1px solid #e0e0e0', 
-                        borderRadius: '8px', 
-                        padding: '15px',
-                        background: '#fff'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' }}>
-                          {profData.foto && (
-                            <img 
-                              src={profData.foto} 
-                              alt={professorNome}
-                              style={{ 
-                                width: '80px', 
-                                height: '80px', 
-                                borderRadius: '50%', 
-                                objectFit: 'cover',
-                                border: '2px solid #235795'
-                              }}
-                            />
-                          )}
-                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px' }}>{professorNome}</h4>
-                        </div>
-                        {profData.descricao && (
-                          <div 
-                            style={{ fontSize: '13px', lineHeight: '1.5', marginBottom: '12px', color: '#333' }}
-                            className="preview-content"
-                            dangerouslySetInnerHTML={{ __html: profData.descricao }}
-                          />
-                        )}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
-                          {profData.linkedin && (
-                            <div>
-                              <strong>LinkedIn:</strong>{' '}
-                              <a href={profData.linkedin} target="_blank" rel="noopener noreferrer" style={{ color: '#0077b5', textDecoration: 'underline' }}>
-                                Ver perfil
-                              </a>
-                            </div>
-                          )}
-                          {profData.lattes && (
-                            <div>
-                              <strong>Currículo Lattes:</strong>{' '}
-                              <a href={profData.lattes} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
-                                Ver currículo
-                              </a>
-                            </div>
-                          )}
-                          {profData.outrosLinks && profData.outrosLinks.map((link, idx) => (
-                            link.url && (
-                              <div key={idx}>
-                                <strong>{link.label || 'Link'}:</strong>{' '}
-                                <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: '#235795', textDecoration: 'underline' }}>
-                                  {link.label || 'Acessar link'}
-                                </a>
-                              </div>
-                            )
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          }
-        } catch (e) {
-          return null;
-        }
-      })()}
-
-      {/* Contatos */}
-      {formData.contatos && (
+      {/* O que é esperado do aluno (se não for curso restrito) */}
+      {formData.o_que_e_esperado && !isRestrictedCourse(formData.curso) && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('contactsTitle')}
+            {t('expectedFromStudentTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.contatos }}
+            dangerouslySetInnerHTML={{ __html: formData.o_que_e_esperado }}
           />
         </div>
       )}
 
-      {/* ODS */}
-      {formData.ods && (
+      {/* Aba Personalizada */}
+      {formData.custom_tab_name && formData.custom_tab_content && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('odsTitle')}
+            {formData.custom_tab_name.toUpperCase()}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.ods }}
+            dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
           />
-        </div>
-      )}
-
-      {/* Competências */}
-      {formData.competencias && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('competenciesTitle')}
-          </h3>
-          <CompetenciesTablePDF data={formData.competencias} />
         </div>
       )}
 
@@ -835,6 +872,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             if (parsed.references && Array.isArray(parsed.references)) {
               const obrigatorias = parsed.references.filter(ref => ref.category === 'obrigatoria');
               const opcionais = parsed.references.filter(ref => ref.category === 'opcional');
+              const outras = parsed.references.filter(ref => ref.category === 'outras');
               
               return (
                 <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
@@ -854,12 +892,24 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
                     </div>
                   )}
                   {opcionais.length > 0 && (
-                    <div>
+                    <div style={{ marginBottom: '20px' }}>
                       <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
                         {t('optionalReading') || 'Leitura Opcional/Complementar:'}
                       </h4>
                       <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
                         {opcionais.map((ref, idx) => (
+                          <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {outras.length > 0 && (
+                    <div>
+                      <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
+                        Outras Referências:
+                      </h4>
+                      <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
+                        {outras.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
                       </ul>
@@ -888,16 +938,16 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         );
       })()}
 
-      {/* Aba Personalizada */}
-      {formData.custom_tab_name && formData.custom_tab_content && (
+      {/* Contatos (sempre por último) */}
+      {formData.contatos && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {formData.custom_tab_name.toUpperCase()}
+            {t('contactsTitle')}
           </h3>
           <div 
             style={{ fontSize: '14px', lineHeight: '1.6' }}
             className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
+            dangerouslySetInnerHTML={{ __html: formData.contatos }}
           />
         </div>
       )}

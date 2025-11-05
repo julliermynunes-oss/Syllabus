@@ -1066,7 +1066,7 @@ function SyllabusForm() {
                 {formData.referencias_layout === 'categorizado' && (
                   <div style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#f0f8ff', borderRadius: '8px', border: '1px solid #235795' }}>
                     <p style={{ margin: 0, color: '#235795', fontSize: '0.9rem' }}>
-                      {t('categorizedModeNote') || 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para preservar a categorização.'}
+                      {t('categorizedModeNote') || 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:", "Leitura Opcional/Complementar:" e "Outras Referências:" para preservar a categorização.'}
                     </p>
                   </div>
                 )}
@@ -1080,6 +1080,7 @@ function SyllabusForm() {
                         if (parsed.references && Array.isArray(parsed.references)) {
                           const obrigatorias = parsed.references.filter(ref => ref.category === 'obrigatoria');
                           const opcionais = parsed.references.filter(ref => ref.category === 'opcional');
+                          const outras = parsed.references.filter(ref => ref.category === 'outras');
                           
                           let html = '';
                           if (obrigatorias.length > 0) {
@@ -1092,6 +1093,13 @@ function SyllabusForm() {
                           if (opcionais.length > 0) {
                             html += `<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul>`;
                             opcionais.forEach(ref => {
+                              html += `<li><p>${ref.text}</p></li>`;
+                            });
+                            html += `</ul>`;
+                          }
+                          if (outras.length > 0) {
+                            html += `<h4><strong>Outras Referências:</strong></h4><ul>`;
+                            outras.forEach(ref => {
                               html += `<li><p>${ref.text}</p></li>`;
                             });
                             html += `</ul>`;
@@ -1145,7 +1153,7 @@ function SyllabusForm() {
                         
                         if (opcionalHeading) {
                           let current = opcionalHeading.nextSibling;
-                          while (current) {
+                          while (current && current.nodeName !== 'H4' && current.nodeName !== 'H3' && current.nodeName !== 'H2' && current.nodeName !== 'H1') {
                             if (current.nodeName === 'UL' || current.nodeName === 'OL') {
                               const items = current.querySelectorAll('li');
                               items.forEach(li => {
@@ -1156,6 +1164,30 @@ function SyllabusForm() {
                               });
                             } else if (current.nodeName === 'P' && current.textContent && current.textContent.trim()) {
                               references.push({ text: current.textContent.trim(), category: 'opcional' });
+                            }
+                            current = current.nextSibling;
+                          }
+                        }
+                        
+                        // Buscar seção "Outras Referências"
+                        const outrasHeading = Array.from(tempDiv.querySelectorAll('h4, h3, h2, h1, strong')).find(el => {
+                          const text = el.textContent || el.innerText || '';
+                          return text.toLowerCase().includes('outras referências') || text.toLowerCase().includes('outras referencias');
+                        });
+                        
+                        if (outrasHeading) {
+                          let current = outrasHeading.nextSibling;
+                          while (current) {
+                            if (current.nodeName === 'UL' || current.nodeName === 'OL') {
+                              const items = current.querySelectorAll('li');
+                              items.forEach(li => {
+                                const text = li.textContent || li.innerText || '';
+                                if (text.trim()) {
+                                  references.push({ text: text.trim(), category: 'outras' });
+                                }
+                              });
+                            } else if (current.nodeName === 'P' && current.textContent && current.textContent.trim()) {
+                              references.push({ text: current.textContent.trim(), category: 'outras' });
                             }
                             current = current.nextSibling;
                           }
@@ -1181,7 +1213,7 @@ function SyllabusForm() {
                 />
                 <p className="editor-note">
                   {formData.referencias_layout === 'categorizado' 
-                    ? (t('categorizedEditorNote') || '💡 Dica: Use títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.')
+                    ? (t('categorizedEditorNote') || '💡 Dica: Use títulos "Leitura Obrigatória:", "Leitura Opcional/Complementar:" e "Outras Referências:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.')
                     : t('referencesNote')
                   }
                 </p>
