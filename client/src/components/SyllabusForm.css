@@ -1151,7 +1151,7 @@
   @page {
     size: A4;
     margin: 0;
-    margin-top: 50px; /* Espaço para o logo fixo nas páginas seguintes */
+    margin-top: 35px; /* Espaço reduzido para o logo fixo nas páginas seguintes */
     @top-left { content: none; }
     @top-center { content: none; }
     @top-right { content: none; }
@@ -1168,7 +1168,7 @@
   /* Adicionar padding-top aos elementos que podem começar em novas páginas */
   /* Isso garante que o conteúdo não fique coberto pelo cabeçalho fixo */
   .pdf-container > div {
-    padding-top: 0 !important;
+    padding-top: 15px !important; /* Espaço para evitar que o cabeçalho fixo cubra conteúdo */
     margin-top: 0 !important;
   }
   
@@ -1181,6 +1181,12 @@
   .pdf-container h3 {
     padding-top: 0 !important;
     margin-top: 0 !important;
+  }
+  
+  /* Garantir que títulos que aparecem no topo de novas páginas tenham espaço suficiente */
+  .pdf-container > div > h3:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
   }
   
   /* Estilos para o conteúdo do PDF */
