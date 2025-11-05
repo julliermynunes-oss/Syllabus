@@ -1152,6 +1152,12 @@
     size: A4;
     margin: 0;
     margin-top: 50px; /* Espaço para o logo fixo nas páginas seguintes */
+    @top-left { content: none; }
+    @top-center { content: none; }
+    @top-right { content: none; }
+    @bottom-left { content: none; }
+    @bottom-center { content: none; }
+    @bottom-right { content: none; }
   }
   
   /* Primeira página pode ter menos espaço */
@@ -1163,6 +1169,7 @@
   /* Isso garante que o conteúdo não fique coberto pelo cabeçalho fixo */
   .pdf-container > div {
     padding-top: 0 !important;
+    margin-top: 0 !important;
   }
   
   /* Primeira seção na primeira página não precisa de padding extra */
@@ -1174,24 +1181,6 @@
   .pdf-container h3 {
     padding-top: 0 !important;
     margin-top: 0 !important;
-  }
-  
-  /* Garantir que as seções tenham espaço suficiente quando começam em nova página */
-  .pdf-container > div {
-    margin-top: 0 !important;
-  }
-  
-  /* Adicionar espaço superior para seções que podem começar em novas páginas */
-  /* Isso é tratado pelo margin-top da @page nas páginas seguintes */
-  
-  /* Remover cabeçalhos e rodapés do navegador */
-  @page {
-    @top-left { content: none; }
-    @top-center { content: none; }
-    @top-right { content: none; }
-    @bottom-left { content: none; }
-    @bottom-center { content: none; }
-    @bottom-right { content: none; }
   }
   
   /* Estilos para o conteúdo do PDF */
