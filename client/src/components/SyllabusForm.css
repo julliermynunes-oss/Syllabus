@@ -1168,7 +1168,7 @@
   /* Adicionar padding-top aos elementos que podem começar em novas páginas */
   /* Isso garante que o conteúdo não fique coberto pelo cabeçalho fixo */
   .pdf-container > div {
-    padding-top: 15px !important; /* Espaço para evitar que o cabeçalho fixo cubra conteúdo */
+    padding-top: 30px !important; /* Espaço aumentado para evitar que o cabeçalho fixo cubra conteúdo */
     margin-top: 0 !important;
   }
   
@@ -1183,11 +1183,20 @@
     margin-top: 0 !important;
   }
   
-  /* Garantir que títulos que aparecem no topo de novas páginas tenham espaço suficiente */
+  /* Quando uma seção começa com título h3 no topo, reduzir padding do container */
+  /* pois o título já tem seu próprio espaçamento visual */
   .pdf-container > div > h3:first-child {
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
+  
+  /* Reduzir padding quando há título no início (menos espaço necessário) */
+  .pdf-container > div > h3:first-child ~ * {
+    /* Se houver conteúdo após o título, manter o padding padrão */
+  }
+  
+  /* Para seções que começam diretamente com conteúdo (sem título), manter padding maior */
+  /* Isso é o padrão de 30px definido acima */
   
   /* Estilos para o conteúdo do PDF */
   #pdf-content h1,
