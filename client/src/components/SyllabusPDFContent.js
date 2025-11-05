@@ -87,8 +87,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
               src="/FGV LOGO NOVO.png" 
               alt="FGV Logo" 
               style={{ 
-                maxHeight: '20px', 
-                height: '20px',
+                maxHeight: '35px', 
+                height: '35px',
                 width: 'auto',
                 display: 'block'
               }} 
@@ -110,7 +110,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             )}
             {formData.semestre_ano && (
               <div>
-                <strong>{t('semesterYear')}:</strong> {formData.semestre_ano}
+                <strong>{t('period')}:</strong> {formData.semestre_ano}
               </div>
             )}
             {formData.linha && (
@@ -323,7 +323,25 @@ function SyllabusPDFContent({ formData, professoresList }) {
       });
     }
 
-    // 6. Metodologia
+    // 6. Conteúdo
+    if (formData.conteudo) {
+      sections.push({
+        id: 'conteudo',
+        component: (
+          <div key="conteudo" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              {t('contentTitle')}
+            </h3>
+            <div 
+              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              dangerouslySetInnerHTML={{ __html: formData.conteudo }}
+            />
+          </div>
+        )
+      });
+    }
+
+    // 7. Metodologia
     if (formData.metodologia) {
       sections.push({
         id: 'metodologia',
@@ -341,7 +359,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       });
     }
 
-    // 7. Avaliação
+    // 8. Avaliação
     if (formData.criterio_avaliacao) {
       const avaliacaoComponent = (() => {
         try {

@@ -290,7 +290,7 @@ const SyllabusList = () => {
                 <div className="request-info">
                   <h3>{request.disciplina}</h3>
                   <p>{t('course')}: {request.curso}</p>
-                  <p>{t('semesterYear')}: {request.semestre_ano}</p>
+                  <p>{t('period')}: {request.semestre_ano}</p>
                   {request.turma_nome && <p>{t('class')}: {request.turma_nome}</p>}
                 </div>
                 <button 
@@ -417,7 +417,7 @@ const SyllabusList = () => {
           <thead>
             <tr>
               <th>{t('professor')}</th>
-              <th>{t('semesterYear')}</th>
+              <th>{t('period')}</th>
               <th>{t('course')}</th>
               <th>{t('discipline')}</th>
               <th>{t('line')}</th>
@@ -559,7 +559,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', fontSize: '14px', width: '100%' }}>
           {formData.curso && (<div><strong>{t('course')}:</strong> {formData.curso}</div>)}
-          {formData.semestre_ano && (<div><strong>{t('semesterYear')}:</strong> {formData.semestre_ano}</div>)}
+          {formData.semestre_ano && (<div><strong>{t('period')}:</strong> {formData.semestre_ano}</div>)}
           {formData.linha && (<div><strong>{t('line')}:</strong> {formData.linha}</div>)}
           {formData.turma && (<div><strong>{t('class')}:</strong> {formData.turma}</div>)}
           {formData.departamento && (<div><strong>{t('department')}:</strong> {formData.departamento}</div>)}
@@ -730,6 +730,20 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </div>
       )}
 
+      {/* Conteúdo */}
+      {formData.conteudo && (
+        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            {t('contentTitle')}
+          </h3>
+          <div 
+            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            className="preview-content"
+            dangerouslySetInnerHTML={{ __html: formData.conteudo }}
+          />
+        </div>
+      )}
+
       {/* Metodologia */}
       {formData.metodologia && (
         <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
@@ -819,20 +833,6 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           );
         }
       })()}
-
-      {/* Conteúdo */}
-      {formData.conteudo && (
-        <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('contentTitle')}
-          </h3>
-          <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
-            className="preview-content"
-            dangerouslySetInnerHTML={{ __html: formData.conteudo }}
-          />
-        </div>
-      )}
 
       {/* O que é esperado do aluno (se não for curso restrito) */}
       {formData.o_que_e_esperado && !isRestrictedCourse(formData.curso) && (
