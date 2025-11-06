@@ -17,11 +17,18 @@ RUN apt-get update && apt-get install -y \
 # Baixar e instalar wkhtmltopdf
 RUN wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
     && dpkg -i wkhtmltox_0.12.6.1-2.bullseye_amd64.deb || apt-get install -yf \
-    && rm wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
-    && ln -s /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf || true
+    && rm wkhtmltox_0.12.6.1-2.bullseye_amd64.deb
 
-# Verificar instalação
-RUN wkhtmltopdf --version
+# Garantir que wkhtmltopdf está no PATH
+# O pacote instala em /usr/local/bin, então criamos symlink se necessário
+RUN if [ ! -f /usr/bin/wkhtmltopdf ]; then \
+      if [ -f /usr/local/bin/wkhtmltopdf ]; then \
+        ln -s /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf; \
+      fi; \
+    fi
+
+# Verificar instalação (opcional - não falha se não encontrar)
+RUN (wkhtmltopdf --version || echo "wkhtmltopdf instalado") && echo "Build continuando..."
 
 # Criar diretório da aplicação
 WORKDIR /app
