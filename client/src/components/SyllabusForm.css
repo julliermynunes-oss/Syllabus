@@ -1112,87 +1112,131 @@
 }
 
 @media print {
-  .form-box-with-tabs {
+  /* Ocultar tudo exceto o conteúdo do PDF */
+  body * {
+    visibility: hidden;
+  }
+  
+  #pdf-content,
+  #pdf-content * {
+    visibility: visible;
+  }
+  
+  #pdf-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  
+  .form-box-with-tabs,
+  .no-print {
     display: none !important;
     visibility: hidden !important;
   }
   
-  /* Logo removido - agora está apenas na primeira página como parte do conteúdo */
-
-  /* Primeira página - espaço no topo */
-  .pdf-container {
-    padding-top: 40px !important;
-    padding-left: 25px !important;
-    padding-right: 25px !important;
-    padding-bottom: 40px !important;
-  }
-  
-  /* Configurações de página - Remove cabeçalhos e rodapés do navegador */
+  /* Configurações de página A4 */
   @page {
     size: A4;
-    margin: 0 !important;
-    margin-top: 0 !important;
-    @top-left { content: none; }
-    @top-center { content: none; }
-    @top-right { content: none; }
-    @bottom-left { content: none; }
-    @bottom-center { content: none; }
-    @bottom-right { content: none; }
+    margin: 25mm 20mm;
   }
   
-  /* Primeira página pode ter menos espaço */
+  /* Primeira página */
   @page:first {
-    margin-top: 0 !important;
+    margin-top: 20mm;
   }
   
-  /* Reset - não aplicar padding por padrão */
-  .pdf-container > div {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
+  /* Container do PDF */
+  .pdf-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
   
-  /* Primeira seção na primeira página não precisa de padding extra */
-  .pdf-container > div:first-child {
-    padding-top: 0 !important;
-    margin-bottom: 0 !important;
-    min-height: 0 !important;
-    height: auto !important;
-  }
-  .pdf-container > div:nth-child(2) {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-  
-  /* Adicionar espaço antes dos títulos h3 que podem aparecer em novas páginas */
+  /* Títulos */
   .pdf-container h3 {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
     font-size: 20px !important;
-    margin-bottom: 12px !important;
+    color: #235795 !important;
+    border-bottom: 2px solid #a4a4a4 !important;
     padding-bottom: 8px !important;
+    margin-bottom: 12px !important;
+    margin-top: 20px !important;
+    padding-top: 0 !important;
+    page-break-after: avoid;
   }
   
   .pdf-container h4 {
     font-size: 17px !important;
+    color: #235795 !important;
+    font-weight: bold !important;
+    page-break-after: avoid;
   }
   
+  /* Texto */
   .pdf-container {
     font-size: 15px !important;
+    line-height: 1.5 !important;
+    color: #000 !important;
   }
   
   .pdf-container p,
-  .pdf-container div:not([class]) {
+  .pdf-container div {
     font-size: 15px !important;
     line-height: 1.5 !important;
+    color: #000 !important;
   }
   
+  /* Tabelas */
   .pdf-container table {
     font-size: 15px !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: avoid;
+    margin: 15px 0 !important;
   }
   
+  .pdf-container table td,
+  .pdf-container table th {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+  }
+  
+  .pdf-container table th {
+    background-color: #235795 !important;
+    color: white !important;
+  }
+  
+  /* Listas */
   .pdf-container ul,
   .pdf-container ol {
     font-size: 15px !important;
+    line-height: 1.6 !important;
+    padding-left: 30px !important;
+  }
+  
+  .pdf-container li {
+    margin-bottom: 5px !important;
+  }
+  
+  /* Imagens */
+  .pdf-container img {
+    max-width: 100% !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Evitar quebra de página em elementos importantes */
+  .pdf-container > div {
+    page-break-inside: avoid;
+  }
+  
+  /* Cores e backgrounds */
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    background: white !important;
   }
   
   .pdf-container strong {
