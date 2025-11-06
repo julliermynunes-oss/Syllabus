@@ -14,19 +14,17 @@ RUN apt-get update && apt-get install -y \
     libxi6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar wkhtmltopdf via repositório oficial do Debian
-# Primeiro, tentar instalar do repositório
-RUN apt-get update && apt-get install -y wkhtmltopdf || \
-    (wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb && \
-     dpkg -i wkhtmltox_0.12.6.1-2.bullseye_amd64.deb || apt-get install -yf && \
-     rm -f wkhtmltox_0.12.6.1-2.bullseye_amd64.deb)
+# Instalar wkhtmltopdf
+# Baixar e instalar o pacote .deb oficial
+RUN wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
+    && dpkg -i wkhtmltox_0.12.6.1-2.bullseye_amd64.deb || apt-get install -yf \
+    && rm -f wkhtmltox_0.12.6.1-2.bullseye_amd64.deb
 
-# Verificar instalação e criar symlink se necessário
-RUN which wkhtmltopdf || \
-    (if [ -f /usr/local/bin/wkhtmltopdf ]; then \
-       ln -sf /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf; \
-     fi) && \
-    wkhtmltopdf --version
+# Garantir que wkhtmltopdf está acessível no PATH
+# O pacote instala em /usr/local/bin, criar symlink em /usr/bin
+RUN if [ -f /usr/local/bin/wkhtmltopdf ] && [ ! -f /usr/bin/wkhtmltopdf ]; then \
+      ln -s /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf; \
+    fi
 
 # Criar diretório da aplicação
 WORKDIR /app
