@@ -251,7 +251,7 @@ const SyllabusList = () => {
       <header className="header">
         <div className="header-title-section">
           <img 
-            src="/FGV LOGO NOVO.png" 
+            src="/FGV_SEM_FUNDO.png" 
             alt="FGV EAESP Logo" 
             className="header-logo"
           />
