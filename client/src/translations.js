@@ -32,6 +32,7 @@ export const translations = {
     delete: 'Excluir',
     copy: 'Copiar',
     acceptAndCreate: 'Aceitar e Criar Syllabus',
+    actions: 'Ações',
     deleteConfirm: 'Tem certeza que deseja excluir este syllabus?',
     yes: 'Sim',
     no: 'Não',
