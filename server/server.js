@@ -1418,39 +1418,48 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
 
     // Executar wkhtmltopdf (tentar diferentes caminhos possíveis)
     // O wkhtmltopdf geralmente está em /usr/local/bin/wkhtmltopdf após instalação
-    const wkhtmltopdfPaths = ['wkhtmltopdf', '/usr/local/bin/wkhtmltopdf', '/usr/bin/wkhtmltopdf'];
+    const wkhtmltopdfPaths = ['/usr/local/bin/wkhtmltopdf', '/usr/bin/wkhtmltopdf', 'wkhtmltopdf'];
     let wkhtmltopdfPath = null;
     
-    // Verificar qual caminho funciona (usar fs.existsSync que é síncrono e mais confiável)
+    console.log('=== Procurando wkhtmltopdf ===');
+    
+    // Verificar caminhos absolutos primeiro (mais confiável)
     for (const testPath of wkhtmltopdfPaths) {
-      if (testPath === 'wkhtmltopdf') {
-        // Para 'wkhtmltopdf', tentar usar which
-        try {
-          const { stdout } = await execAsync(`which wkhtmltopdf`);
-          if (stdout && stdout.trim()) {
-            wkhtmltopdfPath = testPath;
-            console.log('wkhtmltopdf encontrado via which:', stdout.trim());
-            break;
-          }
-        } catch (e) {
-          // Continuar tentando outros caminhos
-          continue;
-        }
-      } else {
+      if (testPath.startsWith('/')) {
         // Para caminhos absolutos, verificar se o arquivo existe
         if (fs.existsSync(testPath)) {
           wkhtmltopdfPath = testPath;
-          console.log('wkhtmltopdf encontrado em:', testPath);
+          console.log('✓ wkhtmltopdf encontrado em:', testPath);
           break;
+        } else {
+          console.log('✗ Não encontrado em:', testPath);
         }
       }
     }
     
+    // Se não encontrou em caminhos absolutos, tentar via which
     if (!wkhtmltopdfPath) {
-      // Se não encontrar, tentar usar 'wkhtmltopdf' mesmo assim
-      wkhtmltopdfPath = 'wkhtmltopdf';
-      console.warn('wkhtmltopdf não encontrado em caminhos conhecidos, tentando usar do PATH');
+      try {
+        const { stdout } = await execAsync(`which wkhtmltopdf`);
+        if (stdout && stdout.trim()) {
+          const foundPath = stdout.trim();
+          if (fs.existsSync(foundPath)) {
+            wkhtmltopdfPath = foundPath;
+            console.log('✓ wkhtmltopdf encontrado via which:', foundPath);
+          }
+        }
+      } catch (e) {
+        console.log('✗ which wkhtmltopdf falhou:', e.message);
+      }
     }
+    
+    // Último recurso: tentar usar 'wkhtmltopdf' do PATH
+    if (!wkhtmltopdfPath) {
+      wkhtmltopdfPath = 'wkhtmltopdf';
+      console.warn('⚠️  wkhtmltopdf não encontrado em caminhos conhecidos, tentando usar do PATH');
+    }
+    
+    console.log('Usando wkhtmltopdf em:', wkhtmltopdfPath);
     
     console.log('Usando wkhtmltopdf em:', wkhtmltopdfPath);
     
