@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -23,6 +23,7 @@ function SyllabusForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const isEditing = !!id;
+  const competenciesTableRef = useRef(null);
 
   // Normalizadores para compatibilidade retroativa
   const normalizeSemestreAno = (value) => {
@@ -524,6 +525,15 @@ function SyllabusForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar limite de contribuições antes de salvar
+    if (competenciesTableRef.current) {
+      const validation = competenciesTableRef.current.validateLimite();
+      if (!validation.valid) {
+        alert(validation.message);
+        return;
+      }
+    }
     
     const dataToSubmit = {
       ...formData,
