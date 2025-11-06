@@ -1121,9 +1121,10 @@
 
   /* Primeira página - espaço no topo */
   .pdf-container {
-    padding-top: 25px !important;
-    padding-left: 30px !important;
-    padding-right: 30px !important;
+    padding-top: 40px !important;
+    padding-left: 50px !important;
+    padding-right: 50px !important;
+    padding-bottom: 40px !important;
   }
   
   /* Configurações de página - Remove cabeçalhos e rodapés do navegador */
@@ -1152,6 +1153,13 @@
   
   /* Primeira seção na primeira página não precisa de padding extra */
   .pdf-container > div:first-child {
+    padding-top: 0 !important;
+    margin-bottom: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .pdf-container > div:nth-child(2) {
+    margin-top: 0 !important;
     padding-top: 0 !important;
   }
   

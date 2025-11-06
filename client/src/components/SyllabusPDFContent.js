@@ -74,7 +74,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '20px', marginTop: '0', paddingBottom: '0', minHeight: 'auto', height: 'auto' }}>
+        <div key="info_gerais" style={{ marginBottom: '0px', marginTop: '0', paddingBottom: '0', minHeight: '0', height: 'auto', overflow: 'visible' }}>
           {/* Logo apenas na primeira página */}
           <div style={{ 
             display: 'flex', 
@@ -174,7 +174,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           sections.push({
             id: 'professores',
             component: (
-              <div key="professores" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+              <div key="professores" style={{ marginBottom: '30px', marginTop: '0', paddingTop: '0', pageBreakInside: 'avoid' }}>
                 <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
                   {t('professorsTitle')}
                 </h3>
@@ -605,8 +605,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
   
   return (
     <div className="pdf-container" style={{ 
-      padding: '25px 30px',
-      paddingTop: '25px',
+      padding: '40px 50px',
+      paddingTop: '40px',
       fontFamily: 'Arial, sans-serif',
       color: '#000',
       backgroundColor: '#fff',
