@@ -1141,9 +1141,9 @@
     margin: 25mm 20mm;
   }
   
-  /* Primeira página */
+  /* Primeira página - reduzir margem superior para caber mais conteúdo */
   @page:first {
-    margin-top: 20mm;
+    margin-top: 15mm;
   }
   
   /* Container do PDF */
@@ -1164,6 +1164,17 @@
     margin-top: 20px !important;
     padding-top: 0 !important;
     page-break-after: avoid;
+  }
+  
+  /* Seção de Professores - evitar quebra de página antes e reduzir espaçamento */
+  .pdf-container .professores-section {
+    page-break-before: avoid !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  .pdf-container .professores-section h3 {
+    margin-top: 10px !important;
   }
   
   .pdf-container h4 {
