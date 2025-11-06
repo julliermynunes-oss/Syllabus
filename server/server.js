@@ -1492,7 +1492,7 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
       }
       
       // Se o erro for relacionado a display/X11, tentar sem xvfb-run
-      if (useXvfb && (execError.stderr?.includes('display') || execError.stderr?.includes('X11'))) {
+      if (useXvfb && (execError.stderr?.includes('display') || execError.stderr?.includes('X11') || execError.code === 1)) {
         console.log('Tentando executar sem xvfb-run...');
         const fallbackCommand = `${wkhtmltopdfPath} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
         try {
@@ -1501,6 +1501,7 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
             maxBuffer: 10 * 1024 * 1024
           });
           console.log('wkhtmltopdf executado com sucesso (sem xvfb-run)');
+          // Continuar normalmente após sucesso do fallback
         } catch (fallbackError) {
           console.error('Erro também sem xvfb-run:', fallbackError);
           throw fallbackError;
