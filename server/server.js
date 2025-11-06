@@ -389,34 +389,67 @@ function loadCSVData() {
 function loadCompetenciasData() {
   try {
     const xlsxPath = path.join(__dirname, '..', 'Competências.xlsx');
+    console.log(`Tentando carregar Competências.xlsx de: ${xlsxPath}`);
+    
     if (!fs.existsSync(xlsxPath)) {
-      console.warn('Competências.xlsx not found');
+      console.warn(`Competências.xlsx não encontrado em: ${xlsxPath}`);
+      console.warn('Verifique se o arquivo existe na raiz do projeto');
       return;
     }
 
+    console.log('Arquivo encontrado, lendo...');
     const workbook = XLSX.readFile(xlsxPath);
+    console.log(`Planilhas encontradas: ${workbook.SheetNames.join(', ')}`);
+    
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     const data = XLSX.utils.sheet_to_json(worksheet);
+    
+    console.log(`Total de linhas lidas: ${data.length}`);
+    
+    if (data.length === 0) {
+      console.warn('Nenhuma linha de dados encontrada no arquivo Competências.xlsx');
+      return;
+    }
+
+    // Log primeira linha para debug
+    if (data.length > 0) {
+      console.log('Primeira linha de exemplo:', JSON.stringify(data[0], null, 2));
+    }
 
     // Group competências by curso
     competenciasData = {};
-    data.forEach(row => {
-      const curso = (row.Curso || '').trim();
+    data.forEach((row, index) => {
+      // Tentar diferentes nomes de coluna possíveis
+      const curso = (row.Curso || row.curso || row.CURSO || row['Curso'] || '').toString().trim();
+      const competencia = (row.Competência || row.competência || row.Competencia || row.competencia || row['Competência'] || row['Competencia'] || '').toString().trim();
+      const descricao = (row.Descrição || row.descrição || row.Descricao || row.descricao || row['Descrição'] || row['Descricao'] || '').toString().trim();
+      
       if (curso) {
         if (!competenciasData[curso]) {
           competenciasData[curso] = [];
         }
-        competenciasData[curso].push({
-          competencia: (row.Competência || '').trim(),
-          descricao: (row.Descrição || '').trim()
-        });
+        if (competencia) {
+          competenciasData[curso].push({
+            competencia: competencia,
+            descricao: descricao
+          });
+        }
+      } else if (index === 0) {
+        console.warn('Primeira linha não tem coluna "Curso". Colunas disponíveis:', Object.keys(row));
       }
     });
 
-    console.log(`Loaded competências for ${Object.keys(competenciasData).length} cursos`);
+    const cursosCount = Object.keys(competenciasData).length;
+    console.log(`✓ Carregadas competências para ${cursosCount} cursos:`, Object.keys(competenciasData).join(', '));
+    
+    if (cursosCount === 0) {
+      console.error('⚠ ATENÇÃO: Nenhum curso foi encontrado no arquivo Competências.xlsx');
+      console.error('Verifique se o arquivo tem uma coluna chamada "Curso" (ou variações)');
+    }
   } catch (error) {
-    console.error('Error loading competências:', error);
+    console.error('Erro ao carregar competências:', error);
+    console.error('Stack trace:', error.stack);
   }
 }
 
