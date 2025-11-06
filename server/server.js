@@ -1461,5 +1461,7 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`wkhtmltopdf endpoint ready at POST /api/generate-pdf`);
 });
 
