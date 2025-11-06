@@ -265,9 +265,9 @@ const SyllabusList = () => {
               fontSize: '0.9rem'
             }}
           >
-            <option value="pt">🇧🇷 Português</option>
-            <option value="en">🇺🇸 English</option>
-            <option value="es">🇪🇸 Español</option>
+            <option value="pt">BR - Português</option>
+            <option value="en">US - English</option>
+            <option value="es">ES - Español</option>
           </select>
           <div className="user-badge" title={user?.email}>{t('professor')}: {user?.nome_completo || '—'}</div>
           <button className="icon-btn" onClick={handleLogout}>

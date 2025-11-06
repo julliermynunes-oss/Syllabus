@@ -586,9 +586,9 @@ function SyllabusForm() {
               marginRight: '1rem'
             }}
           >
-            <option value="pt">🇧🇷 Português</option>
-            <option value="en">🇺🇸 English</option>
-            <option value="es">🇪🇸 Español</option>
+            <option value="pt">BR - Português</option>
+            <option value="en">US - English</option>
+            <option value="es">ES - Español</option>
           </select>
           {isEditing && (
             <button className="export-pdf-btn" onClick={handleExportPDF} type="button">
