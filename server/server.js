@@ -1449,23 +1449,65 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
     
     console.log('Usando wkhtmltopdf em:', wkhtmltopdfPath);
     
-    const command = `${wkhtmltopdfPath} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
+    // Usar xvfb-run para executar wkhtmltopdf em ambiente headless (sem display)
+    // xvfb-run cria um display virtual X11 para aplicações que precisam de GUI
+    const useXvfb = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT;
+    const baseCommand = useXvfb ? `xvfb-run -a --server-args="-screen 0 1024x768x24" ${wkhtmltopdfPath}` : wkhtmltopdfPath;
+    const command = `${baseCommand} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
     
     console.log('Executando wkhtmltopdf...', command);
+    console.log('Usando xvfb-run:', useXvfb);
     
     try {
-      const { stdout, stderr } = await execAsync(command, { timeout: 30000 }); // 30 segundos timeout
+      const { stdout, stderr } = await execAsync(command, { 
+        timeout: 30000, // 30 segundos timeout
+        maxBuffer: 10 * 1024 * 1024 // 10MB buffer para stdout/stderr
+      });
 
-      if (stderr && !stderr.includes('Warning') && !stderr.includes('QFont')) {
-        console.warn('Aviso do wkhtmltopdf:', stderr);
+      // Ignorar avisos comuns do wkhtmltopdf que não são erros críticos
+      if (stderr) {
+        const stderrLower = stderr.toLowerCase();
+        const isWarning = stderrLower.includes('warning') || 
+                         stderrLower.includes('qfont') ||
+                         stderrLower.includes('qt') ||
+                         stderrLower.includes('xcb');
+        
+        if (!isWarning) {
+          console.warn('Aviso do wkhtmltopdf:', stderr);
+        } else {
+          console.log('Avisos ignorados do wkhtmltopdf (não críticos)');
+        }
       }
+      
+      console.log('wkhtmltopdf executado com sucesso');
     } catch (execError) {
       console.error('Erro ao executar wkhtmltopdf:', execError);
+      console.error('Código do erro:', execError.code);
+      console.error('stderr:', execError.stderr);
+      console.error('stdout:', execError.stdout);
+      
       // Se o erro for que o comando não foi encontrado, dar mensagem mais clara
       if (execError.code === 127 || execError.message.includes('not found')) {
         throw new Error('wkhtmltopdf não está instalado ou não está no PATH. Verifique a instalação no servidor.');
       }
-      throw execError;
+      
+      // Se o erro for relacionado a display/X11, tentar sem xvfb-run
+      if (useXvfb && (execError.stderr?.includes('display') || execError.stderr?.includes('X11'))) {
+        console.log('Tentando executar sem xvfb-run...');
+        const fallbackCommand = `${wkhtmltopdfPath} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
+        try {
+          const { stdout, stderr } = await execAsync(fallbackCommand, { 
+            timeout: 30000,
+            maxBuffer: 10 * 1024 * 1024
+          });
+          console.log('wkhtmltopdf executado com sucesso (sem xvfb-run)');
+        } catch (fallbackError) {
+          console.error('Erro também sem xvfb-run:', fallbackError);
+          throw fallbackError;
+        }
+      } else {
+        throw execError;
+      }
     }
 
     // Verificar se o PDF foi criado
