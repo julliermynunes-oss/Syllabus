@@ -250,46 +250,62 @@ function loadCSVData() {
     let programsLoaded = false;
     let disciplinesLoaded = false;
 
-    // Read Cursos CSV
-    fs.createReadStream(path.join(__dirname, '..', 'Curso.csv'), { encoding: 'utf8' })
-      .pipe(csv())
-      .on('data', (row) => {
-        cursosData.push(row);
-      })
-      .on('end', () => {
-        db.serialize(() => {
-          db.run('DELETE FROM programs');
-          const programsMap = new Map();
-          
-          // Insert programs
-          const uniquePrograms = [...new Set(cursosData.map(r => r.programa))];
-          uniquePrograms.forEach((programa) => {
-            db.run('INSERT INTO programs (nome) VALUES (?)', [programa], function(err) {
-              if (!err) {
-                programsMap.set(programa, this.lastID);
-              }
+    // Read Cursos CSV (com tratamento de erro)
+    const cursoCsvPath = path.join(__dirname, '..', 'Curso.csv');
+    if (fs.existsSync(cursoCsvPath)) {
+      fs.createReadStream(cursoCsvPath, { encoding: 'utf8' })
+        .on('error', (err) => {
+          console.warn('Erro ao ler Curso.csv:', err.message);
+        })
+        .pipe(csv())
+        .on('data', (row) => {
+          cursosData.push(row);
+        })
+        .on('end', () => {
+          db.serialize(() => {
+            db.run('DELETE FROM programs');
+            const programsMap = new Map();
+            
+            // Insert programs
+            const uniquePrograms = [...new Set(cursosData.map(r => r.programa))];
+            uniquePrograms.forEach((programa) => {
+              db.run('INSERT INTO programs (nome) VALUES (?)', [programa], function(err) {
+                if (!err) {
+                  programsMap.set(programa, this.lastID);
+                }
+              });
             });
+            
+            programsLoaded = true;
+            if (disciplinesLoaded) {
+              insertDisciplines(disciplinasData, programsMap);
+            }
           });
-          
-          programsLoaded = true;
-          if (disciplinesLoaded) {
-            insertDisciplines(disciplinasData, programsMap);
+        });
+    } else {
+      console.warn('Curso.csv não encontrado, pulando carregamento de programas');
+    }
+
+    // Read Disciplinas CSV (com tratamento de erro)
+    const disciplinaCsvPath = path.join(__dirname, '..', 'Disciplina.csv');
+    if (fs.existsSync(disciplinaCsvPath)) {
+      fs.createReadStream(disciplinaCsvPath, { encoding: 'utf8' })
+        .on('error', (err) => {
+          console.warn('Erro ao ler Disciplina.csv:', err.message);
+        })
+        .pipe(csv())
+        .on('data', (row) => {
+          disciplinasData.push(row);
+        })
+        .on('end', () => {
+          disciplinesLoaded = true;
+          if (programsLoaded) {
+            setTimeout(() => insertDisciplines(disciplinasData, new Map()), 500);
           }
         });
-      });
-
-    // Read Disciplinas CSV
-    fs.createReadStream(path.join(__dirname, '..', 'Disciplina.csv'), { encoding: 'utf8' })
-      .pipe(csv())
-      .on('data', (row) => {
-        disciplinasData.push(row);
-      })
-      .on('end', () => {
-        disciplinesLoaded = true;
-        if (programsLoaded) {
-          setTimeout(() => insertDisciplines(disciplinasData, new Map()), 500);
-        }
-      });
+    } else {
+      console.warn('Disciplina.csv não encontrado, pulando carregamento de disciplinas');
+    }
 
     // Read Professores from XLSX file (better encoding support)
     professoresData = {};
