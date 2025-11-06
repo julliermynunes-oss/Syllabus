@@ -15,9 +15,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Baixar e instalar wkhtmltopdf
-RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
+RUN wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-2/wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
     && dpkg -i wkhtmltox_0.12.6.1-2.bullseye_amd64.deb || apt-get install -yf \
-    && rm wkhtmltox_0.12.6.1-2.bullseye_amd64.deb
+    && rm wkhtmltox_0.12.6.1-2.bullseye_amd64.deb \
+    && ln -s /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf || true
 
 # Verificar instalação
 RUN wkhtmltopdf --version
