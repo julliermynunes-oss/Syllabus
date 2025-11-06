@@ -468,11 +468,13 @@ function SyllabusForm() {
       return;
     }
 
+    // Salvar estilos originais antes do try para poder restaurar no catch
+    const originalDisplay = element.style.display;
+    const originalPosition = element.style.position;
+    const originalLeft = element.style.left;
+
     try {
       // Tornar o elemento visível temporariamente para capturar HTML
-      const originalDisplay = element.style.display;
-      const originalPosition = element.style.position;
-      const originalLeft = element.style.left;
       
       element.style.display = 'block';
       element.style.position = 'relative';
