@@ -486,7 +486,7 @@ function SyllabusForm() {
       
       // Configurações do html2pdf
       const opt = {
-        margin: [40, 50, 40, 50], // [top, left, bottom, right] em mm
+        margin: [40, 20, 40, 20], // [top, left, bottom, right] em mm - reduzido laterais para evitar quebras
         filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 

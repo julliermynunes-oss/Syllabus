@@ -1122,8 +1122,8 @@
   /* Primeira página - espaço no topo */
   .pdf-container {
     padding-top: 40px !important;
-    padding-left: 50px !important;
-    padding-right: 50px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
     padding-bottom: 40px !important;
   }
   
