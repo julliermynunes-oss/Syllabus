@@ -1119,9 +1119,11 @@
   
   /* Logo removido - agora está apenas na primeira página como parte do conteúdo */
 
-  /* Primeira página - menos espaço no topo */
+  /* Primeira página - espaço no topo */
   .pdf-container {
-    padding-top: 10px !important;
+    padding-top: 25px !important;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
   }
   
   /* Configurações de página - Remove cabeçalhos e rodapés do navegador */

@@ -529,18 +529,18 @@ function SyllabusForm() {
             box-sizing: border-box !important;
           }
           .pdf-container {
-            padding-top: 10px !important;
-            padding-left: 15px !important;
-            padding-right: 15px !important;
-            padding-bottom: 10px !important;
+            padding-top: 25px !important;
+            padding-left: 30px !important;
+            padding-right: 30px !important;
+            padding-bottom: 25px !important;
             margin: 0 !important;
             box-sizing: border-box !important;
           }
           .pdf-container[style*="padding"] {
-            padding-top: 10px !important;
-            padding-left: 15px !important;
-            padding-right: 15px !important;
-            padding-bottom: 10px !important;
+            padding-top: 25px !important;
+            padding-left: 30px !important;
+            padding-right: 30px !important;
+            padding-bottom: 25px !important;
           }
           .pdf-container > div {
             padding-top: 0 !important;
@@ -548,9 +548,11 @@ function SyllabusForm() {
           }
           .pdf-container > div:first-child {
             padding-top: 0 !important;
-            margin-bottom: 10px !important;
+            margin-bottom: 20px !important;
             margin-top: 0 !important;
             padding-bottom: 0 !important;
+            min-height: auto !important;
+            height: auto !important;
           }
           .pdf-container > div:nth-child(2) {
             margin-top: 0 !important;
