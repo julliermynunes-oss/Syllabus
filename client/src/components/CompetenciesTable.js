@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import './CompetenciesTable.css';
 
-const CompetenciesTable = ({ data, onChange, curso }) => {
+const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
   const [rows, setRows] = useState([]);
   const initializedRef = useRef(false);
   const loadedCursoRef = useRef(null);
@@ -152,23 +152,7 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
       return;
     }
 
-    // Se estiver atualizando o grau, validar limite
-    if (field === 'grau') {
-      // Calcular total atual de contribuições
-      const totalAtual = rows.reduce((sum, row) => sum + (row.grau || 0), 0);
-      const grauAtual = rows[index].grau || 0;
-      const novoGrau = value;
-      
-      // Calcular novo total se mudarmos este grau
-      const novoTotal = totalAtual - grauAtual + novoGrau;
-      
-      // Se há limite configurado e o novo total ultrapassar, não permitir
-      if (limiteContribuicoes !== null && novoTotal > limiteContribuicoes) {
-        alert(`Limite de contribuições atingido! Você pode usar no máximo ${limiteContribuicoes} bolinhas. Atualmente usando: ${totalAtual}, tentando adicionar mais ${novoGrau - grauAtual}.`);
-        return;
-      }
-    }
-
+    // Permitir mudanças livremente - validação será feita no momento de salvar
     const newRows = rows.map((row, i) => {
       if (i === index) {
         return { ...row, [field]: value };
@@ -177,6 +161,34 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
     });
     setRows(newRows);
   };
+
+  // Função para validar limite de contribuições (será chamada externamente)
+  const validateLimite = () => {
+    if (limiteContribuicoes === null) {
+      return { valid: true, message: '' };
+    }
+
+    const totalUsado = rows.reduce((sum, row) => sum + (row.grau || 0), 0);
+    
+    if (totalUsado > limiteContribuicoes) {
+      return {
+        valid: false,
+        message: `Limite de contribuições excedido! Você pode usar no máximo ${limiteContribuicoes} bolinhas, mas está usando ${totalUsado}. Remova ${totalUsado - limiteContribuicoes} bolinha(s) antes de salvar.`
+      };
+    }
+    
+    return { valid: true, message: '' };
+  };
+
+  // Expor função de validação para o componente pai
+  useEffect(() => {
+    if (onChange && typeof onChange === 'function') {
+      // Passar função de validação através do onChange
+      const dataObj = { rows, validateLimite };
+      onChange(JSON.stringify(dataObj));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows]);
 
   const getContribuicao = (grau) => {
     const circles = [];

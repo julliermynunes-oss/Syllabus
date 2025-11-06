@@ -1215,6 +1215,7 @@ function SyllabusForm() {
                 {t('competenciesLabel')}
               </h3>
               <CompetenciesTable
+                ref={competenciesTableRef}
                 data={formData.competencias}
                 onChange={(content) => setFormData(prev => ({ ...prev, competencias: content }))}
                 curso={formData.curso}
