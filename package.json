@@ -21,7 +21,7 @@
     "multer": "^1.4.5-lts.1",
     "paapi5-nodejs-sdk": "^1.1.0",
     "pdfkit": "^0.13.0",
-    "puppeteer": "^21.5.2",
+    "puppeteer": "^24.15.0",
     "sqlite3": "^5.1.6",
     "xlsx": "^0.18.5"
   },
