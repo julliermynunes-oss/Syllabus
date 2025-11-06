@@ -562,7 +562,11 @@ function SyllabusForm() {
           }
           .pdf-container > div > h3:first-child {
             margin-top: 0 !important;
-            padding-top: 15px !important;
+            padding-top: 0 !important;
+          }
+          .pdf-container > div:nth-child(2) > h3:first-child {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
           }
           .pdf-container > div > *:first-child:not(h3) {
             padding-top: 30px !important;

@@ -175,7 +175,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             id: 'professores',
             component: (
               <div key="professores" style={{ marginBottom: '30px', marginTop: '0', paddingTop: '0', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px', marginTop: '0', paddingTop: '0' }}>
                   {t('professorsTitle')}
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
