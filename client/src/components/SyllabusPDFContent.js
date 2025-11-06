@@ -20,12 +20,12 @@ const CompetenciesTablePDF = ({ data }) => {
     }
     
     return (
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '14px' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '16px' }}>
         <thead>
           <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
-            <th style={{ padding: '12px 10px', textAlign: 'left', border: '1px solid #235795', fontSize: '14px' }}>{t('competence')}</th>
-            <th style={{ padding: '12px 10px', textAlign: 'left', border: '1px solid #235795', fontSize: '14px' }}>{t('descriptionField')}</th>
-            <th style={{ padding: '12px 10px', textAlign: 'center', border: '1px solid #235795', fontSize: '14px', width: '120px' }}>{t('contributionDegree')}</th>
+            <th style={{ padding: '12px 10px', textAlign: 'left', border: '1px solid #235795', fontSize: '16px' }}>{t('competence')}</th>
+            <th style={{ padding: '12px 10px', textAlign: 'left', border: '1px solid #235795', fontSize: '16px' }}>{t('descriptionField')}</th>
+            <th style={{ padding: '12px 10px', textAlign: 'center', border: '1px solid #235795', fontSize: '16px', width: '120px' }}>{t('contributionDegree')}</th>
           </tr>
         </thead>
         <tbody>
@@ -307,12 +307,12 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'competencias',
         component: (
           <div key="competencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('competenciesTitle')}
             </h3>
             {formData.curso && (
-              <div style={{ marginBottom: '15px', padding: '10px 15px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
-                <p style={{ margin: 0, fontSize: '14px', color: '#4a5568', lineHeight: '1.6' }}>
+              <div style={{ marginBottom: '15px', padding: '12px 18px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
+                <p style={{ margin: 0, fontSize: '16px', color: '#4a5568', lineHeight: '1.6' }}>
                   Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
                   demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(formData.curso)}.
                 </p>
@@ -330,11 +330,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'ods',
         component: (
           <div key="ods" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('odsTitle')}
             </h3>
             <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              style={{ fontSize: '16px', lineHeight: '1.6' }}
               dangerouslySetInnerHTML={{ __html: formData.ods }}
             />
           </div>
@@ -348,11 +348,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'conteudo',
         component: (
           <div key="conteudo" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('contentTitle')}
             </h3>
             <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              style={{ fontSize: '16px', lineHeight: '1.6' }}
               dangerouslySetInnerHTML={{ __html: formData.conteudo }}
             />
           </div>
@@ -366,11 +366,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'metodologia',
         component: (
           <div key="metodologia" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('methodologyTitle')}
             </h3>
             <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              style={{ fontSize: '16px', lineHeight: '1.6' }}
               dangerouslySetInnerHTML={{ __html: formData.metodologia }}
             />
           </div>
@@ -389,10 +389,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
           if (parsed && parsed.rows && parsed.rows.length > 0) {
             return (
               <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
                   {t('evaluationCriteriaTitle')}
                 </h3>
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '14px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '16px' }}>
                   <thead>
                     <tr style={{ background: '#235795', color: 'white' }}>
                       <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>{t('type')}</th>
@@ -428,11 +428,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
           // Fallback para formato antigo (rich text)
           return (
             <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-              <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
-                style={{ fontSize: '14px', lineHeight: '1.6' }}
+                style={{ fontSize: '16px', lineHeight: '1.6' }}
                 dangerouslySetInnerHTML={{ __html: formData.criterio_avaliacao }}
               />
             </div>
@@ -441,11 +441,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
           // Se não for JSON, tratar como rich text antigo
           return (
             <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-              <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+              <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
-                style={{ fontSize: '14px', lineHeight: '1.6' }}
+                style={{ fontSize: '16px', lineHeight: '1.6' }}
                 dangerouslySetInnerHTML={{ __html: formData.criterio_avaliacao }}
               />
             </div>
@@ -465,11 +465,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'o_que_e_esperado',
         component: (
           <div key="o_que_e_esperado" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('expectedFromStudentTitle')}
             </h3>
             <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              style={{ fontSize: '16px', lineHeight: '1.6' }}
               dangerouslySetInnerHTML={{ __html: formData.o_que_e_esperado }}
             />
           </div>
@@ -483,11 +483,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'custom',
         component: (
           <div key="custom" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {formData.custom_tab_name.toUpperCase()}
             </h3>
             <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              style={{ fontSize: '16px', lineHeight: '1.6' }}
               dangerouslySetInnerHTML={{ __html: formData.custom_tab_content }}
             />
           </div>
@@ -572,7 +572,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         // Layout lista ou fallback
         return (
           <div 
-            style={{ fontSize: '14px', lineHeight: '1.6' }}
+            style={{ fontSize: '16px', lineHeight: '1.6' }}
             dangerouslySetInnerHTML={{ __html: formData.referencias }}
           />
         );
@@ -582,7 +582,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'referencias',
         component: (
           <div key="referencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('referencesTitle')}
             </h3>
             {renderReferences()}
@@ -597,11 +597,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'contatos',
         component: (
           <div key="contatos" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('contactsTitle')}
             </h3>
             <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              style={{ fontSize: '16px', lineHeight: '1.6' }}
               dangerouslySetInnerHTML={{ __html: formData.contatos }}
             />
           </div>
