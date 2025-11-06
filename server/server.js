@@ -1381,20 +1381,48 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
 
     // Executar wkhtmltopdf (tentar diferentes caminhos possíveis)
     // O wkhtmltopdf geralmente está em /usr/local/bin/wkhtmltopdf após instalação
-    const wkhtmltopdfPath = 'wkhtmltopdf'; // Tentar usar do PATH primeiro
+    const wkhtmltopdfPaths = ['wkhtmltopdf', '/usr/local/bin/wkhtmltopdf', '/usr/bin/wkhtmltopdf'];
+    let wkhtmltopdfPath = null;
+    
+    // Verificar qual caminho funciona
+    for (const path of wkhtmltopdfPaths) {
+      try {
+        await execAsync(`which ${path} 2>/dev/null || test -f ${path}`);
+        wkhtmltopdfPath = path;
+        break;
+      } catch (e) {
+        // Tentar próximo caminho
+        continue;
+      }
+    }
+    
+    if (!wkhtmltopdfPath) {
+      // Se não encontrar, tentar usar 'wkhtmltopdf' mesmo assim
+      wkhtmltopdfPath = 'wkhtmltopdf';
+    }
     
     const command = `${wkhtmltopdfPath} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
     
     console.log('Executando wkhtmltopdf...', command);
-    const { stdout, stderr } = await execAsync(command);
+    
+    try {
+      const { stdout, stderr } = await execAsync(command, { timeout: 30000 }); // 30 segundos timeout
 
-    if (stderr && !stderr.includes('Warning')) {
-      console.error('Erro do wkhtmltopdf:', stderr);
+      if (stderr && !stderr.includes('Warning') && !stderr.includes('QFont')) {
+        console.warn('Aviso do wkhtmltopdf:', stderr);
+      }
+    } catch (execError) {
+      console.error('Erro ao executar wkhtmltopdf:', execError);
+      // Se o erro for que o comando não foi encontrado, dar mensagem mais clara
+      if (execError.code === 127 || execError.message.includes('not found')) {
+        throw new Error('wkhtmltopdf não está instalado ou não está no PATH. Verifique a instalação no servidor.');
+      }
+      throw execError;
     }
 
     // Verificar se o PDF foi criado
     if (!fs.existsSync(pdfPath)) {
-      throw new Error('PDF não foi gerado');
+      throw new Error('PDF não foi gerado. Verifique os logs do wkhtmltopdf para mais detalhes.');
     }
 
     // Ler o PDF
