@@ -1384,15 +1384,23 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
     const wkhtmltopdfPaths = ['wkhtmltopdf', '/usr/local/bin/wkhtmltopdf', '/usr/bin/wkhtmltopdf'];
     let wkhtmltopdfPath = null;
     
-    // Verificar qual caminho funciona
-    for (const path of wkhtmltopdfPaths) {
-      try {
-        await execAsync(`which ${path} 2>/dev/null || test -f ${path}`);
-        wkhtmltopdfPath = path;
-        break;
-      } catch (e) {
-        // Tentar próximo caminho
-        continue;
+    // Verificar qual caminho funciona (usar fs.existsSync que é síncrono e mais confiável)
+    for (const testPath of wkhtmltopdfPaths) {
+      if (testPath === 'wkhtmltopdf') {
+        // Para 'wkhtmltopdf', tentar usar which
+        try {
+          await execAsync(`which wkhtmltopdf`);
+          wkhtmltopdfPath = testPath;
+          break;
+        } catch (e) {
+          continue;
+        }
+      } else {
+        // Para caminhos absolutos, verificar se o arquivo existe
+        if (fs.existsSync(testPath)) {
+          wkhtmltopdfPath = testPath;
+          break;
+        }
       }
     }
     
