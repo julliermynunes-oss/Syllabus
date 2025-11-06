@@ -493,7 +493,10 @@ function SyllabusForm() {
           scale: 2,
           useCORS: true,
           letterRendering: true,
-          logging: false
+          logging: false,
+          width: element.scrollWidth,
+          height: element.scrollHeight,
+          windowWidth: element.scrollWidth
         },
         jsPDF: { 
           unit: 'mm', 

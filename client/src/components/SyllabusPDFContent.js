@@ -188,7 +188,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
                         padding: '15px',
                         background: '#fff',
                         pageBreakInside: 'avoid',
-                        breakInside: 'avoid'
+                        breakInside: 'avoid',
+                        width: '100%',
+                        maxWidth: '100%',
+                        boxSizing: 'border-box',
+                        overflow: 'visible'
                       }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px', pageBreakInside: 'avoid' }}>
                           {profData.foto && (
@@ -215,7 +219,12 @@ function SyllabusPDFContent({ formData, professoresList }) {
                               color: '#333',
                               pageBreakInside: 'avoid',
                               orphans: 3,
-                              widows: 3
+                              widows: 3,
+                              width: '100%',
+                              maxWidth: '100%',
+                              boxSizing: 'border-box',
+                              wordWrap: 'break-word',
+                              overflowWrap: 'break-word'
                             }}
                             dangerouslySetInnerHTML={{ __html: profData.descricao }}
                           />
@@ -612,7 +621,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
       maxWidth: '100%',
       width: '100%',
       boxSizing: 'border-box',
-      position: 'relative'
+      position: 'relative',
+      overflow: 'visible'
     }}>
       {/* Renderizar seções na ordem correta */}
       {getOrderedSections().map(section => section.component)}
