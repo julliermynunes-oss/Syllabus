@@ -486,7 +486,7 @@ function SyllabusForm() {
       
       // Configurações do html2pdf
       const opt = {
-        margin: [40, 20, 40, 20], // [top, left, bottom, right] em mm - reduzido laterais para evitar quebras
+        margin: [40, 15, 40, 15], // [top, left, bottom, right] em mm - reduzido laterais para evitar quebras
         filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
@@ -524,38 +524,38 @@ function SyllabusForm() {
         // Aplicar estilos diretamente nos elementos para garantir que sejam capturados
         const allH3 = element.querySelectorAll('h3');
         allH3.forEach(h3 => {
-          h3.style.fontSize = '26px';
-          h3.style.marginBottom = '18px';
-          h3.style.paddingBottom = '12px';
+          h3.style.fontSize = '22px';
+          h3.style.marginBottom = '15px';
+          h3.style.paddingBottom = '10px';
         });
         
         const allH4 = element.querySelectorAll('h4');
         allH4.forEach(h4 => {
-          h4.style.fontSize = '20px';
+          h4.style.fontSize = '18px';
         });
         
         const allDivs = element.querySelectorAll('div');
         allDivs.forEach(div => {
-          if (!div.style.fontSize || parseInt(div.style.fontSize) < 18) {
-            div.style.fontSize = '18px';
-            div.style.lineHeight = '1.7';
+          if (!div.style.fontSize || parseInt(div.style.fontSize) < 16) {
+            div.style.fontSize = '16px';
+            div.style.lineHeight = '1.6';
           }
         });
         
         const allPs = element.querySelectorAll('p');
         allPs.forEach(p => {
-          p.style.fontSize = '18px';
-          p.style.lineHeight = '1.7';
+          p.style.fontSize = '16px';
+          p.style.lineHeight = '1.6';
         });
         
         const allTables = element.querySelectorAll('table');
         allTables.forEach(table => {
-          table.style.fontSize = '18px';
+          table.style.fontSize = '16px';
         });
         
         const allLists = element.querySelectorAll('ul, ol');
         allLists.forEach(list => {
-          list.style.fontSize = '18px';
+          list.style.fontSize = '16px';
         });
         
         // Forçar outro reflow após aplicar estilos
