@@ -32,3 +32,8 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Arquivos temporários do PDF
+temp/
+*.pdf
+*.html

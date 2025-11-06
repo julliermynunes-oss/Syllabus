@@ -485,7 +485,9 @@ function SyllabusForm() {
       // Aguardar renderização
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Capturar HTML completo do elemento, incluindo estilos inline
+      // Capturar HTML completo do elemento com estilos inline preservados
+      // Os estilos inline já estão aplicados no elemento, então apenas precisamos
+      // criar um HTML válido com o conteúdo
       const htmlContent = `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -497,16 +499,59 @@ function SyllabusForm() {
       size: A4;
       margin: 0;
     }
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
+      color: #000;
+      background: #fff;
     }
     .pdf-container {
       width: 100%;
-      box-sizing: border-box;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      color: #000;
+      background: #fff;
     }
-    /* Importar estilos do CSS se necessário */
+    .pdf-container h3 {
+      font-size: 20px !important;
+      color: #235795;
+      border-bottom: 2px solid #a4a4a4;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      margin-top: 0;
+      padding-top: 0;
+    }
+    .pdf-container h4 {
+      font-size: 17px !important;
+      color: #235795;
+      font-weight: bold;
+    }
+    .pdf-container p,
+    .pdf-container div {
+      font-size: 15px !important;
+      line-height: 1.5 !important;
+    }
+    .pdf-container table {
+      font-size: 15px !important;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .pdf-container ul,
+    .pdf-container ol {
+      font-size: 15px !important;
+      line-height: 1.6;
+    }
+    .pdf-container strong {
+      font-size: 15px !important;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+    }
   </style>
 </head>
 <body>
