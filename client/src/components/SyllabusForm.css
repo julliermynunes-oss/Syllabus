@@ -1122,8 +1122,8 @@
   /* Primeira página - espaço no topo */
   .pdf-container {
     padding-top: 40px !important;
-    padding-left: 15px !important;
-    padding-right: 15px !important;
+    padding-left: 25px !important;
+    padding-right: 25px !important;
     padding-bottom: 40px !important;
   }
   
@@ -1167,36 +1167,36 @@
   .pdf-container h3 {
     padding-top: 0 !important;
     margin-top: 0 !important;
-    font-size: 22px !important;
-    margin-bottom: 15px !important;
-    padding-bottom: 10px !important;
+    font-size: 20px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
   }
   
   .pdf-container h4 {
-    font-size: 18px !important;
+    font-size: 17px !important;
   }
   
   .pdf-container {
-    font-size: 16px !important;
+    font-size: 15px !important;
   }
   
   .pdf-container p,
   .pdf-container div:not([class]) {
-    font-size: 16px !important;
-    line-height: 1.6 !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
   }
   
   .pdf-container table {
-    font-size: 16px !important;
+    font-size: 15px !important;
   }
   
   .pdf-container ul,
   .pdf-container ol {
-    font-size: 16px !important;
+    font-size: 15px !important;
   }
   
   .pdf-container strong {
-    font-size: 16px !important;
+    font-size: 15px !important;
   }
   
   /* Quando uma seção começa com título h3, adicionar espaço antes do título */
