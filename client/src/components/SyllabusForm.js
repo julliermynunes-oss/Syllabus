@@ -6,6 +6,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { FaArrowLeft, FaFilePdf, FaTrash } from 'react-icons/fa';
+import html2pdf from 'html2pdf.js';
 import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
@@ -459,7 +460,7 @@ function SyllabusForm() {
     setProfessoresList(newList);
   };
 
-  // Função para exportar PDF usando window.print()
+  // Função para exportar PDF usando html2pdf.js
   const handleExportPDF = () => {
     const element = document.getElementById('pdf-content');
     if (!element) {
@@ -467,169 +468,70 @@ function SyllabusForm() {
       return;
     }
 
-    // Tornar o elemento visível temporariamente
+    // Tornar o elemento visível temporariamente para renderização
     const originalDisplay = element.style.display;
     const originalPosition = element.style.position;
     const originalLeft = element.style.left;
-    const originalWidth = element.style.width;
     
     element.style.display = 'block';
-    element.style.position = 'fixed';
-    element.style.top = '0';
+    element.style.position = 'relative';
     element.style.left = '0';
     element.style.width = '210mm';
     element.style.maxWidth = '210mm';
     element.style.background = '#fff';
-    element.style.zIndex = '999999';
-    element.style.padding = '0';
-    element.style.margin = '0';
-    element.style.boxSizing = 'border-box';
     
-    // Aguardar um frame para renderização
+    // Configurações do html2pdf
+    const opt = {
+      margin: [40, 50, 40, 50], // [top, left, bottom, right] em mm
+      filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        logging: false
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compress: true
+      },
+      pagebreak: { 
+        mode: ['avoid-all', 'css', 'legacy'],
+        before: '.page-break-before',
+        after: '.page-break-after',
+        avoid: ['.pdf-container > div > div[style*="border"]', 'h3', 'table']
+      }
+    };
+
+    // Aguardar renderização e gerar PDF
     setTimeout(() => {
-      // Adicionar estilos para remover cabeçalhos/rodapés do navegador
-      const style = document.createElement('style');
-      style.id = 'pdf-print-styles';
-      style.textContent = `
-        @media print {
-          @page {
-            size: A4;
-            margin: 0 !important;
-            margin-top: 0 !important;
-            @top-left { content: none; }
-            @top-center { content: none; }
-            @top-right { content: none; }
-            @bottom-left { content: none; }
-            @bottom-center { content: none; }
-            @bottom-right { content: none; }
-          }
-          @page:first {
-            margin-top: 0 !important;
-          }
-          body {
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          body * {
-            visibility: hidden;
-          }
-          #pdf-content,
-          #pdf-content * {
-            visibility: visible;
-          }
-          #pdf-content {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 210mm !important;
-            max-width: 210mm !important;
-            background: white !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            box-sizing: border-box !important;
-          }
-          .pdf-container {
-            padding-top: 40px !important;
-            padding-left: 50px !important;
-            padding-right: 50px !important;
-            padding-bottom: 40px !important;
-            margin: 0 !important;
-            box-sizing: border-box !important;
-          }
-          .pdf-container[style*="padding"] {
-            padding-top: 40px !important;
-            padding-left: 50px !important;
-            padding-right: 50px !important;
-            padding-bottom: 40px !important;
-          }
-          .pdf-container > div {
-            padding-top: 0 !important;
-            margin-top: 0 !important;
-          }
-          .pdf-container > div:first-child {
-            padding-top: 0 !important;
-            margin-bottom: 0 !important;
-            margin-top: 0 !important;
-            padding-bottom: 0 !important;
-            min-height: 0 !important;
-            height: auto !important;
-            overflow: visible !important;
-          }
-          .pdf-container > div:nth-child(2) {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-            margin-bottom: 30px !important;
-          }
-          .pdf-container > div > h3:first-child {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-          }
-          .pdf-container > div:nth-child(2) > h3:first-child {
-            margin-top: 0 !important;
-            padding-top: 0 !important;
-          }
-          .pdf-container > div > *:first-child:not(h3) {
-            padding-top: 30px !important;
-          }
-          .pdf-container p,
-          .pdf-container div[style*="fontSize"] {
-            page-break-inside: avoid !important;
-            orphans: 3 !important;
-            widows: 3 !important;
-          }
-          .pdf-container > div > div[style*="border"] {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-            -webkit-break-inside: avoid !important;
-            page-break-before: auto !important;
-            page-break-after: auto !important;
-          }
-          .pdf-container > div > div[style*="border"] > div {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-          }
-          .preview-modal-overlay,
-          .preview-modal-content,
-          .preview-modal-header,
-          .close-btn,
-          .back-btn,
-          .export-pdf-btn,
-          .preview-btn,
-          .form-header,
-          .form-box-with-tabs {
-            display: none !important;
-            visibility: hidden !important;
-          }
-        }
-      `;
-      document.head.appendChild(style);
-      
-      // Imprimir
-      window.print();
-      
-      // Remover estilo após impressão
-      setTimeout(() => {
-        const styleElement = document.getElementById('pdf-print-styles');
-        if (styleElement) {
-          document.head.removeChild(styleElement);
-        }
-      }, 1000);
-      
-      // Restaurar estilos após impressão
-      setTimeout(() => {
-        element.style.display = originalDisplay;
-        element.style.position = originalPosition;
-        element.style.left = originalLeft;
-        element.style.top = '';
-        element.style.width = originalWidth;
-        element.style.maxWidth = '';
-        element.style.background = '';
-        element.style.padding = '';
-        element.style.zIndex = '';
-        element.style.margin = '';
-        element.style.boxSizing = '';
-      }, 1000);
-    }, 300);
+      html2pdf()
+        .set(opt)
+        .from(element)
+        .save()
+        .then(() => {
+          // Restaurar estilos após geração
+          element.style.display = originalDisplay;
+          element.style.position = originalPosition;
+          element.style.left = originalLeft;
+          element.style.width = '';
+          element.style.maxWidth = '';
+          element.style.background = '';
+        })
+        .catch((error) => {
+          console.error('Erro ao gerar PDF:', error);
+          alert('Erro ao gerar PDF. Por favor, tente novamente.');
+          // Restaurar estilos mesmo em caso de erro
+          element.style.display = originalDisplay;
+          element.style.position = originalPosition;
+          element.style.left = originalLeft;
+          element.style.width = '';
+          element.style.maxWidth = '';
+          element.style.background = '';
+        });
+    }, 500);
   };
 
   const handleSubmit = async (e) => {
