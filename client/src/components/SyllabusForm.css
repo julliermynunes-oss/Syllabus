@@ -1167,6 +1167,36 @@
   .pdf-container h3 {
     padding-top: 0 !important;
     margin-top: 0 !important;
+    font-size: 26px !important;
+    margin-bottom: 18px !important;
+    padding-bottom: 12px !important;
+  }
+  
+  .pdf-container h4 {
+    font-size: 20px !important;
+  }
+  
+  .pdf-container {
+    font-size: 18px !important;
+  }
+  
+  .pdf-container p,
+  .pdf-container div:not([class]) {
+    font-size: 18px !important;
+    line-height: 1.7 !important;
+  }
+  
+  .pdf-container table {
+    font-size: 18px !important;
+  }
+  
+  .pdf-container ul,
+  .pdf-container ol {
+    font-size: 18px !important;
+  }
+  
+  .pdf-container strong {
+    font-size: 18px !important;
   }
   
   /* Quando uma seção começa com título h3, adicionar espaço antes do título */

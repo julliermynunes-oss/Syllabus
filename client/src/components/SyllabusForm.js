@@ -512,14 +512,19 @@ function SyllabusForm() {
         }
       };
 
-      // Aguardar renderização e gerar PDF
+      // Aguardar renderização e gerar PDF (aumentado timeout para garantir renderização)
       setTimeout(() => {
+        // Forçar reflow para garantir que os estilos sejam aplicados
+        void element.offsetHeight;
+        // Adicionar classe para garantir estilos CSS
+        element.classList.add('pdf-exporting');
         html2pdf()
           .set(opt)
           .from(element)
           .save()
           .then(() => {
             // Restaurar estilos após geração
+            element.classList.remove('pdf-exporting');
             element.style.display = originalDisplay;
             element.style.position = originalPosition;
             element.style.left = originalLeft;
@@ -529,6 +534,7 @@ function SyllabusForm() {
           })
           .catch((error) => {
             console.error('Erro ao gerar PDF:', error);
+            element.classList.remove('pdf-exporting');
             alert('Erro ao gerar PDF. Por favor, tente novamente.');
             // Restaurar estilos mesmo em caso de erro
             element.style.display = originalDisplay;
