@@ -94,7 +94,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
               }} 
             />
           </div>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px', marginTop: '0', paddingTop: '0' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '10px', marginTop: '0', paddingTop: '0' }}>
             {t('generalInformation')}
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', width: '100%' }}>
@@ -158,7 +158,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       )
     });
 
-    // 2. Professores (sempre segundo)
+    // 2. Professores (sempre segundo) - sem espaçamento extra
     if (formData.professores_data && professoresList && professoresList.length > 0) {
       try {
         const professoresData = typeof formData.professores_data === 'string' 

@@ -1070,7 +1070,7 @@
     width: 210mm !important;
     max-width: 210mm !important;
     background: white !important;
-    padding: 10mm !important;
+    padding: 0 !important;
     margin: 0 !important;
     box-sizing: border-box !important;
   }
