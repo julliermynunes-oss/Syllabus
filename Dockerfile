@@ -26,6 +26,11 @@ RUN if [ -f /usr/local/bin/wkhtmltopdf ] && [ ! -f /usr/bin/wkhtmltopdf ]; then 
       ln -s /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf; \
     fi
 
+# Verificar instalação do wkhtmltopdf
+RUN wkhtmltopdf --version || echo "wkhtmltopdf instalado (versão pode não ser exibida)"
+RUN which wkhtmltopdf || echo "wkhtmltopdf não encontrado no PATH"
+RUN ls -la /usr/local/bin/wkhtmltopdf /usr/bin/wkhtmltopdf 2>/dev/null || echo "Verificando caminhos do wkhtmltopdf"
+
 # Criar diretório da aplicação
 WORKDIR /app
 
