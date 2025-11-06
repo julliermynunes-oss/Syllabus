@@ -249,7 +249,14 @@ const SyllabusList = () => {
   return (
     <div className="syllabus-list-container">
       <header className="header">
-        <h1 className="main-title">{t('syllabus')}</h1>
+        <div className="header-title-section">
+          <img 
+            src="/FGV LOGO NOVO.png" 
+            alt="FGV EAESP Logo" 
+            className="header-logo"
+          />
+          <h1 className="main-title">{t('syllabus')}</h1>
+        </div>
         <div className="header-actions">
           <select
             value={language}

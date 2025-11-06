@@ -13,12 +13,26 @@
   margin-bottom: 1rem;
 }
 
+.header-title-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+}
+
 .main-title {
   font-size: 3rem;
   color: #235795;
-  font-weight: 900;
+  font-weight: 700;
   margin: 0;
-  letter-spacing: -1px;
+  letter-spacing: 0.5px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
 }
 
 .build-tag { display: none; }
