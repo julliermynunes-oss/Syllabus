@@ -1352,11 +1352,8 @@ if (isProduction && buildExists) {
   app.use(express.static(buildPath, { etag: false }));
   
   // For any other requests, send back React's index.html file
+  // Esta rota deve ser a ÚLTIMA, depois de todas as rotas de API
   app.get('*', (req, res) => {
-    // Não servir index.html para rotas de API
-    if (req.path.startsWith('/api/')) {
-      return next();
-    }
     res.set('Cache-Control', 'no-store');
     const indexPath = path.join(buildPath, 'index.html');
     if (fs.existsSync(indexPath)) {
