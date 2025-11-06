@@ -10,7 +10,6 @@ const fs = require('fs');
 const multer = require('multer');
 const PDFDocument = require('pdfkit');
 const axios = require('axios');
-const puppeteer = require('puppeteer');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -1365,110 +1364,11 @@ if (isProduction && buildExists) {
   console.warn('⚠️  Build path:', buildPath);
 }
 
-// Endpoint para gerar PDF usando Puppeteer (Chrome headless)
-app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
-  console.log('=== INÍCIO DA GERAÇÃO DE PDF ===');
-  const { html, filename } = req.body;
-
-  if (!html) {
-    console.error('HTML não fornecido');
-    return res.status(400).json({ error: 'HTML é obrigatório' });
-  }
-
-  console.log('HTML recebido, tamanho:', html.length, 'caracteres');
-  console.log('Filename:', filename || 'não fornecido');
-
-  let browser = null;
-  try {
-    // Iniciar Puppeteer com Chrome headless
-    console.log('Iniciando Puppeteer...');
-    browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--disable-gpu'
-      ]
-    });
-
-    console.log('Puppeteer iniciado com sucesso');
-
-    // Criar nova página
-    const page = await browser.newPage();
-    
-    // Configurar viewport para A4
-    await page.setViewport({
-      width: 794, // A4 width em pixels (210mm a 96 DPI)
-      height: 1123, // A4 height em pixels (297mm a 96 DPI)
-    });
-
-    // Definir conteúdo HTML
-    await page.setContent(html, {
-      waitUntil: 'networkidle0', // Aguardar até que não haja requisições de rede
-      timeout: 30000
-    });
-
-    console.log('HTML carregado na página');
-
-    // Gerar PDF
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      margin: {
-        top: '40mm',
-        right: '25mm',
-        bottom: '40mm',
-        left: '25mm'
-      },
-      printBackground: true, // Incluir backgrounds e cores
-      preferCSSPageSize: false // Usar as margens especificadas
-    });
-
-    console.log('PDF gerado com sucesso, tamanho:', pdfBuffer.length, 'bytes');
-
-    // Fechar browser
-    await browser.close();
-    browser = null;
-
-    // Enviar PDF como resposta
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename || 'syllabus.pdf'}"`);
-    res.send(pdfBuffer);
-
-  } catch (error) {
-    console.error('=== ERRO AO GERAR PDF ===');
-    console.error('Erro:', error);
-    console.error('Mensagem:', error.message);
-    console.error('Stack:', error.stack);
-    console.error('=== FIM DO ERRO ===');
-    
-    // Fechar browser se ainda estiver aberto
-    if (browser) {
-      try {
-        await browser.close();
-      } catch (closeError) {
-        console.error('Erro ao fechar browser:', closeError);
-      }
-    }
-    
-    // Retornar mensagem mais útil para o frontend
-    let errorMessage = 'Erro ao gerar PDF';
-    let errorDetails = error.message || 'Sem detalhes adicionais';
-    
-    res.status(500).json({ 
-      error: 'Erro ao gerar PDF',
-      message: errorMessage,
-      details: errorDetails
-    });
-  }
-});
 
 // Iniciar servidor (independente do carregamento de CSV)
 app.listen(PORT, () => {
   console.log(`✓ Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`✓ wkhtmltopdf endpoint ready at POST /api/generate-pdf`);
   console.log(`✓ Server ready to accept connections`);
 });
 

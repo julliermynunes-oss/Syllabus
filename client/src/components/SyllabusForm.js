@@ -460,22 +460,21 @@ function SyllabusForm() {
     setProfessoresList(newList);
   };
 
-  // Função para exportar PDF usando wkhtmltopdf (backend)
-  const handleExportPDF = async () => {
+  // Função para exportar PDF usando window.print()
+  const handleExportPDF = () => {
     const element = document.getElementById('pdf-content');
     if (!element) {
       alert('Erro: Conteúdo não encontrado');
       return;
     }
 
-    // Salvar estilos originais antes do try para poder restaurar no catch
+    // Salvar estilos originais
     const originalDisplay = element.style.display;
     const originalPosition = element.style.position;
     const originalLeft = element.style.left;
 
     try {
-      // Tornar o elemento visível temporariamente para capturar HTML
-      
+      // Tornar o elemento visível e posicionado corretamente
       element.style.display = 'block';
       element.style.position = 'relative';
       element.style.left = '0';
@@ -484,146 +483,34 @@ function SyllabusForm() {
       element.style.background = '#fff';
       element.style.boxSizing = 'border-box';
       
-      // Aguardar renderização
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Capturar HTML completo do elemento com estilos inline preservados
-      // Os estilos inline já estão aplicados no elemento, então apenas precisamos
-      // criar um HTML válido com o conteúdo
-      const htmlContent = `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    @page {
-      size: A4;
-      margin: 0;
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      color: #000;
-      background: #fff;
-    }
-    .pdf-container {
-      width: 100%;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      color: #000;
-      background: #fff;
-    }
-    .pdf-container h3 {
-      font-size: 20px !important;
-      color: #235795;
-      border-bottom: 2px solid #a4a4a4;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-      margin-top: 0;
-      padding-top: 0;
-    }
-    .pdf-container h4 {
-      font-size: 17px !important;
-      color: #235795;
-      font-weight: bold;
-    }
-    .pdf-container p,
-    .pdf-container div {
-      font-size: 15px !important;
-      line-height: 1.5 !important;
-    }
-    .pdf-container table {
-      font-size: 15px !important;
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .pdf-container ul,
-    .pdf-container ol {
-      font-size: 15px !important;
-      line-height: 1.6;
-    }
-    .pdf-container strong {
-      font-size: 15px !important;
-    }
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-  </style>
-</head>
-<body>
-  ${element.outerHTML}
-</body>
-</html>`;
+      // Ocultar elementos que não devem aparecer na impressão
+      const noPrintElements = document.querySelectorAll('.no-print');
+      noPrintElements.forEach(el => {
+        el.style.display = 'none';
+      });
 
-      // Enviar HTML para o backend gerar PDF
-      const response = await axios.post(
-        `${API_URL}/api/generate-pdf`,
-        {
-          html: htmlContent,
-          filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          responseType: 'blob'
-        }
-      );
-
-      // Criar blob e fazer download
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Syllabus_${formData.disciplina || 'documento'}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      // Restaurar estilos
-      element.style.display = originalDisplay;
-      element.style.position = originalPosition;
-      element.style.left = originalLeft;
-      element.style.width = '';
-      element.style.maxWidth = '';
-      element.style.background = '';
-
+      // Aguardar renderização e então imprimir
+      setTimeout(() => {
+        window.print();
+        
+        // Restaurar estilos após impressão
+        element.style.display = originalDisplay;
+        element.style.position = originalPosition;
+        element.style.left = originalLeft;
+        element.style.width = '';
+        element.style.maxWidth = '';
+        element.style.background = '';
+        
+        // Restaurar elementos ocultos
+        noPrintElements.forEach(el => {
+          el.style.display = '';
+        });
+      }, 100);
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      console.error('Response data:', error.response?.data);
-      
-      // Tentar extrair mensagem de erro mais detalhada
-      let errorMessage = 'Erro desconhecido';
-      let errorDetails = '';
-      
-      if (error.response?.data) {
-        errorMessage = error.response.data.message || error.response.data.error || error.message;
-        errorDetails = error.response.data.details || '';
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      // Montar mensagem completa
-      let fullMessage = `Erro ao gerar PDF: ${errorMessage}`;
-      if (errorDetails) {
-        fullMessage += `\n\nDetalhes: ${errorDetails}`;
-      }
-      if (error.response?.data?.code) {
-        fullMessage += `\n\nCódigo do erro: ${error.response.data.code}`;
-      }
-      
-      alert(fullMessage);
+      alert(`Erro ao gerar PDF: ${error.message}`);
       
       // Restaurar estilos mesmo em caso de erro
-      const element = document.getElementById('pdf-content');
       if (element) {
         element.style.display = originalDisplay;
         element.style.position = originalPosition;
