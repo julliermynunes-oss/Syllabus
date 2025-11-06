@@ -106,6 +106,32 @@ const CompetenciesManager = () => {
       return;
     }
 
+    // Salvar limite de contribuições
+    try {
+      await axios.post(
+        `${API_URL}/api/competencias/limit`,
+        {
+          curso: selectedCurso,
+          limite: limiteContribuicoes
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      // Atualizar mapa de limites
+      setLimitesPorCurso(prev => ({
+        ...prev,
+        [selectedCurso]: limiteContribuicoes
+      }));
+      
+      alert('Limite de contribuições salvo com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar limite:', error);
+      alert('Erro ao salvar limite de contribuições');
+      return;
+    }
+
     // Atualizar dados em memória
     const updatedData = {
       ...competenciasData,

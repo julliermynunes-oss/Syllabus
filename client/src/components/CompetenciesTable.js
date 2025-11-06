@@ -134,6 +134,24 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
     if (field === 'competencia') {
       return;
     }
+
+    // Se estiver atualizando o grau, validar limite
+    if (field === 'grau') {
+      // Calcular total atual de contribuições
+      const totalAtual = rows.reduce((sum, row) => sum + (row.grau || 0), 0);
+      const grauAtual = rows[index].grau || 0;
+      const novoGrau = value;
+      
+      // Calcular novo total se mudarmos este grau
+      const novoTotal = totalAtual - grauAtual + novoGrau;
+      
+      // Se há limite configurado e o novo total ultrapassar, não permitir
+      if (limiteContribuicoes !== null && novoTotal > limiteContribuicoes) {
+        alert(`Limite de contribuições atingido! Você pode usar no máximo ${limiteContribuicoes} bolinhas. Atualmente usando: ${totalAtual}, tentando adicionar mais ${novoGrau - grauAtual}.`);
+        return;
+      }
+    }
+
     const newRows = rows.map((row, i) => {
       if (i === index) {
         return { ...row, [field]: value };
