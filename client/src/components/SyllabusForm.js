@@ -6,7 +6,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { FaArrowLeft, FaFilePdf, FaTrash } from 'react-icons/fa';
-import html2pdf from 'html2pdf.js';
+// html2pdf será importado dinamicamente para evitar problemas no build
 import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
@@ -461,77 +461,85 @@ function SyllabusForm() {
   };
 
   // Função para exportar PDF usando html2pdf.js
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     const element = document.getElementById('pdf-content');
     if (!element) {
       alert('Erro: Conteúdo não encontrado');
       return;
     }
 
-    // Tornar o elemento visível temporariamente para renderização
-    const originalDisplay = element.style.display;
-    const originalPosition = element.style.position;
-    const originalLeft = element.style.left;
-    
-    element.style.display = 'block';
-    element.style.position = 'relative';
-    element.style.left = '0';
-    element.style.width = '210mm';
-    element.style.maxWidth = '210mm';
-    element.style.background = '#fff';
-    
-    // Configurações do html2pdf
-    const opt = {
-      margin: [40, 50, 40, 50], // [top, left, bottom, right] em mm
-      filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { 
-        scale: 2,
-        useCORS: true,
-        letterRendering: true,
-        logging: false
-      },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compress: true
-      },
-      pagebreak: { 
-        mode: ['avoid-all', 'css', 'legacy'],
-        before: '.page-break-before',
-        after: '.page-break-after',
-        avoid: ['.pdf-container > div > div[style*="border"]', 'h3', 'table']
-      }
-    };
+    try {
+      // Importação dinâmica para evitar problemas no build
+      const html2pdf = (await import('html2pdf.js')).default;
+      
+      // Tornar o elemento visível temporariamente para renderização
+      const originalDisplay = element.style.display;
+      const originalPosition = element.style.position;
+      const originalLeft = element.style.left;
+      
+      element.style.display = 'block';
+      element.style.position = 'relative';
+      element.style.left = '0';
+      element.style.width = '210mm';
+      element.style.maxWidth = '210mm';
+      element.style.background = '#fff';
+      
+      // Configurações do html2pdf
+      const opt = {
+        margin: [40, 50, 40, 50], // [top, left, bottom, right] em mm
+        filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          letterRendering: true,
+          logging: false
+        },
+        jsPDF: { 
+          unit: 'mm', 
+          format: 'a4', 
+          orientation: 'portrait',
+          compress: true
+        },
+        pagebreak: { 
+          mode: ['avoid-all', 'css', 'legacy'],
+          before: '.page-break-before',
+          after: '.page-break-after',
+          avoid: ['.pdf-container > div > div[style*="border"]', 'h3', 'table']
+        }
+      };
 
-    // Aguardar renderização e gerar PDF
-    setTimeout(() => {
-      html2pdf()
-        .set(opt)
-        .from(element)
-        .save()
-        .then(() => {
-          // Restaurar estilos após geração
-          element.style.display = originalDisplay;
-          element.style.position = originalPosition;
-          element.style.left = originalLeft;
-          element.style.width = '';
-          element.style.maxWidth = '';
-          element.style.background = '';
-        })
-        .catch((error) => {
-          console.error('Erro ao gerar PDF:', error);
-          alert('Erro ao gerar PDF. Por favor, tente novamente.');
-          // Restaurar estilos mesmo em caso de erro
-          element.style.display = originalDisplay;
-          element.style.position = originalPosition;
-          element.style.left = originalLeft;
-          element.style.width = '';
-          element.style.maxWidth = '';
-          element.style.background = '';
-        });
-    }, 500);
+      // Aguardar renderização e gerar PDF
+      setTimeout(() => {
+        html2pdf()
+          .set(opt)
+          .from(element)
+          .save()
+          .then(() => {
+            // Restaurar estilos após geração
+            element.style.display = originalDisplay;
+            element.style.position = originalPosition;
+            element.style.left = originalLeft;
+            element.style.width = '';
+            element.style.maxWidth = '';
+            element.style.background = '';
+          })
+          .catch((error) => {
+            console.error('Erro ao gerar PDF:', error);
+            alert('Erro ao gerar PDF. Por favor, tente novamente.');
+            // Restaurar estilos mesmo em caso de erro
+            element.style.display = originalDisplay;
+            element.style.position = originalPosition;
+            element.style.left = originalLeft;
+            element.style.width = '';
+            element.style.maxWidth = '';
+            element.style.background = '';
+          });
+      }, 500);
+    } catch (error) {
+      console.error('Erro ao importar html2pdf:', error);
+      alert('Erro ao carregar biblioteca de PDF. Por favor, tente novamente.');
+    }
   };
 
   const handleSubmit = async (e) => {
