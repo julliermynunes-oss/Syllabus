@@ -39,9 +39,18 @@ const CompetenciesManager = () => {
 
   const loadCompetenciasData = async () => {
     try {
-      // Carregar todas as competências organizadas por curso
-      // Como não temos endpoint para todas, vamos buscar curso por curso
-      const cursos = ['CGA', 'CGAP', 'OneMBA', 'MPA', 'MPGI', 'MPGPP', 'MPGC', 'DPA', 'CMAE', 'CDAE', 'CMAPG', 'CDAPG', 'AFA', 'EMBA', 'EMBA Saúde'];
+      // Primeiro, obter lista de todos os cursos disponíveis
+      const cursosResponse = await axios.get(`${API_URL}/api/competencias/cursos`);
+      const cursos = cursosResponse.data || [];
+      
+      if (cursos.length === 0) {
+        console.warn('Nenhum curso encontrado no arquivo de competências');
+        setCompetenciasData({});
+        setLoading(false);
+        return;
+      }
+
+      // Carregar competências para cada curso
       const allData = {};
       
       for (const curso of cursos) {
@@ -51,9 +60,14 @@ const CompetenciesManager = () => {
           });
           if (response.data && response.data.length > 0) {
             allData[curso] = response.data;
+          } else {
+            // Adicionar curso mesmo sem competências para permitir configuração de limite
+            allData[curso] = [];
           }
         } catch (error) {
           console.error(`Erro ao carregar competências para ${curso}:`, error);
+          // Adicionar curso mesmo com erro para permitir configuração de limite
+          allData[curso] = [];
         }
       }
       

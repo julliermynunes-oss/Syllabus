@@ -646,6 +646,12 @@ app.get('/api/competencias', (req, res) => {
   res.json(competenciasData[cursoCode]);
 });
 
+// Endpoint para obter todos os cursos disponíveis (chaves do competenciasData)
+app.get('/api/competencias/cursos', (req, res) => {
+  const cursos = Object.keys(competenciasData).sort();
+  res.json(cursos);
+});
+
 // Endpoint para obter limite de contribuições de um curso
 app.get('/api/competencias/limit', (req, res) => {
   const { curso } = req.query;
