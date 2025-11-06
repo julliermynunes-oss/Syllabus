@@ -20,13 +20,13 @@
 }
 
 .header-logo {
-  height: 60px;
+  height: 40px;
   width: auto;
   object-fit: contain;
 }
 
 .main-title {
-  font-size: 3rem;
+  font-size: 2rem;
   color: #235795;
   font-weight: 700;
   margin: 0;
