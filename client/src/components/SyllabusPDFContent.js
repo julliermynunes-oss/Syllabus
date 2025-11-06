@@ -6,7 +6,7 @@ const CompetenciesTablePDF = ({ data }) => {
   const { t } = useTranslation();
   
   if (!data || data === '' || data === '[]') {
-    return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
+    return <div style={{ fontSize: '16px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
   }
   
   try {
@@ -16,16 +16,16 @@ const CompetenciesTablePDF = ({ data }) => {
     const rows = parsed.rows || parsed;
     
     if (!rows || rows.length === 0) {
-      return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
+      return <div style={{ fontSize: '16px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
     }
     
     return (
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '12px' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '14px' }}>
         <thead>
           <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>{t('competence')}</th>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>{t('descriptionField')}</th>
-            <th style={{ padding: '10px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '12px', width: '100px' }}>{t('contributionDegree')}</th>
+            <th style={{ padding: '12px 10px', textAlign: 'left', border: '1px solid #235795', fontSize: '14px' }}>{t('competence')}</th>
+            <th style={{ padding: '12px 10px', textAlign: 'left', border: '1px solid #235795', fontSize: '14px' }}>{t('descriptionField')}</th>
+            <th style={{ padding: '12px 10px', textAlign: 'center', border: '1px solid #235795', fontSize: '14px', width: '120px' }}>{t('contributionDegree')}</th>
           </tr>
         </thead>
         <tbody>
@@ -43,7 +43,7 @@ const CompetenciesTablePDF = ({ data }) => {
     );
   } catch (e) {
     console.error('Erro ao renderizar competências:', e, 'Data:', data);
-    return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('errorLoadingCompetencies')}</div>;
+    return <div style={{ fontSize: '16px', color: '#666', fontStyle: 'italic' }}>{t('errorLoadingCompetencies')}</div>;
   }
 };
 
@@ -74,7 +74,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '0px', marginTop: '0', paddingBottom: '0', minHeight: '0', height: 'auto', overflow: 'visible' }}>
+        <div key="info_gerais" style={{ marginBottom: '30px', marginTop: '0', paddingBottom: '0', minHeight: '0', height: 'auto', overflow: 'visible' }}>
           {/* Logo apenas na primeira página */}
           <div style={{ 
             display: 'flex', 
@@ -87,17 +87,17 @@ function SyllabusPDFContent({ formData, professoresList }) {
               src="/FGV LOGO NOVO.png" 
               alt="FGV Logo" 
               style={{ 
-                maxHeight: '35px', 
-                height: '35px',
+                maxHeight: '45px', 
+                height: '45px',
                 width: 'auto',
                 display: 'block'
               }} 
             />
           </div>
-          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '10px', marginTop: '0', paddingTop: '0' }}>
+          <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '15px', marginTop: '0', paddingTop: '0' }}>
             {t('generalInformation')}
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '14px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '16px', width: '100%' }}>
             {formData.disciplina && (
               <div>
                 <strong>{t('discipline')}:</strong> {formData.disciplina}
@@ -175,7 +175,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             id: 'professores',
             component: (
               <div key="professores" style={{ marginBottom: '30px', marginTop: '0', paddingTop: '0', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px', marginTop: '0', paddingTop: '0' }}>
+                <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px', marginTop: '0', paddingTop: '0' }}>
                   {t('professorsTitle')}
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -208,14 +208,14 @@ function SyllabusPDFContent({ formData, professoresList }) {
                               }}
                             />
                           )}
-                          <h4 style={{ margin: 0, color: '#235795', fontSize: '16px', pageBreakAfter: 'avoid' }}>{professorNome}</h4>
+                          <h4 style={{ margin: 0, color: '#235795', fontSize: '18px', fontWeight: 'bold', pageBreakAfter: 'avoid' }}>{professorNome}</h4>
                         </div>
                         {profData.descricao && (
                           <div 
                             style={{ 
-                              fontSize: '13px', 
-                              lineHeight: '1.5', 
-                              marginBottom: '12px', 
+                              fontSize: '15px', 
+                              lineHeight: '1.6', 
+                              marginBottom: '15px', 
                               color: '#333',
                               pageBreakInside: 'avoid',
                               orphans: 3,
@@ -229,7 +229,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
                             dangerouslySetInnerHTML={{ __html: profData.descricao }}
                           />
                         )}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '14px' }}>
                           {profData.linkedin && (
                             <div>
                               <strong>LinkedIn:</strong>{' '}
@@ -276,11 +276,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'sobre',
         component: (
           <div key="sobre" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '20px' }}>
               {t('aboutDisciplineTitle')}
             </h3>
             <div 
-              style={{ fontSize: '14px', lineHeight: '1.6' }}
+              style={{ fontSize: '16px', lineHeight: '1.6' }}
               dangerouslySetInnerHTML={{ __html: formData.sobre_disciplina }}
             />
           </div>
@@ -417,7 +417,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   </tbody>
                 </table>
                 {parsed.observacoes && parsed.observacoes.trim() !== '' && (
-                  <div style={{ marginTop: '15px', padding: '10px', background: '#f9f9f9', borderRadius: '4px', fontSize: '14px', lineHeight: '1.6' }}>
+                  <div style={{ marginTop: '15px', padding: '12px', background: '#f9f9f9', borderRadius: '4px', fontSize: '16px', lineHeight: '1.6' }}>
                     <strong>{t('additionalObservations')}</strong>
                     <div style={{ marginTop: '8px' }} dangerouslySetInnerHTML={{ __html: parsed.observacoes }} />
                   </div>
@@ -527,10 +527,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
                 <div>
                   {obrigatorias.length > 0 && (
                     <div style={{ marginBottom: '20px' }}>
-                      <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
+                      <h4 style={{ fontSize: '18px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
                         {t('requiredReading') || 'Leitura Obrigatória:'}
                       </h4>
-                      <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
+                      <ul style={{ marginLeft: '20px', fontSize: '16px', lineHeight: '1.8' }}>
                         {obrigatorias.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
@@ -539,10 +539,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   )}
                   {opcionais.length > 0 && (
                     <div style={{ marginBottom: '20px' }}>
-                      <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
+                      <h4 style={{ fontSize: '18px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
                         {t('optionalReading') || 'Leitura Opcional/Complementar:'}
                       </h4>
-                      <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
+                      <ul style={{ marginLeft: '20px', fontSize: '16px', lineHeight: '1.8' }}>
                         {opcionais.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
@@ -551,10 +551,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   )}
                   {outras.length > 0 && (
                     <div>
-                      <h4 style={{ fontSize: '16px', color: '#235795', fontWeight: 'bold', marginBottom: '10px' }}>
+                      <h4 style={{ fontSize: '18px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
                         Outras Referências:
                       </h4>
-                      <ul style={{ marginLeft: '20px', fontSize: '14px', lineHeight: '1.8' }}>
+                      <ul style={{ marginLeft: '20px', fontSize: '16px', lineHeight: '1.8' }}>
                         {outras.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
