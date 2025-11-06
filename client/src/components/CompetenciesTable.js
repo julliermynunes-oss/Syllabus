@@ -7,6 +7,7 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
   const [rows, setRows] = useState([]);
   const initializedRef = useRef(false);
   const loadedCursoRef = useRef(null);
+  const [limiteContribuicoes, setLimiteContribuicoes] = useState(null);
 
   // Carregar dados salvos primeiro (se houver)
   useEffect(() => {
@@ -35,10 +36,26 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
   useEffect(() => {
     if (curso && curso !== loadedCursoRef.current) {
       loadCompetenciasFromAPI(curso);
+      loadLimite(curso);
       loadedCursoRef.current = curso;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [curso]);
+
+  // Carregar limite de contribuições do curso
+  const loadLimite = async (cursoNome) => {
+    if (!cursoNome) return;
+    
+    try {
+      const response = await axios.get(`${API_URL}/api/competencias/limit`, {
+        params: { curso: cursoNome }
+      });
+      setLimiteContribuicoes(response.data.limite);
+    } catch (error) {
+      console.error('Erro ao carregar limite:', error);
+      setLimiteContribuicoes(null); // Sem limite se houver erro
+    }
+  };
 
   const loadCompetenciasFromAPI = async (cursoNome) => {
     if (!cursoNome) return;
