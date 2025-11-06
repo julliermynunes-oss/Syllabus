@@ -527,10 +527,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
                 <div>
                   {obrigatorias.length > 0 && (
                     <div style={{ marginBottom: '20px' }}>
-                      <h4 style={{ fontSize: '18px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
+                      <h4 style={{ fontSize: '20px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
                         {t('requiredReading') || 'Leitura Obrigatória:'}
                       </h4>
-                      <ul style={{ marginLeft: '20px', fontSize: '16px', lineHeight: '1.8' }}>
+                      <ul style={{ marginLeft: '20px', fontSize: '18px', lineHeight: '1.8' }}>
                         {obrigatorias.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
@@ -539,10 +539,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   )}
                   {opcionais.length > 0 && (
                     <div style={{ marginBottom: '20px' }}>
-                      <h4 style={{ fontSize: '18px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
+                      <h4 style={{ fontSize: '20px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
                         {t('optionalReading') || 'Leitura Opcional/Complementar:'}
                       </h4>
-                      <ul style={{ marginLeft: '20px', fontSize: '16px', lineHeight: '1.8' }}>
+                      <ul style={{ marginLeft: '20px', fontSize: '18px', lineHeight: '1.8' }}>
                         {opcionais.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
@@ -551,10 +551,10 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   )}
                   {outras.length > 0 && (
                     <div>
-                      <h4 style={{ fontSize: '18px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
+                      <h4 style={{ fontSize: '20px', color: '#235795', fontWeight: 'bold', marginBottom: '12px', marginTop: '15px' }}>
                         Outras Referências:
                       </h4>
-                      <ul style={{ marginLeft: '20px', fontSize: '16px', lineHeight: '1.8' }}>
+                      <ul style={{ marginLeft: '20px', fontSize: '18px', lineHeight: '1.8' }}>
                         {outras.map((ref, idx) => (
                           <li key={idx} style={{ marginBottom: '8px' }}>{ref.text}</li>
                         ))}
