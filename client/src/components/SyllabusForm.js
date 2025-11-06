@@ -13,6 +13,7 @@ import CompetenciesTable from './CompetenciesTable';
 import ProfessoresManager from './ProfessoresManager';
 import AvaliacaoTable from './AvaliacaoTable';
 import SyllabusPDFContent from './SyllabusPDFContent';
+import LanguageSelector from './LanguageSelector';
 import './SyllabusForm.css';
 
 function SyllabusForm() {
@@ -571,25 +572,13 @@ function SyllabusForm() {
           {isEditing ? t('editSyllabus') : t('createSyllabus')}
         </h1>
         <div className="form-header-actions">
-          <select
+          <LanguageSelector
             value={language}
-            onChange={(e) => changeLanguage(e.target.value)}
+            onChange={changeLanguage}
             style={{
-              padding: '0.5rem 1rem',
-              border: '2px solid #235795',
-              borderRadius: '8px',
-              background: 'white',
-              color: '#235795',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
               marginRight: '1rem'
             }}
-          >
-            <option value="pt">BR - Português</option>
-            <option value="en">US - English</option>
-            <option value="es">ES - Español</option>
-          </select>
+          />
           {isEditing && (
             <button className="export-pdf-btn" onClick={handleExportPDF} type="button">
               <FaFilePdf /> {t('exportPDF')}
