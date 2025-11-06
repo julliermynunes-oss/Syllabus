@@ -211,6 +211,15 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         FOREIGN KEY (assigned_to_user_id) REFERENCES users(id)
       )`);
 
+      // Tabela para armazenar limites de contribuições por curso
+      db.run(`CREATE TABLE IF NOT EXISTS competencia_limits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        curso TEXT UNIQUE NOT NULL,
+        limite_contribuicoes INTEGER NOT NULL DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )`);
+
       // Normalização retroativa de valores de semestre (idempotente)
       const normalizeSemesters = () => {
         // Semestre/Ano: Primeiro/AAAA -> 1/AAAA, Segundo/AAAA -> 2/AAAA
