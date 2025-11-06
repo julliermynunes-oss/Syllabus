@@ -7,14 +7,34 @@ import './CompetenciesManager.css';
 
 const CompetenciesManager = () => {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [competenciasData, setCompetenciasData] = useState({});
   const [selectedCurso, setSelectedCurso] = useState('');
   const [competenciaRows, setCompetenciaRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [limiteContribuicoes, setLimiteContribuicoes] = useState(0);
+  const [limitesPorCurso, setLimitesPorCurso] = useState({});
 
   useEffect(() => {
     loadCompetenciasData();
+    loadLimites();
   }, []);
+
+  const loadLimites = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/competencias/limits`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const limitesMap = {};
+      response.data.forEach(item => {
+        limitesMap[item.curso] = item.limite_contribuicoes;
+      });
+      setLimitesPorCurso(limitesMap);
+    } catch (error) {
+      console.error('Erro ao carregar limites:', error);
+    }
+  };
 
   const loadCompetenciasData = async () => {
     try {
@@ -54,8 +74,11 @@ const CompetenciesManager = () => {
           descricao: item.descricao || ''
         }))
       );
+      // Carregar limite do curso selecionado
+      setLimiteContribuicoes(limitesPorCurso[curso] || 0);
     } else {
       setCompetenciaRows([]);
+      setLimiteContribuicoes(0);
     }
   };
 
@@ -133,6 +156,31 @@ const CompetenciesManager = () => {
 
         {selectedCurso && (
           <>
+            <div className="limite-config-section">
+              <label htmlFor="limite-input">
+                <strong>Limite de Contribuições para {selectedCurso}:</strong>
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+                <input
+                  id="limite-input"
+                  type="number"
+                  min="0"
+                  value={limiteContribuicoes}
+                  onChange={(e) => setLimiteContribuicoes(parseInt(e.target.value) || 0)}
+                  style={{
+                    padding: '8px 12px',
+                    border: '2px solid #235795',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    width: '100px'
+                  }}
+                />
+                <span style={{ color: '#666', fontSize: '14px' }}>
+                  bolinhas disponíveis para distribuir entre todas as competências
+                </span>
+              </div>
+            </div>
+
             <div className="table-header">
               <h3>Competências para {selectedCurso}</h3>
               <button type="button" onClick={addRow} className="add-row-btn">
