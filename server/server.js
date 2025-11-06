@@ -1461,8 +1461,6 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
     
     console.log('Usando wkhtmltopdf em:', wkhtmltopdfPath);
     
-    console.log('Usando wkhtmltopdf em:', wkhtmltopdfPath);
-    
     // Usar xvfb-run para executar wkhtmltopdf em ambiente headless (sem display)
     // xvfb-run cria um display virtual X11 para aplicações que precisam de GUI
     const useXvfb = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT;
