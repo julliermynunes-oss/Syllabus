@@ -598,8 +598,29 @@ function SyllabusForm() {
 
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Erro desconhecido';
-      alert(`Erro ao gerar PDF: ${errorMessage}`);
+      console.error('Response data:', error.response?.data);
+      
+      // Tentar extrair mensagem de erro mais detalhada
+      let errorMessage = 'Erro desconhecido';
+      let errorDetails = '';
+      
+      if (error.response?.data) {
+        errorMessage = error.response.data.message || error.response.data.error || error.message;
+        errorDetails = error.response.data.details || '';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Montar mensagem completa
+      let fullMessage = `Erro ao gerar PDF: ${errorMessage}`;
+      if (errorDetails) {
+        fullMessage += `\n\nDetalhes: ${errorDetails}`;
+      }
+      if (error.response?.data?.code) {
+        fullMessage += `\n\nCódigo do erro: ${error.response.data.code}`;
+      }
+      
+      alert(fullMessage);
       
       // Restaurar estilos mesmo em caso de erro
       const element = document.getElementById('pdf-content');
