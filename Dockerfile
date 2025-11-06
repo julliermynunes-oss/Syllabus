@@ -11,6 +11,9 @@ RUN npm install
 # Copiar código do servidor
 COPY server ./server
 
+# Copiar arquivos de dados (CSV e XLSX)
+COPY *.csv *.xlsx ./
+
 # Copiar código do cliente e fazer build
 COPY client ./client
 WORKDIR /app/client
