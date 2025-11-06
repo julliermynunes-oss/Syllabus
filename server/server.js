@@ -646,6 +646,89 @@ app.get('/api/competencias', (req, res) => {
   res.json(competenciasData[cursoCode]);
 });
 
+// Endpoint para obter limite de contribuições de um curso
+app.get('/api/competencias/limit', (req, res) => {
+  const { curso } = req.query;
+  
+  if (!curso) {
+    return res.status(400).json({ error: 'Curso é obrigatório' });
+  }
+
+  const cursoCode = getCursoCode(curso);
+  
+  if (!cursoCode) {
+    return res.status(400).json({ error: 'Curso não encontrado' });
+  }
+
+  db.get(
+    'SELECT limite_contribuicoes FROM competencia_limits WHERE curso = ?',
+    [cursoCode],
+    (err, row) => {
+      if (err) {
+        console.error('Erro ao buscar limite:', err);
+        return res.status(500).json({ error: 'Erro ao buscar limite' });
+      }
+      
+      // Se não houver limite configurado, retornar null (sem limite)
+      res.json({ curso: cursoCode, limite: row ? row.limite_contribuicoes : null });
+    }
+  );
+});
+
+// Endpoint para salvar/atualizar limite de contribuições de um curso
+app.post('/api/competencias/limit', authenticateToken, (req, res) => {
+  const { curso, limite } = req.body;
+  
+  if (!curso || limite === undefined || limite === null) {
+    return res.status(400).json({ error: 'Curso e limite são obrigatórios' });
+  }
+
+  if (limite < 0) {
+    return res.status(400).json({ error: 'Limite deve ser maior ou igual a zero' });
+  }
+
+  const cursoCode = getCursoCode(curso);
+  
+  if (!cursoCode) {
+    return res.status(400).json({ error: 'Curso não encontrado' });
+  }
+
+  // Usar INSERT OR REPLACE para atualizar se já existir
+  db.run(
+    `INSERT OR REPLACE INTO competencia_limits (curso, limite_contribuicoes, updated_at)
+     VALUES (?, ?, CURRENT_TIMESTAMP)`,
+    [cursoCode, limite],
+    function(err) {
+      if (err) {
+        console.error('Erro ao salvar limite:', err);
+        return res.status(500).json({ error: 'Erro ao salvar limite' });
+      }
+      
+      res.json({ 
+        message: 'Limite salvo com sucesso',
+        curso: cursoCode,
+        limite: limite
+      });
+    }
+  );
+});
+
+// Endpoint para obter todos os limites (para a tela de gerenciamento)
+app.get('/api/competencias/limits', authenticateToken, (req, res) => {
+  db.all(
+    'SELECT curso, limite_contribuicoes FROM competencia_limits ORDER BY curso',
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error('Erro ao buscar limites:', err);
+        return res.status(500).json({ error: 'Erro ao buscar limites' });
+      }
+      
+      res.json(rows || []);
+    }
+  );
+});
+
 // Google Scholar endpoint (via backend para usar API key do servidor)
 app.get('/api/search-scholar', async (req, res) => {
   const { q } = req.query;
