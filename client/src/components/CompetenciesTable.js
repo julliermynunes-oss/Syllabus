@@ -180,15 +180,10 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
     return { valid: true, message: '' };
   };
 
-  // Expor função de validação para o componente pai
-  useEffect(() => {
-    if (onChange && typeof onChange === 'function') {
-      // Passar função de validação através do onChange
-      const dataObj = { rows, validateLimite };
-      onChange(JSON.stringify(dataObj));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows]);
+  // Expor função de validação para o componente pai via ref
+  useImperativeHandle(ref, () => ({
+    validateLimite
+  }));
 
   const getContribuicao = (grau) => {
     const circles = [];
