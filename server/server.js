@@ -1379,10 +1379,13 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
       '--quiet'
     ].join(' ');
 
-    // Executar wkhtmltopdf
-    const command = `wkhtmltopdf ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
+    // Executar wkhtmltopdf (tentar diferentes caminhos possíveis)
+    // O wkhtmltopdf geralmente está em /usr/local/bin/wkhtmltopdf após instalação
+    const wkhtmltopdfPath = 'wkhtmltopdf'; // Tentar usar do PATH primeiro
     
-    console.log('Executando wkhtmltopdf...');
+    const command = `${wkhtmltopdfPath} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
+    
+    console.log('Executando wkhtmltopdf...', command);
     const { stdout, stderr } = await execAsync(command);
 
     if (stderr && !stderr.includes('Warning')) {
