@@ -1421,16 +1421,21 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
       if (testPath === 'wkhtmltopdf') {
         // Para 'wkhtmltopdf', tentar usar which
         try {
-          await execAsync(`which wkhtmltopdf`);
-          wkhtmltopdfPath = testPath;
-          break;
+          const { stdout } = await execAsync(`which wkhtmltopdf`);
+          if (stdout && stdout.trim()) {
+            wkhtmltopdfPath = testPath;
+            console.log('wkhtmltopdf encontrado via which:', stdout.trim());
+            break;
+          }
         } catch (e) {
+          // Continuar tentando outros caminhos
           continue;
         }
       } else {
         // Para caminhos absolutos, verificar se o arquivo existe
         if (fs.existsSync(testPath)) {
           wkhtmltopdfPath = testPath;
+          console.log('wkhtmltopdf encontrado em:', testPath);
           break;
         }
       }
@@ -1439,7 +1444,10 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
     if (!wkhtmltopdfPath) {
       // Se não encontrar, tentar usar 'wkhtmltopdf' mesmo assim
       wkhtmltopdfPath = 'wkhtmltopdf';
+      console.warn('wkhtmltopdf não encontrado em caminhos conhecidos, tentando usar do PATH');
     }
+    
+    console.log('Usando wkhtmltopdf em:', wkhtmltopdfPath);
     
     const command = `${wkhtmltopdfPath} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
     
@@ -1483,10 +1491,17 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
 
   } catch (error) {
     console.error('Erro ao gerar PDF:', error);
+    console.error('Erro completo:', {
+      message: error.message,
+      code: error.code,
+      stderr: error.stderr,
+      stdout: error.stdout,
+      stack: error.stack
+    });
     res.status(500).json({ 
       error: 'Erro ao gerar PDF',
-      message: error.message,
-      details: error.stderr || error.stdout
+      message: error.message || 'Erro desconhecido',
+      details: error.stderr || error.stdout || 'Sem detalhes adicionais'
     });
   }
 });
