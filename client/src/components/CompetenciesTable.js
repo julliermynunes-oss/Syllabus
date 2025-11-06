@@ -221,6 +221,29 @@ const CompetenciesTable = ({ data, onChange, curso }) => {
             Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
             demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(curso)}.
           </p>
+          {limiteContribuicoes !== null && (
+            <div style={{
+              marginTop: '15px',
+              padding: '12px',
+              backgroundColor: '#eef4fa',
+              border: '2px solid #235795',
+              borderRadius: '8px',
+              fontSize: '14px'
+            }}>
+              <strong>Limite de Contribuições:</strong> Você pode usar no máximo{' '}
+              <strong style={{ color: '#235795' }}>{limiteContribuicoes}</strong> bolinhas no total.{' '}
+              <span style={{ 
+                color: (() => {
+                  const totalUsado = rows.reduce((sum, row) => sum + (row.grau || 0), 0);
+                  if (totalUsado > limiteContribuicoes) return '#d32f2f';
+                  if (totalUsado === limiteContribuicoes) return '#f57c00';
+                  return '#388e3c';
+                })()
+              }}>
+                Usadas: <strong>{rows.reduce((sum, row) => sum + (row.grau || 0), 0)}</strong> / {limiteContribuicoes}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
