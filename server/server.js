@@ -10,9 +10,7 @@ const fs = require('fs');
 const multer = require('multer');
 const PDFDocument = require('pdfkit');
 const axios = require('axios');
-const { exec } = require('child_process');
-const { promisify } = require('util');
-const execAsync = promisify(exec);
+const puppeteer = require('puppeteer');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -1367,7 +1365,7 @@ if (isProduction && buildExists) {
   console.warn('⚠️  Build path:', buildPath);
 }
 
-// Endpoint para gerar PDF usando wkhtmltopdf
+// Endpoint para gerar PDF usando Puppeteer (Chrome headless)
 app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
   console.log('=== INÍCIO DA GERAÇÃO DE PDF ===');
   const { html, filename } = req.body;
@@ -1380,164 +1378,58 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
   console.log('HTML recebido, tamanho:', html.length, 'caracteres');
   console.log('Filename:', filename || 'não fornecido');
 
+  let browser = null;
   try {
-    // Criar diretório temporário se não existir
-    const tempDir = path.join(__dirname, '..', 'temp');
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
-    }
+    // Iniciar Puppeteer com Chrome headless
+    console.log('Iniciando Puppeteer...');
+    browser = await puppeteer.launch({
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--disable-gpu'
+      ]
+    });
 
-    // Criar arquivo HTML temporário
-    const htmlPath = path.join(tempDir, `temp-${Date.now()}.html`);
-    const pdfPath = path.join(tempDir, `temp-${Date.now()}.pdf`);
+    console.log('Puppeteer iniciado com sucesso');
 
-    // Escrever HTML no arquivo
-    fs.writeFileSync(htmlPath, html, 'utf8');
+    // Criar nova página
+    const page = await browser.newPage();
+    
+    // Configurar viewport para A4
+    await page.setViewport({
+      width: 794, // A4 width em pixels (210mm a 96 DPI)
+      height: 1123, // A4 height em pixels (297mm a 96 DPI)
+    });
 
-    // Opções do wkhtmltopdf
-    // --page-size A4: formato A4
-    // --margin-top/bottom/left/right: margens em mm
-    // --encoding UTF-8: encoding UTF-8
-    // --no-outline: não gerar outline
-    // --enable-local-file-access: permitir acesso a arquivos locais (para imagens)
-    // --disable-smart-shrinking: desabilitar smart shrinking para melhor controle
-    const wkhtmltopdfOptions = [
-      '--page-size A4',
-      '--orientation Portrait',
-      '--margin-top 40mm',
-      '--margin-bottom 40mm',
-      '--margin-left 25mm',
-      '--margin-right 25mm',
-      '--encoding UTF-8',
-      '--no-outline',
-      '--enable-local-file-access',
-      '--disable-smart-shrinking',
-      '--print-media-type',
-      '--quiet'
-    ].join(' ');
+    // Definir conteúdo HTML
+    await page.setContent(html, {
+      waitUntil: 'networkidle0', // Aguardar até que não haja requisições de rede
+      timeout: 30000
+    });
 
-    // Executar wkhtmltopdf (tentar diferentes caminhos possíveis)
-    // O wkhtmltopdf geralmente está em /usr/local/bin/wkhtmltopdf após instalação
-    const wkhtmltopdfPaths = ['/usr/local/bin/wkhtmltopdf', '/usr/bin/wkhtmltopdf', 'wkhtmltopdf'];
-    let wkhtmltopdfPath = null;
-    
-    console.log('=== Procurando wkhtmltopdf ===');
-    
-    // Verificar caminhos absolutos primeiro (mais confiável)
-    for (const testPath of wkhtmltopdfPaths) {
-      if (testPath.startsWith('/')) {
-        // Para caminhos absolutos, verificar se o arquivo existe
-        if (fs.existsSync(testPath)) {
-          wkhtmltopdfPath = testPath;
-          console.log('✓ wkhtmltopdf encontrado em:', testPath);
-          break;
-        } else {
-          console.log('✗ Não encontrado em:', testPath);
-        }
-      }
-    }
-    
-    // Se não encontrou em caminhos absolutos, tentar via which
-    if (!wkhtmltopdfPath) {
-      try {
-        const { stdout } = await execAsync(`which wkhtmltopdf`);
-        if (stdout && stdout.trim()) {
-          const foundPath = stdout.trim();
-          if (fs.existsSync(foundPath)) {
-            wkhtmltopdfPath = foundPath;
-            console.log('✓ wkhtmltopdf encontrado via which:', foundPath);
-          }
-        }
-      } catch (e) {
-        console.log('✗ which wkhtmltopdf falhou:', e.message);
-      }
-    }
-    
-    // Último recurso: tentar usar 'wkhtmltopdf' do PATH
-    if (!wkhtmltopdfPath) {
-      wkhtmltopdfPath = 'wkhtmltopdf';
-      console.warn('⚠️  wkhtmltopdf não encontrado em caminhos conhecidos, tentando usar do PATH');
-    }
-    
-    console.log('Usando wkhtmltopdf em:', wkhtmltopdfPath);
-    
-    // Usar xvfb-run para executar wkhtmltopdf em ambiente headless (sem display)
-    // xvfb-run cria um display virtual X11 para aplicações que precisam de GUI
-    const useXvfb = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT;
-    const baseCommand = useXvfb ? `xvfb-run -a --server-args="-screen 0 1024x768x24" ${wkhtmltopdfPath}` : wkhtmltopdfPath;
-    const command = `${baseCommand} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
-    
-    console.log('Executando wkhtmltopdf...', command);
-    console.log('Usando xvfb-run:', useXvfb);
-    
-    try {
-      const { stdout, stderr } = await execAsync(command, { 
-        timeout: 30000, // 30 segundos timeout
-        maxBuffer: 10 * 1024 * 1024 // 10MB buffer para stdout/stderr
-      });
+    console.log('HTML carregado na página');
 
-      // Ignorar avisos comuns do wkhtmltopdf que não são erros críticos
-      if (stderr) {
-        const stderrLower = stderr.toLowerCase();
-        const isWarning = stderrLower.includes('warning') || 
-                         stderrLower.includes('qfont') ||
-                         stderrLower.includes('qt') ||
-                         stderrLower.includes('xcb');
-        
-        if (!isWarning) {
-          console.warn('Aviso do wkhtmltopdf:', stderr);
-        } else {
-          console.log('Avisos ignorados do wkhtmltopdf (não críticos)');
-        }
-      }
-      
-      console.log('wkhtmltopdf executado com sucesso');
-    } catch (execError) {
-      console.error('Erro ao executar wkhtmltopdf:', execError);
-      console.error('Código do erro:', execError.code);
-      console.error('stderr:', execError.stderr);
-      console.error('stdout:', execError.stdout);
-      
-      // Se o erro for que o comando não foi encontrado, dar mensagem mais clara
-      if (execError.code === 127 || execError.message.includes('not found')) {
-        throw new Error('wkhtmltopdf não está instalado ou não está no PATH. Verifique a instalação no servidor.');
-      }
-      
-      // Se o erro for relacionado a display/X11, tentar sem xvfb-run
-      if (useXvfb && (execError.stderr?.includes('display') || execError.stderr?.includes('X11') || execError.code === 1)) {
-        console.log('Tentando executar sem xvfb-run...');
-        const fallbackCommand = `${wkhtmltopdfPath} ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
-        try {
-          const { stdout, stderr } = await execAsync(fallbackCommand, { 
-            timeout: 30000,
-            maxBuffer: 10 * 1024 * 1024
-          });
-          console.log('wkhtmltopdf executado com sucesso (sem xvfb-run)');
-          // Continuar normalmente após sucesso do fallback
-        } catch (fallbackError) {
-          console.error('Erro também sem xvfb-run:', fallbackError);
-          throw fallbackError;
-        }
-      } else {
-        throw execError;
-      }
-    }
+    // Gerar PDF
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      margin: {
+        top: '40mm',
+        right: '25mm',
+        bottom: '40mm',
+        left: '25mm'
+      },
+      printBackground: true, // Incluir backgrounds e cores
+      preferCSSPageSize: false // Usar as margens especificadas
+    });
 
-    // Verificar se o PDF foi criado
-    if (!fs.existsSync(pdfPath)) {
-      throw new Error('PDF não foi gerado. Verifique os logs do wkhtmltopdf para mais detalhes.');
-    }
+    console.log('PDF gerado com sucesso, tamanho:', pdfBuffer.length, 'bytes');
 
-    // Ler o PDF
-    const pdfBuffer = fs.readFileSync(pdfPath);
-
-    // Limpar arquivos temporários
-    try {
-      fs.unlinkSync(htmlPath);
-      fs.unlinkSync(pdfPath);
-    } catch (cleanupError) {
-      console.warn('Erro ao limpar arquivos temporários:', cleanupError);
-    }
+    // Fechar browser
+    await browser.close();
+    browser = null;
 
     // Enviar PDF como resposta
     res.setHeader('Content-Type', 'application/pdf');
@@ -1548,37 +1440,26 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
     console.error('=== ERRO AO GERAR PDF ===');
     console.error('Erro:', error);
     console.error('Mensagem:', error.message);
-    console.error('Código:', error.code);
-    console.error('stderr:', error.stderr);
-    console.error('stdout:', error.stdout);
     console.error('Stack:', error.stack);
     console.error('=== FIM DO ERRO ===');
     
+    // Fechar browser se ainda estiver aberto
+    if (browser) {
+      try {
+        await browser.close();
+      } catch (closeError) {
+        console.error('Erro ao fechar browser:', closeError);
+      }
+    }
+    
     // Retornar mensagem mais útil para o frontend
     let errorMessage = 'Erro ao gerar PDF';
-    let errorDetails = 'Sem detalhes adicionais';
-    
-    if (error.message) {
-      errorMessage = error.message;
-    }
-    
-    if (error.stderr) {
-      errorDetails = error.stderr.toString().substring(0, 500); // Limitar a 500 caracteres
-    } else if (error.stdout) {
-      errorDetails = error.stdout.toString().substring(0, 500);
-    } else if (error.code === 127) {
-      errorMessage = 'wkhtmltopdf não está instalado ou não está no PATH';
-      errorDetails = 'Verifique a instalação do wkhtmltopdf no servidor';
-    } else if (error.code === 'ENOENT') {
-      errorMessage = 'Arquivo ou diretório não encontrado';
-      errorDetails = error.path || 'Caminho não especificado';
-    }
+    let errorDetails = error.message || 'Sem detalhes adicionais';
     
     res.status(500).json({ 
       error: 'Erro ao gerar PDF',
       message: errorMessage,
-      details: errorDetails,
-      code: error.code
+      details: errorDetails
     });
   }
 });
