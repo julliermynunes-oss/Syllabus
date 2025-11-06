@@ -1324,9 +1324,19 @@ app.put('/api/requests/:id/accept', authenticateToken, (req, res) => {
 });
 
 // Serve static files from React app in production
-if (process.env.NODE_ENV === 'production') {
-  const buildPath = path.join(__dirname, '..', 'client', 'build');
+// Verificar se estamos em produção OU se o build existe (para Railway)
+const buildPath = path.join(__dirname, '..', 'client', 'build');
+const buildExists = fs.existsSync(buildPath);
+const isProduction = process.env.NODE_ENV === 'production' || buildExists;
 
+console.log('=== FRONTEND CONFIGURATION ===');
+console.log('NODE_ENV:', process.env.NODE_ENV || 'not set');
+console.log('Build path:', buildPath);
+console.log('Build exists:', buildExists);
+console.log('Will serve frontend:', isProduction);
+console.log('=== END FRONTEND CONFIGURATION ===');
+
+if (isProduction && buildExists) {
   // Middleware de cache-busting para assets do frontend
   app.use((req, res, next) => {
     if (/\.html$/i.test(req.url)) {
@@ -1343,9 +1353,21 @@ if (process.env.NODE_ENV === 'production') {
   
   // For any other requests, send back React's index.html file
   app.get('*', (req, res) => {
+    // Não servir index.html para rotas de API
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
     res.set('Cache-Control', 'no-store');
-    res.sendFile(path.join(buildPath, 'index.html'));
+    const indexPath = path.join(buildPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send('Frontend build not found');
+    }
   });
+} else {
+  console.warn('⚠️  Frontend build not found. API endpoints will work, but frontend will not be served.');
+  console.warn('⚠️  Build path:', buildPath);
 }
 
 // Endpoint para gerar PDF usando wkhtmltopdf
