@@ -307,7 +307,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'competencias',
         component: (
           <div key="competencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '26px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '12px', marginBottom: '15px' }}>
+            <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '15px' }}>
               {t('competenciesTitle')}
             </h3>
             {formData.curso && (
@@ -389,7 +389,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           if (parsed && parsed.rows && parsed.rows.length > 0) {
             return (
               <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '26px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '12px', marginBottom: '15px' }}>
+                <h3 style={{ fontSize: '22px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '10px', marginBottom: '15px' }}>
                   {t('evaluationCriteriaTitle')}
                 </h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px', fontSize: '16px' }}>
