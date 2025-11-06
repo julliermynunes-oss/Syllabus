@@ -490,13 +490,15 @@ function SyllabusForm() {
         filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
-          scale: 2,
+          scale: 3,
           useCORS: true,
           letterRendering: true,
           logging: false,
           width: element.scrollWidth,
           height: element.scrollHeight,
-          windowWidth: element.scrollWidth
+          windowWidth: element.scrollWidth,
+          allowTaint: true,
+          backgroundColor: '#ffffff'
         },
         jsPDF: { 
           unit: 'mm', 
@@ -518,6 +520,47 @@ function SyllabusForm() {
         void element.offsetHeight;
         // Adicionar classe para garantir estilos CSS
         element.classList.add('pdf-exporting');
+        
+        // Aplicar estilos diretamente nos elementos para garantir que sejam capturados
+        const allH3 = element.querySelectorAll('h3');
+        allH3.forEach(h3 => {
+          h3.style.fontSize = '26px';
+          h3.style.marginBottom = '18px';
+          h3.style.paddingBottom = '12px';
+        });
+        
+        const allH4 = element.querySelectorAll('h4');
+        allH4.forEach(h4 => {
+          h4.style.fontSize = '20px';
+        });
+        
+        const allDivs = element.querySelectorAll('div');
+        allDivs.forEach(div => {
+          if (!div.style.fontSize || parseInt(div.style.fontSize) < 18) {
+            div.style.fontSize = '18px';
+            div.style.lineHeight = '1.7';
+          }
+        });
+        
+        const allPs = element.querySelectorAll('p');
+        allPs.forEach(p => {
+          p.style.fontSize = '18px';
+          p.style.lineHeight = '1.7';
+        });
+        
+        const allTables = element.querySelectorAll('table');
+        allTables.forEach(table => {
+          table.style.fontSize = '18px';
+        });
+        
+        const allLists = element.querySelectorAll('ul, ol');
+        allLists.forEach(list => {
+          list.style.fontSize = '18px';
+        });
+        
+        // Forçar outro reflow após aplicar estilos
+        void element.offsetHeight;
+        
         html2pdf()
           .set(opt)
           .from(element)
