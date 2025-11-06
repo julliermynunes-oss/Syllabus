@@ -313,7 +313,7 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
       </div>
     </div>
   );
-};
+});
 
 export default CompetenciesTable;
 
