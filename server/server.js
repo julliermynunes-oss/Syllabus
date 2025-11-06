@@ -1369,11 +1369,16 @@ if (isProduction && buildExists) {
 
 // Endpoint para gerar PDF usando wkhtmltopdf
 app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
+  console.log('=== INÍCIO DA GERAÇÃO DE PDF ===');
   const { html, filename } = req.body;
 
   if (!html) {
+    console.error('HTML não fornecido');
     return res.status(400).json({ error: 'HTML é obrigatório' });
   }
+
+  console.log('HTML recebido, tamanho:', html.length, 'caracteres');
+  console.log('Filename:', filename || 'não fornecido');
 
   try {
     // Criar diretório temporário se não existir
@@ -1533,18 +1538,40 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
     res.send(pdfBuffer);
 
   } catch (error) {
-    console.error('Erro ao gerar PDF:', error);
-    console.error('Erro completo:', {
-      message: error.message,
-      code: error.code,
-      stderr: error.stderr,
-      stdout: error.stdout,
-      stack: error.stack
-    });
+    console.error('=== ERRO AO GERAR PDF ===');
+    console.error('Erro:', error);
+    console.error('Mensagem:', error.message);
+    console.error('Código:', error.code);
+    console.error('stderr:', error.stderr);
+    console.error('stdout:', error.stdout);
+    console.error('Stack:', error.stack);
+    console.error('=== FIM DO ERRO ===');
+    
+    // Retornar mensagem mais útil para o frontend
+    let errorMessage = 'Erro ao gerar PDF';
+    let errorDetails = 'Sem detalhes adicionais';
+    
+    if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    if (error.stderr) {
+      errorDetails = error.stderr.toString().substring(0, 500); // Limitar a 500 caracteres
+    } else if (error.stdout) {
+      errorDetails = error.stdout.toString().substring(0, 500);
+    } else if (error.code === 127) {
+      errorMessage = 'wkhtmltopdf não está instalado ou não está no PATH';
+      errorDetails = 'Verifique a instalação do wkhtmltopdf no servidor';
+    } else if (error.code === 'ENOENT') {
+      errorMessage = 'Arquivo ou diretório não encontrado';
+      errorDetails = error.path || 'Caminho não especificado';
+    }
+    
     res.status(500).json({ 
       error: 'Erro ao gerar PDF',
-      message: error.message || 'Erro desconhecido',
-      details: error.stderr || error.stdout || 'Sem detalhes adicionais'
+      message: errorMessage,
+      details: errorDetails,
+      code: error.code
     });
   }
 });
