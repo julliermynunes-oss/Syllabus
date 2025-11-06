@@ -460,7 +460,7 @@ function SyllabusForm() {
     setProfessoresList(newList);
   };
 
-  // Função para exportar PDF usando html2pdf.js
+  // Função para exportar PDF usando wkhtmltopdf (backend)
   const handleExportPDF = async () => {
     const element = document.getElementById('pdf-content');
     if (!element) {
@@ -469,10 +469,7 @@ function SyllabusForm() {
     }
 
     try {
-      // Importação dinâmica para evitar problemas no build
-      const html2pdf = (await import('html2pdf.js')).default;
-      
-      // Tornar o elemento visível temporariamente para renderização
+      // Tornar o elemento visível temporariamente para capturar HTML
       const originalDisplay = element.style.display;
       const originalPosition = element.style.position;
       const originalLeft = element.style.left;
@@ -480,119 +477,93 @@ function SyllabusForm() {
       element.style.display = 'block';
       element.style.position = 'relative';
       element.style.left = '0';
-      // Ajustar largura considerando margens (A4 = 210mm, menos margens)
       element.style.width = '210mm';
       element.style.maxWidth = '210mm';
       element.style.background = '#fff';
       element.style.boxSizing = 'border-box';
       
-      // Configurações do html2pdf
-      const opt = {
-        margin: [40, 25, 40, 25], // [top, left, bottom, right] em mm - margens intermediárias
-        filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 3,
-          useCORS: true,
-          letterRendering: true,
-          logging: false,
-          width: element.scrollWidth,
-          height: element.scrollHeight,
-          windowWidth: element.scrollWidth,
-          allowTaint: true,
-          backgroundColor: '#ffffff'
-        },
-        jsPDF: { 
-          unit: 'mm', 
-          format: 'a4', 
-          orientation: 'portrait',
-          compress: true
-        },
-        pagebreak: { 
-          mode: ['avoid-all', 'css', 'legacy'],
-          before: '.page-break-before',
-          after: '.page-break-after',
-          avoid: ['.pdf-container > div > div[style*="border"]', 'h3', 'table']
-        }
-      };
+      // Aguardar renderização
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Capturar HTML completo do elemento, incluindo estilos inline
+      const htmlContent = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    .pdf-container {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    /* Importar estilos do CSS se necessário */
+  </style>
+</head>
+<body>
+  ${element.outerHTML}
+</body>
+</html>`;
 
-      // Aguardar renderização e gerar PDF (aumentado timeout para garantir renderização)
-      setTimeout(() => {
-        // Forçar reflow para garantir que os estilos sejam aplicados
-        void element.offsetHeight;
-        // Adicionar classe para garantir estilos CSS
-        element.classList.add('pdf-exporting');
-        
-        // Aplicar estilos diretamente nos elementos para garantir que sejam capturados
-        const allH3 = element.querySelectorAll('h3');
-        allH3.forEach(h3 => {
-          h3.style.fontSize = '20px';
-          h3.style.marginBottom = '12px';
-          h3.style.paddingBottom = '8px';
-        });
-        
-        const allH4 = element.querySelectorAll('h4');
-        allH4.forEach(h4 => {
-          h4.style.fontSize = '17px';
-        });
-        
-        const allDivs = element.querySelectorAll('div');
-        allDivs.forEach(div => {
-          if (!div.style.fontSize || parseInt(div.style.fontSize) < 15) {
-            div.style.fontSize = '15px';
-            div.style.lineHeight = '1.5';
-          }
-        });
-        
-        const allPs = element.querySelectorAll('p');
-        allPs.forEach(p => {
-          p.style.fontSize = '15px';
-          p.style.lineHeight = '1.5';
-        });
-        
-        const allTables = element.querySelectorAll('table');
-        allTables.forEach(table => {
-          table.style.fontSize = '15px';
-        });
-        
-        const allLists = element.querySelectorAll('ul, ol');
-        allLists.forEach(list => {
-          list.style.fontSize = '15px';
-        });
-        
-        // Forçar outro reflow após aplicar estilos
-        void element.offsetHeight;
-        
-        html2pdf()
-          .set(opt)
-          .from(element)
-          .save()
-          .then(() => {
-            // Restaurar estilos após geração
-            element.classList.remove('pdf-exporting');
-            element.style.display = originalDisplay;
-            element.style.position = originalPosition;
-            element.style.left = originalLeft;
-            element.style.width = '';
-            element.style.maxWidth = '';
-            element.style.background = '';
-          })
-          .catch((error) => {
-            console.error('Erro ao gerar PDF:', error);
-            element.classList.remove('pdf-exporting');
-            alert('Erro ao gerar PDF. Por favor, tente novamente.');
-            // Restaurar estilos mesmo em caso de erro
-            element.style.display = originalDisplay;
-            element.style.position = originalPosition;
-            element.style.left = originalLeft;
-            element.style.width = '';
-            element.style.maxWidth = '';
-            element.style.background = '';
-          });
-      }, 500);
+      // Enviar HTML para o backend gerar PDF
+      const response = await axios.post(
+        `${API_URL}/api/generate-pdf`,
+        {
+          html: htmlContent,
+          filename: `Syllabus_${formData.disciplina || 'documento'}.pdf`
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          responseType: 'blob'
+        }
+      );
+
+      // Criar blob e fazer download
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Syllabus_${formData.disciplina || 'documento'}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      // Restaurar estilos
+      element.style.display = originalDisplay;
+      element.style.position = originalPosition;
+      element.style.left = originalLeft;
+      element.style.width = '';
+      element.style.maxWidth = '';
+      element.style.background = '';
+
     } catch (error) {
-      console.error('Erro ao importar html2pdf:', error);
-      alert('Erro ao carregar biblioteca de PDF. Por favor, tente novamente.');
+      console.error('Erro ao gerar PDF:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Erro desconhecido';
+      alert(`Erro ao gerar PDF: ${errorMessage}`);
+      
+      // Restaurar estilos mesmo em caso de erro
+      const element = document.getElementById('pdf-content');
+      if (element) {
+        element.style.display = originalDisplay;
+        element.style.position = originalPosition;
+        element.style.left = originalLeft;
+        element.style.width = '';
+        element.style.maxWidth = '';
+        element.style.background = '';
+      }
     }
   };
 

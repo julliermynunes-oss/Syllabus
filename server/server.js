@@ -10,6 +10,9 @@ const fs = require('fs');
 const multer = require('multer');
 const PDFDocument = require('pdfkit');
 const axios = require('axios');
+const { exec } = require('child_process');
+const { promisify } = require('util');
+const execAsync = promisify(exec);
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -1331,6 +1334,91 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(buildPath, 'index.html'));
   });
 }
+
+// Endpoint para gerar PDF usando wkhtmltopdf
+app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
+  const { html, filename } = req.body;
+
+  if (!html) {
+    return res.status(400).json({ error: 'HTML é obrigatório' });
+  }
+
+  try {
+    // Criar diretório temporário se não existir
+    const tempDir = path.join(__dirname, '..', 'temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    // Criar arquivo HTML temporário
+    const htmlPath = path.join(tempDir, `temp-${Date.now()}.html`);
+    const pdfPath = path.join(tempDir, `temp-${Date.now()}.pdf`);
+
+    // Escrever HTML no arquivo
+    fs.writeFileSync(htmlPath, html, 'utf8');
+
+    // Opções do wkhtmltopdf
+    // --page-size A4: formato A4
+    // --margin-top/bottom/left/right: margens em mm
+    // --encoding UTF-8: encoding UTF-8
+    // --no-outline: não gerar outline
+    // --enable-local-file-access: permitir acesso a arquivos locais (para imagens)
+    // --disable-smart-shrinking: desabilitar smart shrinking para melhor controle
+    const wkhtmltopdfOptions = [
+      '--page-size A4',
+      '--orientation Portrait',
+      '--margin-top 40mm',
+      '--margin-bottom 40mm',
+      '--margin-left 25mm',
+      '--margin-right 25mm',
+      '--encoding UTF-8',
+      '--no-outline',
+      '--enable-local-file-access',
+      '--disable-smart-shrinking',
+      '--print-media-type',
+      '--quiet'
+    ].join(' ');
+
+    // Executar wkhtmltopdf
+    const command = `wkhtmltopdf ${wkhtmltopdfOptions} "${htmlPath}" "${pdfPath}"`;
+    
+    console.log('Executando wkhtmltopdf...');
+    const { stdout, stderr } = await execAsync(command);
+
+    if (stderr && !stderr.includes('Warning')) {
+      console.error('Erro do wkhtmltopdf:', stderr);
+    }
+
+    // Verificar se o PDF foi criado
+    if (!fs.existsSync(pdfPath)) {
+      throw new Error('PDF não foi gerado');
+    }
+
+    // Ler o PDF
+    const pdfBuffer = fs.readFileSync(pdfPath);
+
+    // Limpar arquivos temporários
+    try {
+      fs.unlinkSync(htmlPath);
+      fs.unlinkSync(pdfPath);
+    } catch (cleanupError) {
+      console.warn('Erro ao limpar arquivos temporários:', cleanupError);
+    }
+
+    // Enviar PDF como resposta
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename || 'syllabus.pdf'}"`);
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error('Erro ao gerar PDF:', error);
+    res.status(500).json({ 
+      error: 'Erro ao gerar PDF',
+      message: error.message,
+      details: error.stderr || error.stdout
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
