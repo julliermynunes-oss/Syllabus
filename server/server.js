@@ -479,9 +479,6 @@ function insertDisciplines(disciplinasData, programsMap) {
   });
 }
 
-// Load CSV data on startup
-setTimeout(loadCSVData, 1000);
-
 // Auth middleware
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -1475,9 +1472,20 @@ app.post('/api/generate-pdf', authenticateToken, async (req, res) => {
   }
 });
 
+// Iniciar servidor (independente do carregamento de CSV)
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✓ Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`wkhtmltopdf endpoint ready at POST /api/generate-pdf`);
+  console.log(`✓ wkhtmltopdf endpoint ready at POST /api/generate-pdf`);
+  console.log(`✓ Server ready to accept connections`);
 });
+
+// Carregar dados CSV em background (não bloqueia)
+setTimeout(() => {
+  try {
+    loadCSVData();
+  } catch (error) {
+    console.error('Erro ao carregar dados CSV (não crítico):', error);
+  }
+}, 1000);
 
