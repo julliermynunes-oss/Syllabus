@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase, FaFlask } from 'react-icons/fa';
+import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase, FaFlask, FaUser } from 'react-icons/fa';
 import './ReferenceManager.css';
 
 const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
@@ -639,14 +639,24 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
             <option value="arxiv">arXiv</option>
             <option value="openalex">OpenAlex</option>
           </select>
-          <select
-            value={searchBy}
-            onChange={(e) => setSearchBy(e.target.value)}
-            className="reference-search-by-select"
-          >
-            <option value="title">Título</option>
-            <option value="author">Autor</option>
-          </select>
+          <div className="search-by-buttons">
+            <button
+              type="button"
+              className={`search-by-btn ${searchBy === 'title' ? 'active' : ''}`}
+              onClick={() => setSearchBy('title')}
+              title="Buscar por título"
+            >
+              <FaBook />
+            </button>
+            <button
+              type="button"
+              className={`search-by-btn ${searchBy === 'author' ? 'active' : ''}`}
+              onClick={() => setSearchBy('author')}
+              title="Buscar por autor"
+            >
+              <FaUser />
+            </button>
+          </div>
           <input
             type="text"
             placeholder={getPlaceholder()}
