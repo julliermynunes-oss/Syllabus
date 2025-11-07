@@ -736,32 +736,6 @@
   box-shadow: none;
 }
 
-/* Breadcrumb */
-.breadcrumb-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem 1.5rem;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: 0.9rem;
-}
-
-.breadcrumb-item {
-  color: #666;
-  font-weight: 500;
-}
-
-.breadcrumb-item.active {
-  color: #235795;
-  font-weight: 600;
-}
-
-.breadcrumb-separator {
-  color: #999;
-  font-weight: 300;
-}
-
 .submit-btn {
   padding: 1rem 3rem;
   background: #235795;

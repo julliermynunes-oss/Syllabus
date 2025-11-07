@@ -768,15 +768,6 @@ function SyllabusForm() {
 
       {/* Container unificado com abas e formulário */}
       <div className="form-box-with-tabs">
-        {/* Breadcrumb */}
-        <div className="breadcrumb-container">
-          <span className="breadcrumb-item">{t('header') || 'Cabeçalho'}</span>
-          <span className="breadcrumb-separator">/</span>
-          <span className="breadcrumb-item active">
-            {getCurrentTabInfo().currentTab?.label || t('header') || 'Cabeçalho'}
-          </span>
-        </div>
-
         {/* Abas no topo */}
         <div className="tabs-container">
           {getOrderedTabs().map((tab) => {
