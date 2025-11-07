@@ -145,6 +145,7 @@ function SyllabusForm() {
   useEffect(() => {
     fetchPrograms();
     fetchAllProfessoresForLider();
+    fetchAllProfessoresForList(); // Carregar todos os professores para o campo de professores
     if (isEditing) {
       fetchSyllabus();
     } else if (location.state) {
@@ -178,6 +179,26 @@ function SyllabusForm() {
       setFilteredLiderDisciplina(uniqueProfs);
     } catch (err) {
       console.error('Erro ao buscar professores para Líder:', err);
+    }
+  };
+
+  // Carregar todos os professores para o campo de professores (mesmo comportamento do Líder)
+  const fetchAllProfessoresForList = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/professores`);
+      const data = response.data;
+      // Flatten all professors from all departments
+      const allProfs = [];
+      Object.keys(data).forEach(dept => {
+        if (Array.isArray(data[dept])) {
+          allProfs.push(...data[dept].map(p => p.nome || p));
+        }
+      });
+      const uniqueProfs = [...new Set(allProfs)].sort();
+      setAllProfessoresForList(uniqueProfs);
+      setFilteredProfessores(uniqueProfs);
+    } catch (err) {
+      console.error('Erro ao buscar professores para lista:', err);
     }
   };
 
@@ -398,46 +419,21 @@ function SyllabusForm() {
     setShowDisciplineDropdown(false);
   };
 
-  // Função para buscar professores (todos, sem depender do departamento)
-  const fetchProfessores = async (searchValue) => {
-    if (!searchValue || searchValue.trim() === '') {
-      setFilteredProfessores([]);
-      setShowProfessoresDropdown(false);
-      return;
-    }
-
-    try {
-      const response = await axios.get(`${API_URL}/api/professores`);
-      const data = response.data;
-      
-      // Flatten all professors from all departments
-      const allProfs = [];
-      Object.keys(data).forEach(dept => {
-        if (Array.isArray(data[dept])) {
-          data[dept].forEach(prof => {
-            allProfs.push(prof);
-          });
-        }
-      });
-      
-      // Filtrar por nome
-      const filtered = allProfs.filter(p =>
-        p.nome.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setFilteredProfessores(filtered);
-      setShowProfessoresDropdown(searchValue.length > 0 && filtered.length > 0);
-    } catch (err) {
-      console.error('Erro ao buscar professores:', err);
-      setFilteredProfessores([]);
-      setShowProfessoresDropdown(false);
-    }
-  };
-
-  // Handler para mudança no campo de professor
+  // Handler para mudança no campo de professor (mesmo comportamento do Líder de Disciplina)
   const handleProfessorInputChange = (e) => {
     const value = e.target.value;
     setCurrentProfessor(value);
-    fetchProfessores(value);
+    
+    if (value.trim()) {
+      const filtered = allProfessoresForList.filter(p =>
+        p.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredProfessores(filtered);
+      setShowProfessoresDropdown(value.length > 0 && filtered.length > 0);
+    } else {
+      setFilteredProfessores(allProfessoresForList);
+      setShowProfessoresDropdown(false);
+    }
   };
 
   const selectProfessor = (professor) => {
