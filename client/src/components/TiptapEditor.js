@@ -7,6 +7,8 @@ import { TableCell } from '@tiptap/extension-table-cell';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { Image } from '@tiptap/extension-image';
 import { Link } from '@tiptap/extension-link';
+import TextStyle from '@tiptap/extension-text-style';
+import { Color } from '@tiptap/extension-color';
 import './TiptapEditor.css';
 
 const TiptapEditor = ({ content, onChange, showCharCount = false }) => {
@@ -17,6 +19,17 @@ const TiptapEditor = ({ content, onChange, showCharCount = false }) => {
   const wrapperRef = React.useRef(null);
   const [isSticky, setIsSticky] = React.useState(false);
   const [charCount, setCharCount] = React.useState(0);
+  const [showColorPicker, setShowColorPicker] = React.useState(false);
+  const colorPickerRef = React.useRef(null);
+
+  // Cores disponíveis: cores do tema + vermelho + verde
+  const availableColors = [
+    { name: 'Preto', value: '#000000' },
+    { name: 'Azul Escuro', value: '#235795' },
+    { name: 'Azul Claro', value: '#2a6ca8' },
+    { name: 'Vermelho', value: '#d32f2f' },
+    { name: 'Verde', value: '#388e3c' },
+  ];
 
   const editor = useEditor({
     extensions: [
@@ -69,6 +82,10 @@ const TiptapEditor = ({ content, onChange, showCharCount = false }) => {
       }),
       Link.configure({
         openOnClick: false,
+      }),
+      TextStyle,
+      Color.configure({
+        types: ['textStyle'],
       }),
     ],
     content: content || '',
@@ -378,6 +395,39 @@ const TiptapEditor = ({ content, onChange, showCharCount = false }) => {
         >
           ―
         </button>
+        <div className="divider"></div>
+        <div className="color-picker-wrapper">
+          <button
+            onClick={() => setShowColorPicker(!showColorPicker)}
+            type="button"
+            title="Cor do texto"
+            className={editor.isActive('textStyle', { color: /^#(?!000000)/ }) ? 'is-active' : ''}
+          >
+            <span style={{ color: '#235795' }}>A</span>
+          </button>
+          {showColorPicker && (
+            <div className="color-picker-dropdown" ref={colorPickerRef}>
+              {availableColors.map((color) => (
+                <button
+                  key={color.value}
+                  type="button"
+                  className="color-option"
+                  style={{ backgroundColor: color.value }}
+                  onClick={() => {
+                    if (color.value === '#000000') {
+                      // Remover cor (voltar ao padrão)
+                      editor.chain().focus().unsetColor().run();
+                    } else {
+                      editor.chain().focus().setColor(color.value).run();
+                    }
+                    setShowColorPicker(false);
+                  }}
+                  title={color.name}
+                />
+              ))}
+            </div>
+          )}
+        </div>
         <div className="divider"></div>
         <button
           onClick={() => editor.chain().focus().undo().run()}

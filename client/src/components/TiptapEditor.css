@@ -254,3 +254,52 @@
   margin: 4px 0;
 }
 
+/* Color Picker Styles */
+.color-picker-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.color-picker-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 1000;
+  flex-wrap: wrap;
+  min-width: 200px;
+}
+
+.color-option {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.color-option:hover {
+  border-color: #235795;
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-option:first-child {
+  border: 2px solid #333;
+}
+
+.color-picker-wrapper button.is-active {
+  background: #e8f2ff;
+  border-color: #235795;
+}
+
