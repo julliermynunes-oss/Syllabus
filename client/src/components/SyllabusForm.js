@@ -403,20 +403,30 @@ function SyllabusForm() {
     setShowDisciplineDropdown(false);
   };
 
-  // Função para buscar professores baseado no departamento
+  // Função para buscar professores (todos, sem depender do departamento)
   const fetchProfessores = async (searchValue) => {
-    const departamento = formData.departamento;
-    if (!departamento) {
+    if (!searchValue || searchValue.trim() === '') {
       setFilteredProfessores([]);
       setShowProfessoresDropdown(false);
       return;
     }
 
     try {
-      const response = await axios.get(`${API_URL}/api/professores`, {
-        params: { departamento }
+      const response = await axios.get(`${API_URL}/api/professores`);
+      const data = response.data;
+      
+      // Flatten all professors from all departments
+      const allProfs = [];
+      Object.keys(data).forEach(dept => {
+        if (Array.isArray(data[dept])) {
+          data[dept].forEach(prof => {
+            allProfs.push(prof);
+          });
+        }
       });
-      const filtered = response.data.filter(p =>
+      
+      // Filtrar por nome
+      const filtered = allProfs.filter(p =>
         p.nome.toLowerCase().includes(searchValue.toLowerCase())
       );
       setFilteredProfessores(filtered);
@@ -432,12 +442,7 @@ function SyllabusForm() {
   const handleProfessorInputChange = (e) => {
     const value = e.target.value;
     setCurrentProfessor(value);
-    if (formData.departamento) {
-      fetchProfessores(value);
-    } else {
-      setFilteredProfessores([]);
-      setShowProfessoresDropdown(false);
-    }
+    fetchProfessores(value);
   };
 
   const selectProfessor = (professor) => {
