@@ -141,6 +141,8 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
+  height: 42px;
+  box-sizing: border-box;
 }
 
 .reference-search-input:focus {
