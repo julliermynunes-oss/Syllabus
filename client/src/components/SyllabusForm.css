@@ -1089,6 +1089,74 @@
   }
 }
 
+/* Layout Selector Buttons */
+.layout-selector-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.layout-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 200px;
+  text-align: left;
+}
+
+.layout-option-btn:hover {
+  border-color: #235795;
+  background: #f0f7ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(35, 87, 149, 0.15);
+}
+
+.layout-option-btn.active {
+  border-color: #235795;
+  background: #e8f2ff;
+  box-shadow: 0 4px 12px rgba(35, 87, 149, 0.2);
+}
+
+.layout-icon {
+  flex-shrink: 0;
+  color: #235795;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layout-option-btn.active .layout-icon {
+  color: #235795;
+}
+
+.layout-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.layout-label strong {
+  color: #235795;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.layout-label span {
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.layout-option-btn.active .layout-label strong {
+  color: #235795;
+}
+
 @media (max-width: 768px) {
   .tabs-container {
     padding: 1rem 1rem 0;
