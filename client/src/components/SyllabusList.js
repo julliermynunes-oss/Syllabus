@@ -50,16 +50,10 @@ const SyllabusList = () => {
       if (professorSearch) {
         filteredData = filteredData.filter(s => {
           const professores = s.professores || '';
-          const coordenador = s.coordenador || '';
           const searchLower = professorSearch.toLowerCase();
-          // Buscar apenas em professores e usuario
+          // Buscar apenas no campo professores (ignorar coordenador completamente)
           const matchProfessores = professores.toLowerCase().includes(searchLower);
-          const matchUsuario = s.usuario && s.usuario.toLowerCase().includes(searchLower);
-          // Se o nome está apenas no coordenador (e não em professores), não incluir
-          const matchCoordenador = coordenador.toLowerCase().includes(searchLower);
-          const matchApenasCoordenador = matchCoordenador && !matchProfessores;
-          // Retornar true se está em professores ou usuario, mas não se está apenas em coordenador
-          return (matchProfessores || matchUsuario) && !matchApenasCoordenador;
+          return matchProfessores;
         });
       }
       
