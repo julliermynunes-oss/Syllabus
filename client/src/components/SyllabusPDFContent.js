@@ -295,7 +295,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         component: (
           <div key="compromisso_etico" className="compromisso-etico-section" style={{ marginBottom: '15px' }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
-              {t('ethicsTitle') || 'COMPROMISSO ÉTICO'}
+              {t('ethicalCommitmentTitle')}
             </h3>
             <div 
               style={{ fontSize: '15px', lineHeight: '1.5' }}

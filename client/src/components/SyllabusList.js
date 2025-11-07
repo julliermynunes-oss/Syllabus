@@ -50,8 +50,16 @@ const SyllabusList = () => {
       if (professorSearch) {
         filteredData = filteredData.filter(s => {
           const professores = s.professores || '';
-          return professores.toLowerCase().includes(professorSearch.toLowerCase()) ||
-                 (s.usuario && s.usuario.toLowerCase().includes(professorSearch.toLowerCase()));
+          const coordenador = s.coordenador || '';
+          const searchLower = professorSearch.toLowerCase();
+          // Buscar apenas em professores e usuario
+          const matchProfessores = professores.toLowerCase().includes(searchLower);
+          const matchUsuario = s.usuario && s.usuario.toLowerCase().includes(searchLower);
+          // Se o nome está apenas no coordenador (e não em professores), não incluir
+          const matchCoordenador = coordenador.toLowerCase().includes(searchLower);
+          const matchApenasCoordenador = matchCoordenador && !matchProfessores;
+          // Retornar true se está em professores ou usuario, mas não se está apenas em coordenador
+          return (matchProfessores || matchUsuario) && !matchApenasCoordenador;
         });
       }
       
@@ -695,7 +703,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       {formData.compromisso_etico && (
         <div style={{ marginBottom: '15px' }}>
           <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
-            {t('ethicsTitle') || 'COMPROMISSO ÉTICO'}
+            {t('ethicalCommitmentTitle')}
           </h3>
           <div 
             style={{ 
