@@ -850,7 +850,7 @@ function SyllabusForm() {
                     type="text"
                     value={currentProfessor}
                     onChange={handleProfessorInputChange}
-                    placeholder={formData.departamento ? `${t('typeProfessorName')}` : t('selectDepartment')}
+                    placeholder={t('typeProfessorName')}
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
