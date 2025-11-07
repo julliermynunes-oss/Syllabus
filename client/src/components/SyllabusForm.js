@@ -1481,6 +1481,49 @@ function SyllabusForm() {
         <SyllabusPDFContent formData={formData} professoresList={professoresList} />
       </div>
 
+      {/* Modal de confirmação antes de salvar */}
+      {showConfirmModal && (
+        <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
+          <div className="modal-content confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>{isEditing ? t('updateSyllabus') || 'Atualizar Syllabus' : t('createSyllabus') || 'Criar Syllabus'}</h2>
+            <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+              {isEditing 
+                ? t('confirmUpdateMessage') || 'Confira o resumo das abas antes de atualizar:'
+                : t('confirmCreateMessage') || 'Confira o resumo das abas antes de criar:'
+              }
+            </p>
+            <div className="tabs-checklist">
+              {checkTabContent().map((tab) => (
+                <div key={tab.id} className="checklist-item">
+                  <span className={`checklist-icon ${tab.hasContent ? 'filled' : 'empty'}`}>
+                    {tab.hasContent ? '✓' : '○'}
+                  </span>
+                  <span className={`checklist-label ${tab.hasContent ? 'filled' : 'empty'}`}>
+                    {tab.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="modal-actions" style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="modal-btn-cancel"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                {t('back') || 'Voltar'}
+              </button>
+              <button
+                type="button"
+                className="modal-btn-confirm"
+                onClick={confirmSubmit}
+              >
+                {isEditing ? t('update') || 'Atualizar' : t('createSyllabus') || 'Criar Syllabus'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal para criar aba personalizada */}
       {showCustomTabModal && (() => {
         // Obter lista de abas disponíveis para posicionamento (sem a custom)
