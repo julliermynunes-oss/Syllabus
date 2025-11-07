@@ -44,6 +44,8 @@ export const translations = {
     confirmCreateMessage: 'Confira o resumo das abas antes de criar:',
     confirmUpdateMessage: 'Confira o resumo das abas antes de atualizar:',
     update: 'Atualizar',
+    previousTab: 'Anterior',
+    nextTab: 'Próxima',
     cancel: 'Cancelar',
     exportPDF: 'Exportar PDF',
     
@@ -229,6 +231,8 @@ export const translations = {
     confirmCreateMessage: 'Review the summary of tabs before creating:',
     confirmUpdateMessage: 'Review the summary of tabs before updating:',
     update: 'Update',
+    previousTab: 'Previous',
+    nextTab: 'Next',
     cancel: 'Cancel',
     exportPDF: 'Export PDF',
     
@@ -414,6 +418,8 @@ export const translations = {
     confirmCreateMessage: 'Revise el resumen de las pestañas antes de crear:',
     confirmUpdateMessage: 'Revise el resumen de las pestañas antes de actualizar:',
     update: 'Actualizar',
+    previousTab: 'Anterior',
+    nextTab: 'Siguiente',
     cancel: 'Cancelar',
     exportPDF: 'Exportar PDF',
     

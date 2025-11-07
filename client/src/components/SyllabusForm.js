@@ -20,7 +20,9 @@ import {
   FaGlobe, 
   FaList, 
   FaGraduationCap,
-  FaFileAlt
+  FaFileAlt,
+  FaChevronLeft,
+  FaChevronRight
 } from 'react-icons/fa';
 // html2pdf será importado dinamicamente para evitar problemas no build
 import TiptapEditor from './TiptapEditor';
@@ -464,6 +466,38 @@ function SyllabusForm() {
     }, 100);
   };
 
+  // Função para navegar para a próxima aba
+  const goToNextTab = () => {
+    const tabs = getOrderedTabs();
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
+    if (currentIndex < tabs.length - 1) {
+      handleTabChange(tabs[currentIndex + 1].id);
+    }
+  };
+
+  // Função para navegar para a aba anterior
+  const goToPreviousTab = () => {
+    const tabs = getOrderedTabs();
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
+    if (currentIndex > 0) {
+      handleTabChange(tabs[currentIndex - 1].id);
+    }
+  };
+
+  // Obter informações da aba atual para breadcrumb
+  const getCurrentTabInfo = () => {
+    const tabs = getOrderedTabs();
+    const currentTab = tabs.find(tab => tab.id === activeTab);
+    const currentIndex = tabs.findIndex(tab => tab.id === activeTab);
+    return {
+      currentTab,
+      currentIndex,
+      totalTabs: tabs.length,
+      hasNext: currentIndex < tabs.length - 1,
+      hasPrevious: currentIndex > 0
+    };
+  };
+
   const selectDiscipline = (discipline) => {
     setFormData({ ...formData, disciplina: discipline.nome });
     setShowDisciplineDropdown(false);
@@ -734,6 +768,15 @@ function SyllabusForm() {
 
       {/* Container unificado com abas e formulário */}
       <div className="form-box-with-tabs">
+        {/* Breadcrumb */}
+        <div className="breadcrumb-container">
+          <span className="breadcrumb-item">{t('header') || 'Cabeçalho'}</span>
+          <span className="breadcrumb-separator">/</span>
+          <span className="breadcrumb-item active">
+            {getCurrentTabInfo().currentTab?.label || t('header') || 'Cabeçalho'}
+          </span>
+        </div>
+
         {/* Abas no topo */}
         <div className="tabs-container">
           {getOrderedTabs().map((tab) => {
@@ -1511,16 +1554,40 @@ function SyllabusForm() {
         )}
 
         <div className="form-actions">
-          <button type="submit" className="submit-btn">
-            {isEditing ? t('update') : t('createSyllabus')}
-          </button>
-          <button
-            type="button"
-            className="cancel-btn"
-            onClick={() => navigate('/syllabi')}
-          >
-            {t('cancel')}
-          </button>
+          <div className="form-actions-left">
+            <button
+              type="button"
+              className="nav-tab-btn"
+              onClick={goToPreviousTab}
+              disabled={!getCurrentTabInfo().hasPrevious}
+              title={t('previousTab') || 'Aba anterior'}
+            >
+              <FaChevronLeft />
+              <span>{t('previousTab') || 'Anterior'}</span>
+            </button>
+            <button
+              type="button"
+              className="nav-tab-btn"
+              onClick={goToNextTab}
+              disabled={!getCurrentTabInfo().hasNext}
+              title={t('nextTab') || 'Próxima aba'}
+            >
+              <span>{t('nextTab') || 'Próxima'}</span>
+              <FaChevronRight />
+            </button>
+          </div>
+          <div className="form-actions-right">
+            <button type="submit" className="submit-btn">
+              {isEditing ? t('update') : t('createSyllabus')}
+            </button>
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={() => navigate('/syllabi')}
+            >
+              {t('cancel')}
+            </button>
+          </div>
         </div>
           </form>
         </div>
