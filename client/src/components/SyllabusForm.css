@@ -120,6 +120,23 @@
   border-bottom: 2px solid transparent;
   text-align: center;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.tab-icon {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.tab:hover .tab-icon {
+  transform: scale(1.1);
+}
+
+.tab.active .tab-icon {
+  transform: scale(1.15);
 }
 
 .tab:hover {
@@ -247,6 +264,29 @@
 .form-content-area {
   padding: 2rem;
   background: white;
+  position: relative;
+  min-height: 400px;
+}
+
+/* Animações para transição de abas */
+.form-row {
+  animation: fadeInSlide 0.3s ease-in-out;
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animação para o conteúdo das abas */
+.form-row.full-width {
+  animation: fadeInSlide 0.3s ease-in-out;
 }
 
 .delete-custom-tab-btn:active {

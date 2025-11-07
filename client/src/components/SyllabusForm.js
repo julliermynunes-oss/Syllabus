@@ -5,7 +5,23 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { FaArrowLeft, FaFilePdf, FaTrash } from 'react-icons/fa';
+import { 
+  FaArrowLeft, 
+  FaFilePdf, 
+  FaTrash, 
+  FaHome, 
+  FaInfoCircle, 
+  FaBook, 
+  FaChalkboardTeacher, 
+  FaClipboardCheck, 
+  FaShieldAlt, 
+  FaUserFriends, 
+  FaAddressBook, 
+  FaGlobe, 
+  FaListCheck, 
+  FaGraduationCap,
+  FaFileAlt
+} from 'react-icons/fa';
 // html2pdf será importado dinamicamente para evitar problemas no build
 import TiptapEditor from './TiptapEditor';
 import ReferenceManager from './ReferenceManager';
@@ -368,6 +384,26 @@ function SyllabusForm() {
     }
   };
 
+  // Função para obter o ícone de cada aba
+  const getTabIcon = (tabId) => {
+    const iconMap = {
+      'cabecalho': FaHome,
+      'sobre': FaInfoCircle,
+      'conteudo': FaBook,
+      'metodologia': FaChalkboardTeacher,
+      'avaliacao': FaClipboardCheck,
+      'compromisso_etico': FaShieldAlt,
+      'professores': FaUserFriends,
+      'contatos': FaAddressBook,
+      'ods': FaGlobe,
+      'referencias': FaListCheck,
+      'competencias': FaGraduationCap,
+      'o_que_e_esperado': FaGraduationCap,
+      'custom': FaFileAlt
+    };
+    return iconMap[tabId] || FaFileAlt;
+  };
+
   // Função para obter a lista de abas ordenadas
   const getOrderedTabs = () => {
     const tabs = [
@@ -414,6 +450,18 @@ function SyllabusForm() {
     }
 
     return tabs;
+  };
+
+  // Função para trocar de aba com animação
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    // Scroll suave para o topo do formulário
+    setTimeout(() => {
+      const formBox = document.querySelector('.form-box-with-tabs');
+      if (formBox) {
+        formBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   const selectDiscipline = (discipline) => {
@@ -694,9 +742,10 @@ function SyllabusForm() {
                 <div key={tab.id} className="tab-with-delete">
                   <button
                     className={`tab custom-tab ${activeTab === tab.id ? 'active' : ''}`}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => handleTabChange(tab.id)}
                     type="button"
                   >
+                    {React.createElement(getTabIcon(tab.id), { className: 'tab-icon' })}
                     {tab.label}
                   </button>
                   <button
@@ -717,9 +766,10 @@ function SyllabusForm() {
               <button
                 key={tab.id}
                 className={`tab ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 type="button"
               >
+                {React.createElement(getTabIcon(tab.id), { className: 'tab-icon' })}
                 {tab.label}
               </button>
             );
