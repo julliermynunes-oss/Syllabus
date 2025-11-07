@@ -536,7 +536,7 @@ function SyllabusForm() {
       },
       {
         id: 'competencias',
-        name: t('competenciesLabel') || 'Competências',
+        name: t('competencies') || 'Competências',
         hasContent: !!(formData.competencias && formData.competencias.trim() !== '')
       },
       {
@@ -571,7 +571,7 @@ function SyllabusForm() {
       },
       {
         id: 'referencias',
-        name: t('referencesLabel') || 'Referências Bibliográficas',
+        name: t('references') || 'Referências Bibliográficas',
         hasContent: !!(formData.referencias && formData.referencias.trim() !== '')
       }
     ];
