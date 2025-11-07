@@ -138,6 +138,7 @@ function SyllabusForm() {
   const [allProfessoresForLider, setAllProfessoresForLider] = useState([]);
   const [filteredLiderDisciplina, setFilteredLiderDisciplina] = useState([]);
   const [showLiderDropdown, setShowLiderDropdown] = useState(false);
+  const [allProfessoresForList, setAllProfessoresForList] = useState([]);
   const [showCustomTabModal, setShowCustomTabModal] = useState(false);
   const [customTabNameInput, setCustomTabNameInput] = useState('');
   const [customTabPositionInput, setCustomTabPositionInput] = useState('end');
