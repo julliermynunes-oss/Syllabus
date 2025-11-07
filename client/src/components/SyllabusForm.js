@@ -1035,17 +1035,49 @@ function SyllabusForm() {
           <div className="form-row full-width">
             <div className="form-field">
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#235795' }}>
+                <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 'bold', color: '#235795' }}>
                   {t('referencesLayout') || 'Layout das Referências:'}
                 </label>
-                <select
-                  value={formData.referencias_layout || 'lista'}
-                  onChange={(e) => setFormData(prev => ({ ...prev, referencias_layout: e.target.value }))}
-                  style={{ padding: '8px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', minWidth: '250px' }}
-                >
-                  <option value="lista">{t('listLayout') || 'Lista (todas as referências juntas)'}</option>
-                  <option value="categorizado">{t('categorizedLayout') || 'Categorizado (Obrigatória/Opcional)'}</option>
-                </select>
+                <div className="layout-selector-buttons">
+                  <button
+                    type="button"
+                    className={`layout-option-btn ${formData.referencias_layout === 'lista' ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({ ...prev, referencias_layout: 'lista' }))}
+                  >
+                    <div className="layout-icon">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                      </svg>
+                    </div>
+                    <div className="layout-label">
+                      <strong>{t('listLayout') || 'Lista'}</strong>
+                      <span>{t('listLayoutDesc') || 'Todas as referências juntas'}</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    className={`layout-option-btn ${formData.referencias_layout === 'categorizado' ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({ ...prev, referencias_layout: 'categorizado' }))}
+                  >
+                    <div className="layout-icon">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                      </svg>
+                    </div>
+                    <div className="layout-label">
+                      <strong>{t('categorizedLayout') || 'Categorizado'}</strong>
+                      <span>{t('categorizedLayoutDesc') || 'Obrigatória / Opcional / Outras'}</span>
+                    </div>
+                  </button>
+                </div>
               </div>
               <h3 style={{ marginBottom: '1.5rem', color: '#235795' }}>
                 {t('searchReferences')}
@@ -1066,43 +1098,74 @@ function SyllabusForm() {
                 <label>{t('manualEditor')}</label>
                 <TiptapEditor
                   content={(() => {
-                    // Se for categorizado e o conteúdo for JSON, converter para HTML formatado
-                    if (formData.referencias_layout === 'categorizado' && formData.referencias) {
-                      try {
-                        const parsed = JSON.parse(formData.referencias);
-                        if (parsed.references && Array.isArray(parsed.references)) {
-                          const obrigatorias = parsed.references.filter(ref => ref.category === 'obrigatoria');
-                          const opcionais = parsed.references.filter(ref => ref.category === 'opcional');
-                          const outras = parsed.references.filter(ref => ref.category === 'outras');
+                    // Se for categorizado, sempre mostrar os títulos das categorias
+                    if (formData.referencias_layout === 'categorizado') {
+                      let html = '';
+                      
+                      // Se já existe conteúdo em JSON, converter para HTML formatado
+                      if (formData.referencias) {
+                        try {
+                          const parsed = JSON.parse(formData.referencias);
+                          if (parsed.references && Array.isArray(parsed.references)) {
+                            const obrigatorias = parsed.references.filter(ref => ref.category === 'obrigatoria');
+                            const opcionais = parsed.references.filter(ref => ref.category === 'opcional');
+                            const outras = parsed.references.filter(ref => ref.category === 'outras');
+                            
+                            if (obrigatorias.length > 0) {
+                              html += `<h4><strong>Leitura Obrigatória:</strong></h4><ul>`;
+                              obrigatorias.forEach(ref => {
+                                html += `<li><p>${ref.text}</p></li>`;
+                              });
+                              html += `</ul>`;
+                            } else {
+                              html += `<h4><strong>Leitura Obrigatória:</strong></h4><ul></ul>`;
+                            }
+                            
+                            if (opcionais.length > 0) {
+                              html += `<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul>`;
+                              opcionais.forEach(ref => {
+                                html += `<li><p>${ref.text}</p></li>`;
+                              });
+                              html += `</ul>`;
+                            } else {
+                              html += `<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul></ul>`;
+                            }
+                            
+                            if (outras.length > 0) {
+                              html += `<h4><strong>Outras Referências:</strong></h4><ul>`;
+                              outras.forEach(ref => {
+                                html += `<li><p>${ref.text}</p></li>`;
+                              });
+                              html += `</ul>`;
+                            } else {
+                              html += `<h4><strong>Outras Referências:</strong></h4><ul></ul>`;
+                            }
+                            
+                            return html;
+                          }
+                        } catch (e) {
+                          // Se não for JSON válido, verificar se já tem os títulos no HTML
+                          const tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = formData.referencias;
+                          const hasObrigatoria = tempDiv.textContent.toLowerCase().includes('obrigatória') || tempDiv.textContent.toLowerCase().includes('obrigatoria');
+                          const hasOpcional = tempDiv.textContent.toLowerCase().includes('opcional') || tempDiv.textContent.toLowerCase().includes('complementar');
+                          const hasOutras = tempDiv.textContent.toLowerCase().includes('outras referências') || tempDiv.textContent.toLowerCase().includes('outras referencias');
                           
-                          let html = '';
-                          if (obrigatorias.length > 0) {
-                            html += `<h4><strong>Leitura Obrigatória:</strong></h4><ul>`;
-                            obrigatorias.forEach(ref => {
-                              html += `<li><p>${ref.text}</p></li>`;
-                            });
-                            html += `</ul>`;
+                          // Se já tem os títulos, retornar como está
+                          if (hasObrigatoria || hasOpcional || hasOutras) {
+                            return formData.referencias;
                           }
-                          if (opcionais.length > 0) {
-                            html += `<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul>`;
-                            opcionais.forEach(ref => {
-                              html += `<li><p>${ref.text}</p></li>`;
-                            });
-                            html += `</ul>`;
-                          }
-                          if (outras.length > 0) {
-                            html += `<h4><strong>Outras Referências:</strong></h4><ul>`;
-                            outras.forEach(ref => {
-                              html += `<li><p>${ref.text}</p></li>`;
-                            });
-                            html += `</ul>`;
-                          }
-                          return html;
                         }
-                      } catch (e) {
-                        // Se não for JSON, retornar o conteúdo como está
                       }
+                      
+                      // Se não tem conteúdo ou não é JSON válido, criar estrutura inicial com títulos
+                      html = `<h4><strong>Leitura Obrigatória:</strong></h4><ul></ul>
+<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul></ul>
+<h4><strong>Outras Referências:</strong></h4><ul></ul>`;
+                      return html;
                     }
+                    
+                    // Se for lista, retornar conteúdo normal
                     return formData.referencias || '';
                   })()}
                   onChange={(content) => {
