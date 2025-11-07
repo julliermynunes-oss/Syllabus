@@ -110,6 +110,51 @@
   border-color: #ddd;
 }
 
+/* Tooltip para descrição base da competência */
+.competencia-with-tooltip {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.competencia-with-tooltip .tooltip-text {
+  visibility: hidden;
+  width: 300px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 10px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -150px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.competencia-with-tooltip .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.competencia-with-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
 .table-textarea {
   width: 100%;
   padding: 0.5rem;

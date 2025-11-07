@@ -278,13 +278,18 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
             {rows.map((row, index) => (
               <tr key={index}>
                 <td className="col-competencia">
-                  <input
-                    type="text"
-                    value={row.competencia || ''}
-                    readOnly
-                    placeholder="Nome da competência"
-                    className="table-input readonly"
-                  />
+                  <div className="competencia-with-tooltip">
+                    <input
+                      type="text"
+                      value={row.competencia || ''}
+                      readOnly
+                      placeholder="Nome da competência"
+                      className="table-input readonly"
+                    />
+                    {row.descricaoBase && (
+                      <span className="tooltip-text">{row.descricaoBase}</span>
+                    )}
+                  </div>
                 </td>
                 <td className="col-descricao">
                   <textarea
