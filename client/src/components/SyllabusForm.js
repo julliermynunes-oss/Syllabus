@@ -18,7 +18,7 @@ import {
   FaUserFriends, 
   FaAddressBook, 
   FaGlobe, 
-  FaListCheck, 
+  FaList, 
   FaGraduationCap,
   FaFileAlt
 } from 'react-icons/fa';
@@ -396,7 +396,7 @@ function SyllabusForm() {
       'professores': FaUserFriends,
       'contatos': FaAddressBook,
       'ods': FaGlobe,
-      'referencias': FaListCheck,
+      'referencias': FaList,
       'competencias': FaGraduationCap,
       'o_que_e_esperado': FaGraduationCap,
       'custom': FaFileAlt
