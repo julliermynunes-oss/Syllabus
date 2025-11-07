@@ -1091,6 +1091,7 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.sobre_disciplina}
                 onChange={(content) => setFormData(prev => ({ ...prev, sobre_disciplina: content }))}
+                showCharCount={true}
               />
               <p className="editor-note">
                 {t('editorNote')}
