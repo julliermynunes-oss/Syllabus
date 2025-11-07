@@ -123,7 +123,13 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
           try {
             const parsed = JSON.parse(data);
             if (parsed.rows && parsed.rows.length > 0) {
-              setRows(parsed.rows);
+              // Ordenar alfabeticamente por nome da competência
+              const sortedRows = [...parsed.rows].sort((a, b) => {
+                const nomeA = (a.competencia || '').toLowerCase();
+                const nomeB = (b.competencia || '').toLowerCase();
+                return nomeA.localeCompare(nomeB, 'pt-BR');
+              });
+              setRows(sortedRows);
               initializedRef.current = true;
             } else {
               setRows([]);
