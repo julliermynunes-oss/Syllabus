@@ -438,7 +438,7 @@ function SyllabusForm() {
   };
 
   const selectProfessor = (professor) => {
-    setCurrentProfessor(professor.nome);
+    setCurrentProfessor(professor);
     setShowProfessoresDropdown(false);
   };
 
@@ -867,7 +867,7 @@ function SyllabusForm() {
                           onClick={() => selectProfessor(p)}
                           className="autocomplete-item"
                         >
-                          {p.nome}
+                          {p}
                         </div>
                       ))}
                     </div>
