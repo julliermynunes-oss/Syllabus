@@ -88,6 +88,8 @@
   font-weight: 500;
   min-width: 140px;
   max-width: 140px;
+  height: 42px;
+  box-sizing: border-box;
 }
 
 .reference-source-select:focus {
