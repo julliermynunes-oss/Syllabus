@@ -280,11 +280,6 @@ function SyllabusForm() {
       } catch (err) {
         console.error('Erro ao buscar disciplinas:', err);
       }
-    } else if (name === 'departamento') {
-      // Quando o departamento mudar, limpar o campo de professor
-      setCurrentProfessor('');
-      setFilteredProfessores([]);
-      setShowProfessoresDropdown(false);
     }
   };
 
