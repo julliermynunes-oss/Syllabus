@@ -786,56 +786,6 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
         )}
       </div>
 
-      <div className="reference-editor">
-        <label>Referências Adicionadas (use o rich text abaixo para editar):</label>
-        <div className="added-references">
-          {addedReferences.length > 0 ? (
-            layout === 'categorizado' ? (
-              <div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Leitura Obrigatória:</h4>
-                  <ul>
-                    {addedReferences
-                      .filter(ref => ref.category === 'obrigatoria')
-                      .map((ref, index) => (
-                        <li key={index}>{ref.text}</li>
-                      ))}
-                  </ul>
-                </div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Leitura Complementar:</h4>
-                  <ul>
-                    {addedReferences
-                      .filter(ref => ref.category === 'opcional')
-                      .map((ref, index) => (
-                        <li key={index}>{ref.text}</li>
-                      ))}
-                  </ul>
-                </div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Outras Referências:</h4>
-                  <ul>
-                    {addedReferences
-                      .filter(ref => ref.category === 'outras')
-                      .map((ref, index) => (
-                        <li key={index}>{ref.text}</li>
-                      ))}
-                  </ul>
-                </div>
-              </div>
-            ) : (
-              <ul>
-                {addedReferences.map((ref, index) => (
-                  <li key={index}>{typeof ref === 'string' ? ref : ref.text}</li>
-                ))}
-              </ul>
-            )
-          ) : (
-            <p className="no-references">Nenhuma referência adicionada ainda. Use a busca acima para encontrar e adicionar referências.</p>
-          )}
-        </div>
-      </div>
-
       {/* Modal para escolher categoria */}
       {showCategoryModal && (
         <div className="modal-overlay" onClick={() => {
