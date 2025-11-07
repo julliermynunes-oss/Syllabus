@@ -46,13 +46,16 @@ const SyllabusList = () => {
       
       let filteredData = response.data;
       
-      // Filter by professor name if search is provided (buscar apenas no campo professores)
+      // Filter by professor name if search is provided
       if (professorSearch) {
         filteredData = filteredData.filter(s => {
           const professores = s.professores || '';
           const searchLower = professorSearch.toLowerCase();
-          // Buscar apenas no campo professores
-          return professores.toLowerCase().includes(searchLower);
+          // Buscar em professores e usuario
+          const matchProfessores = professores.toLowerCase().includes(searchLower);
+          const matchUsuario = s.usuario && s.usuario.toLowerCase().includes(searchLower);
+          // Retornar true se está em professores ou usuario
+          return matchProfessores || matchUsuario;
         });
       }
       
