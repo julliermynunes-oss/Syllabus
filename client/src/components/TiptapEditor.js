@@ -9,13 +9,14 @@ import { Image } from '@tiptap/extension-image';
 import { Link } from '@tiptap/extension-link';
 import './TiptapEditor.css';
 
-const TiptapEditor = ({ content, onChange }) => {
+const TiptapEditor = ({ content, onChange, showCharCount = false }) => {
   const fileInputRef = React.useRef(null);
   const [contextMenu, setContextMenu] = React.useState(null);
   const contextMenuRef = React.useRef(null);
   const menuBarRef = React.useRef(null);
   const wrapperRef = React.useRef(null);
   const [isSticky, setIsSticky] = React.useState(false);
+  const [charCount, setCharCount] = React.useState(0);
 
   const editor = useEditor({
     extensions: [
@@ -77,7 +78,13 @@ const TiptapEditor = ({ content, onChange }) => {
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const html = editor.getHTML();
+      onChange(html);
+      // Atualizar contador de caracteres (texto puro, sem HTML)
+      if (showCharCount) {
+        const text = editor.getText();
+        setCharCount(text.length);
+      }
     },
   });
 
@@ -293,6 +300,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive('bold') ? 'is-active' : ''}
           type="button"
+          title="Negrito (Ctrl+B)"
         >
           B
         </button>
@@ -300,6 +308,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={editor.isActive('italic') ? 'is-active' : ''}
           type="button"
+          title="Itálico (Ctrl+I)"
         >
           I
         </button>
@@ -307,6 +316,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           className={editor.isActive('underline') ? 'is-active' : ''}
           type="button"
+          title="Sublinhado (Ctrl+U)"
         >
           U
         </button>
@@ -314,6 +324,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleStrike().run()}
           className={editor.isActive('strike') ? 'is-active' : ''}
           type="button"
+          title="Riscado"
         >
           S
         </button>
@@ -322,6 +333,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={editor.isActive('heading', { level: 1 }) ? 'is-active' : ''}
           type="button"
+          title="Título 1"
         >
           H1
         </button>
@@ -329,6 +341,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
           type="button"
+          title="Título 2"
         >
           H2
         </button>
@@ -337,6 +350,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive('bulletList') ? 'is-active' : ''}
           type="button"
+          title="Lista com marcadores"
         >
           •
         </button>
@@ -344,6 +358,7 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={editor.isActive('orderedList') ? 'is-active' : ''}
           type="button"
+          title="Lista numerada"
         >
           1.
         </button>
@@ -352,12 +367,14 @@ const TiptapEditor = ({ content, onChange }) => {
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={editor.isActive('blockquote') ? 'is-active' : ''}
           type="button"
+          title="Citação"
         >
           "
         </button>
         <button
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           type="button"
+          title="Linha horizontal"
         >
           ―
         </button>
@@ -365,12 +382,14 @@ const TiptapEditor = ({ content, onChange }) => {
         <button
           onClick={() => editor.chain().focus().undo().run()}
           type="button"
+          title="Desfazer (Ctrl+Z)"
         >
           ↶
         </button>
         <button
           onClick={() => editor.chain().focus().redo().run()}
           type="button"
+          title="Refazer (Ctrl+Y)"
         >
           ↷
         </button>
@@ -378,6 +397,7 @@ const TiptapEditor = ({ content, onChange }) => {
         <button
           onClick={addLink}
           type="button"
+          title="Adicionar link"
         >
           🔗 Link
         </button>
@@ -399,6 +419,7 @@ const TiptapEditor = ({ content, onChange }) => {
         <button
           onClick={() => editor.chain().focus().insertTable({ rows: 2, cols: 3, withHeaderRow: true }).run()}
           type="button"
+          title="Inserir tabela"
         >
           📊 Tabela
         </button>
@@ -483,6 +504,11 @@ const TiptapEditor = ({ content, onChange }) => {
       >
         <EditorContent editor={editor} />
       </div>
+      {showCharCount && (
+        <div className="char-count">
+          {charCount.toLocaleString()} {charCount === 1 ? 'caractere' : 'caracteres'}
+        </div>
+      )}
       
       {/* Context Menu */}
       {contextMenu && (

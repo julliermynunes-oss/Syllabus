@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase, FaFlask, FaUser } from 'react-icons/fa';
@@ -13,10 +13,20 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [pendingReference, setPendingReference] = useState(null);
   const [pendingIndex, setPendingIndex] = useState(null);
+  const searchCacheRef = useRef(new Map()); // Cache de resultados de busca
+  const debounceTimerRef = useRef(null);
 
 
   const searchAll = async () => {
     if (!searchTerm.trim()) return;
+
+    // Verificar cache antes de buscar
+    const cacheKey = `${searchTerm.toLowerCase()}_${searchBy}`;
+    if (searchCacheRef.current.has(cacheKey)) {
+      const cachedResults = searchCacheRef.current.get(cacheKey);
+      setSearchResults(cachedResults);
+      return;
+    }
 
     setIsSearching(true);
     setSearchResults([]); // Limpar resultados anteriores
@@ -44,6 +54,17 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           console.error('Erro no OpenAlex:', err);
         })
       ]);
+
+      // Salvar no cache após a busca (usar setTimeout para garantir que searchResults foi atualizado)
+      setTimeout(() => {
+        const cacheKey = `${searchTerm.toLowerCase()}_${searchBy}`;
+        setSearchResults(currentResults => {
+          if (currentResults.length > 0) {
+            searchCacheRef.current.set(cacheKey, [...currentResults]);
+          }
+          return currentResults;
+        });
+      }, 100);
     } catch (error) {
       console.error('Erro ao buscar em todas as APIs:', error);
     } finally {
@@ -327,7 +348,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       return;
     }
 
-    // Sempre buscar em todas as fontes
+    // Sempre buscar em todas as fontes (o cache é verificado dentro de searchAll)
     searchAll();
   };
 

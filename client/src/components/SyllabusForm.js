@@ -161,6 +161,7 @@ function SyllabusForm() {
   const [customTabNameInput, setCustomTabNameInput] = useState('');
   const [customTabPositionInput, setCustomTabPositionInput] = useState('end');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [loadedTabs, setLoadedTabs] = useState(new Set(['cabecalho'])); // Lazy loading: começar com a primeira aba carregada
 
   useEffect(() => {
     fetchPrograms();
@@ -457,6 +458,8 @@ function SyllabusForm() {
   // Função para trocar de aba com animação
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
+    // Marcar a aba como carregada (lazy loading)
+    setLoadedTabs(prev => new Set([...prev, tabId]));
     // Scroll suave para o topo do formulário
     setTimeout(() => {
       const formBox = document.querySelector('.form-box-with-tabs');
@@ -778,6 +781,7 @@ function SyllabusForm() {
                     className={`tab custom-tab ${activeTab === tab.id ? 'active' : ''}`}
                     onClick={() => handleTabChange(tab.id)}
                     type="button"
+                    title={tab.label}
                   >
                     {React.createElement(getTabIcon(tab.id), { className: 'tab-icon' })}
                     {tab.label}
@@ -826,7 +830,7 @@ function SyllabusForm() {
         <div className="form-content-area">
           <form onSubmit={handleSubmit} className="syllabus-form">
         {/* Aba: Cabeçalho */}
-        {activeTab === 'cabecalho' && (
+        {activeTab === 'cabecalho' && loadedTabs.has('cabecalho') && (
           <>
         <div className="form-row">
           <div className="form-field">
@@ -1080,7 +1084,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Sobre a Disciplina */}
-        {activeTab === 'sobre' && (
+        {activeTab === 'sobre' && loadedTabs.has('sobre') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('description')}</label>
@@ -1096,13 +1100,14 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Conteúdo */}
-        {activeTab === 'conteudo' && (
+        {activeTab === 'conteudo' && loadedTabs.has('conteudo') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('programmaticContent')}</label>
               <TiptapEditor
                 content={formData.conteudo}
                 onChange={(content) => setFormData(prev => ({ ...prev, conteudo: content }))}
+                showCharCount={true}
               />
               <p className="editor-note">
                 {t('editorNote')}
@@ -1112,13 +1117,14 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Metodologia */}
-        {activeTab === 'metodologia' && (
+        {activeTab === 'metodologia' && loadedTabs.has('metodologia') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('teachingMethodology')}</label>
               <TiptapEditor
                 content={formData.metodologia}
                 onChange={(content) => setFormData(prev => ({ ...prev, metodologia: content }))}
+                showCharCount={true}
               />
               <p className="editor-note">
                 {t('editorNote')}
@@ -1128,7 +1134,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Critério de Avaliação */}
-        {activeTab === 'avaliacao' && (
+        {activeTab === 'avaliacao' && loadedTabs.has('avaliacao') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('evaluationCriteria')}</label>
@@ -1142,7 +1148,7 @@ function SyllabusForm() {
 
 
         {/* Aba: Compromisso Ético */}
-        {activeTab === 'compromisso_etico' && (
+        {activeTab === 'compromisso_etico' && loadedTabs.has('compromisso_etico') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('ethicalCommitment')}</label>
@@ -1158,7 +1164,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Professores */}
-        {activeTab === 'professores' && (
+        {activeTab === 'professores' && loadedTabs.has('professores') && (
           <div className="form-row full-width">
             <div className="form-field">
               <ProfessoresManager
@@ -1172,7 +1178,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Contatos */}
-        {activeTab === 'contatos' && (
+        {activeTab === 'contatos' && loadedTabs.has('contatos') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('contactsLabel')}</label>
@@ -1188,7 +1194,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: ODS */}
-        {activeTab === 'ods' && !isRestrictedCourse(formData.curso) && (
+        {activeTab === 'ods' && !isRestrictedCourse(formData.curso) && loadedTabs.has('ods') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('odsLabel')}</label>
@@ -1204,7 +1210,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Referências Bibliográficas */}
-        {activeTab === 'referencias' && (
+        {activeTab === 'referencias' && loadedTabs.has('referencias') && (
           <div className="form-row full-width">
             <div className="form-field">
               <div style={{ marginBottom: '1.5rem' }}>
@@ -1499,7 +1505,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Competências */}
-        {activeTab === 'competencias' && (
+        {activeTab === 'competencias' && loadedTabs.has('competencias') && (
           <div className="form-row full-width">
             <div className="form-field">
               <h3 style={{ marginBottom: '1.5rem', color: '#235795' }}>
@@ -1516,7 +1522,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: O QUE É ESPERADO QUE O(A) ALUNO(A) */}
-        {activeTab === 'o_que_e_esperado' && !isRestrictedCourse(formData.curso) && (
+        {activeTab === 'o_que_e_esperado' && !isRestrictedCourse(formData.curso) && loadedTabs.has('o_que_e_esperado') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{t('expectedFromStudentLabel')}</label>
@@ -1532,7 +1538,7 @@ function SyllabusForm() {
         )}
 
         {/* Aba: Personalizada */}
-        {activeTab === 'custom' && formData.custom_tab_name && (
+        {activeTab === 'custom' && formData.custom_tab_name && loadedTabs.has('custom') && (
           <div className="form-row full-width">
             <div className="form-field">
               <label>{formData.custom_tab_name}:</label>
