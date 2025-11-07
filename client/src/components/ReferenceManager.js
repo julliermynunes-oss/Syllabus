@@ -490,19 +490,20 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           }
           // Se só tiver family
           if (author.family) {
-            return author.family;
+            return typeof author.family === 'string' ? author.family : String(author.family || '');
           }
           // Se só tiver given
           if (author.given) {
-            return author.given;
+            return typeof author.given === 'string' ? author.given : String(author.given || '');
           }
           // Se tiver name como string completa
           if (author.name) {
-            return author.name;
+            return typeof author.name === 'string' ? author.name : String(author.name || '');
           }
           // Tentar outros campos possíveis
-          return author.literal || author.fullName || '';
-        }).filter(name => name && name.trim() !== '');
+          const literal = author.literal || author.fullName || '';
+          return typeof literal === 'string' ? literal : String(literal || '');
+        }).filter(name => name && typeof name === 'string' && name.trim() !== '');
         
         if (authorNames.length > 0) {
           authors = authorNames.join(', ');
@@ -731,11 +732,12 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                                 if (author.given && author.family) {
                                   return `${author.given} ${author.family}`.trim();
                                 }
-                                if (author.family) return author.family;
-                                if (author.given) return author.given;
-                                if (author.name) return author.name;
-                                return author.literal || author.fullName || '';
-                              }).filter(name => name && name.trim() !== '');
+                                if (author.family) return typeof author.family === 'string' ? author.family : String(author.family || '');
+                                if (author.given) return typeof author.given === 'string' ? author.given : String(author.given || '');
+                                if (author.name) return typeof author.name === 'string' ? author.name : String(author.name || '');
+                                const literal = author.literal || author.fullName || '';
+                                return typeof literal === 'string' ? literal : String(literal || '');
+                              }).filter(name => name && typeof name === 'string' && name.trim() !== '');
                               return authorNames.length > 0 ? authorNames.join(', ') : 'Autor não especificado';
                             }
                             if (item.author && typeof item.author === 'string') {
