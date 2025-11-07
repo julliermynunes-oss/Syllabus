@@ -142,6 +142,7 @@ function SyllabusForm() {
   const [showCustomTabModal, setShowCustomTabModal] = useState(false);
   const [customTabNameInput, setCustomTabNameInput] = useState('');
   const [customTabPositionInput, setCustomTabPositionInput] = useState('end');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     fetchPrograms();
@@ -520,6 +521,87 @@ function SyllabusForm() {
     }
   };
 
+  // Função para verificar o conteúdo de cada aba
+  const checkTabContent = () => {
+    const tabs = [
+      {
+        id: 'cabecalho',
+        name: t('header') || 'Cabeçalho',
+        hasContent: !!(formData.curso || formData.disciplina || formData.departamento || formData.semestre_ano || professoresList.length > 0 || formData.coordenador)
+      },
+      {
+        id: 'sobre',
+        name: t('aboutDiscipline') || 'Sobre a Disciplina',
+        hasContent: !!(formData.sobre_disciplina && formData.sobre_disciplina.trim() !== '')
+      },
+      {
+        id: 'competencias',
+        name: t('competenciesLabel') || 'Competências',
+        hasContent: !!(formData.competencias && formData.competencias.trim() !== '')
+      },
+      {
+        id: 'conteudo',
+        name: t('contentLabel') || 'Conteúdo',
+        hasContent: !!(formData.conteudo && formData.conteudo.trim() !== '')
+      },
+      {
+        id: 'metodologia',
+        name: t('methodologyLabel') || 'Metodologia',
+        hasContent: !!(formData.metodologia && formData.metodologia.trim() !== '')
+      },
+      {
+        id: 'avaliacao',
+        name: t('evaluationLabel') || 'Avaliação',
+        hasContent: !!(formData.criterio_avaliacao && formData.criterio_avaliacao.trim() !== '')
+      },
+      {
+        id: 'etica',
+        name: t('ethicalCommitmentTitle') || 'Compromisso Ético',
+        hasContent: !!(formData.compromisso_etico && formData.compromisso_etico.trim() !== '')
+      },
+      {
+        id: 'professores',
+        name: t('professorsLabel') || 'Professores',
+        hasContent: !!(formData.professores_data && formData.professores_data.trim() !== '')
+      },
+      {
+        id: 'contatos',
+        name: t('contactsLabel') || 'Contatos',
+        hasContent: !!(formData.contatos && formData.contatos.trim() !== '')
+      },
+      {
+        id: 'referencias',
+        name: t('referencesLabel') || 'Referências Bibliográficas',
+        hasContent: !!(formData.referencias && formData.referencias.trim() !== '')
+      }
+    ];
+
+    // Adicionar abas condicionais
+    if (!isRestrictedCourse(formData.curso)) {
+      tabs.push({
+        id: 'ods',
+        name: t('odsLabel') || 'ODS',
+        hasContent: !!(formData.ods && formData.ods.trim() !== '')
+      });
+      tabs.push({
+        id: 'o_que_e_esperado',
+        name: t('expectedFromStudentLabel') || 'O que é esperado do aluno(a)',
+        hasContent: !!(formData.o_que_e_esperado && formData.o_que_e_esperado.trim() !== '')
+      });
+    }
+
+    // Adicionar aba customizada se existir
+    if (formData.custom_tab_name) {
+      tabs.push({
+        id: 'custom',
+        name: formData.custom_tab_name,
+        hasContent: !!(formData.custom_tab_content && formData.custom_tab_content.trim() !== '')
+      });
+    }
+
+    return tabs;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -531,6 +613,13 @@ function SyllabusForm() {
         return;
       }
     }
+    
+    // Mostrar modal de confirmação
+    setShowConfirmModal(true);
+  };
+
+  const confirmSubmit = async () => {
+    setShowConfirmModal(false);
     
     const dataToSubmit = {
       ...formData,

@@ -40,6 +40,9 @@ export const translations = {
     // Formulário
     createSyllabus: 'Criar Syllabus',
     editSyllabus: 'Editar Syllabus',
+    updateSyllabus: 'Atualizar Syllabus',
+    confirmCreateMessage: 'Confira o resumo das abas antes de criar:',
+    confirmUpdateMessage: 'Confira o resumo das abas antes de atualizar:',
     update: 'Atualizar',
     cancel: 'Cancelar',
     exportPDF: 'Exportar PDF',
@@ -222,6 +225,9 @@ export const translations = {
     // Formulário
     createSyllabus: 'Create Syllabus',
     editSyllabus: 'Edit Syllabus',
+    updateSyllabus: 'Update Syllabus',
+    confirmCreateMessage: 'Review the summary of tabs before creating:',
+    confirmUpdateMessage: 'Review the summary of tabs before updating:',
     update: 'Update',
     cancel: 'Cancel',
     exportPDF: 'Export PDF',
@@ -404,6 +410,9 @@ export const translations = {
     // Formulário
     createSyllabus: 'Crear Syllabus',
     editSyllabus: 'Editar Syllabus',
+    updateSyllabus: 'Actualizar Syllabus',
+    confirmCreateMessage: 'Revise el resumen de las pestañas antes de crear:',
+    confirmUpdateMessage: 'Revise el resumen de las pestañas antes de actualizar:',
     update: 'Actualizar',
     cancel: 'Cancelar',
     exportPDF: 'Exportar PDF',
