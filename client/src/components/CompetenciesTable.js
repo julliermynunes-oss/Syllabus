@@ -83,6 +83,7 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
           if (row.competencia) {
             savedMap.set(row.competencia, {
               descricao: row.descricao || '',
+              descricaoBase: row.descricaoBase || '', // Preservar descricaoBase se existir
               grau: row.grau || 0
             });
           }
