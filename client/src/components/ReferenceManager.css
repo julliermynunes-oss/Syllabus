@@ -157,9 +157,12 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   font-weight: 600;
   transition: background 0.3s ease;
+  height: 42px;
+  min-width: 42px;
 }
 
 .reference-search-btn:hover:not(:disabled) {
