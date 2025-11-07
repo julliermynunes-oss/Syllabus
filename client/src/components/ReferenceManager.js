@@ -58,8 +58,14 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
 
     if (!append) setIsSearching(true);
     try {
+      // Ajustar query baseado em searchBy
+      let query = searchTerm;
+      if (searchBy === 'author') {
+        query = `author:"${searchTerm}"`;
+      }
+      
       const response = await axios.get(
-        `https://api.crossref.org/works?query=${encodeURIComponent(searchTerm)}&rows=10`,
+        `https://api.crossref.org/works?query=${encodeURIComponent(query)}&rows=10`,
         {
           headers: {
             'Accept': 'application/json'
