@@ -400,8 +400,12 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     } else if (item.type === 'article') {
       if (item.author && Array.isArray(item.author) && item.author.length > 0) {
         hasAuthor = item.author.some(author => {
-          const name = (author.given && author.family) ? `${author.given} ${author.family}`.trim() :
-                      author.family || author.given || author.name || author.literal || author.fullName || '';
+          let name = '';
+          if (author.given && author.family) {
+            name = `${author.given} ${author.family}`;
+          } else {
+            name = author.family || author.given || author.name || author.literal || author.fullName || '';
+          }
           return name && typeof name === 'string' && name.trim() !== '';
         });
       } else if (item.author && typeof item.author === 'string') {
