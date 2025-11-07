@@ -288,7 +288,25 @@ function SyllabusPDFContent({ formData, professoresList }) {
       });
     }
 
-    // 4. Competências
+    // 4. Compromisso Ético (se existir)
+    if (formData.compromisso_etico) {
+      sections.push({
+        id: 'compromisso_etico',
+        component: (
+          <div key="compromisso_etico" style={{ marginBottom: '15px', pageBreakInside: 'avoid' }}>
+            <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
+              {t('ethicsTitle') || 'COMPROMISSO ÉTICO'}
+            </h3>
+            <div 
+              style={{ fontSize: '15px', lineHeight: '1.5' }}
+              dangerouslySetInnerHTML={{ __html: formData.compromisso_etico }}
+            />
+          </div>
+        )
+      });
+    }
+
+    // 5. Competências
     if (formData.competencias) {
       const getCursoSigla = (cursoNome) => {
         if (!cursoNome) return '';

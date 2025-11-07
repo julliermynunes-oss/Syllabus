@@ -46,7 +46,7 @@ const SyllabusList = () => {
       
       let filteredData = response.data;
       
-      // Filter by professor name if search is provided
+      // Filter by professor name if search is provided (apenas no campo professores, não em coordenador)
       if (professorSearch) {
         filteredData = filteredData.filter(s => {
           const professores = s.professores || '';
