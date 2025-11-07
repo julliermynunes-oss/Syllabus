@@ -803,7 +803,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                   </ul>
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
-                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Leitura Opcional/Complementar:</h4>
+                  <h4 style={{ color: '#235795', marginBottom: '0.5rem' }}>Leitura Complementar:</h4>
                   <ul>
                     {addedReferences
                       .filter(ref => ref.category === 'opcional')
@@ -861,7 +861,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                 onClick={() => confirmAddReference('opcional')}
                 style={{ flex: 1, backgroundColor: '#28a745', minWidth: '150px' }}
               >
-                Leitura Opcional/Complementar
+                Leitura Complementar
               </button>
               <button
                 type="button"

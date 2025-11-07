@@ -1043,52 +1043,13 @@ function SyllabusForm() {
                     type="button"
                     className={`layout-option-btn ${formData.referencias_layout === 'lista' ? 'active' : ''}`}
                     onClick={() => {
-                      // Se estava em categorizado e tem conteúdo JSON, converter para lista simples
-                      if (formData.referencias_layout === 'categorizado' && formData.referencias) {
-                        try {
-                          const parsed = JSON.parse(formData.referencias);
-                          if (parsed.references && Array.isArray(parsed.references) && parsed.references.length > 0) {
-                            // Converter todas as referências para uma lista HTML simples
-                            let html = '<ul>';
-                            parsed.references.forEach(ref => {
-                              html += `<li><p>${ref.text}</p></li>`;
-                            });
-                            html += '</ul>';
-                            setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
-                            return;
-                          }
-                        } catch (e) {
-                          // Se não for JSON, verificar se tem títulos de categorias no HTML
-                          const tempDiv = document.createElement('div');
-                          tempDiv.innerHTML = formData.referencias;
-                          const hasCategories = tempDiv.textContent.toLowerCase().includes('obrigatória') || 
-                                             tempDiv.textContent.toLowerCase().includes('opcional') ||
-                                             tempDiv.textContent.toLowerCase().includes('outras referências');
-                          if (hasCategories) {
-                            // Extrair todas as referências (listas e parágrafos) e criar uma lista simples
-                            const allTexts = [];
-                            tempDiv.querySelectorAll('ul li, ol li, p').forEach(el => {
-                              const text = el.textContent.trim();
-                              if (text && !text.toLowerCase().includes('obrigatória') && 
-                                  !text.toLowerCase().includes('opcional') && 
-                                  !text.toLowerCase().includes('complementar') &&
-                                  !text.toLowerCase().includes('outras referências')) {
-                                allTexts.push(text);
-                              }
-                            });
-                            if (allTexts.length > 0) {
-                              let html = '<ul>';
-                              allTexts.forEach(text => {
-                                html += `<li><p>${text}</p></li>`;
-                              });
-                              html += '</ul>';
-                              setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
-                              return;
-                            }
-                          }
-                        }
+                      // Se estava em categorizado, limpar o rich text
+                      if (formData.referencias_layout === 'categorizado') {
+                        // Limpar o conteúdo do rich text
+                        setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: '' }));
+                        return;
                       }
-                      // Se não tinha conteúdo categorizado ou estava vazio, apenas mudar o layout
+                      // Se não estava em categorizado, apenas mudar o layout
                       setFormData(prev => ({ ...prev, referencias_layout: 'lista' }));
                     }}
                   >
@@ -1177,7 +1138,7 @@ function SyllabusForm() {
                 {formData.referencias_layout === 'categorizado' && (
                   <div style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#f0f8ff', borderRadius: '8px', border: '1px solid #235795' }}>
                     <p style={{ margin: 0, color: '#235795', fontSize: '0.9rem' }}>
-                      {t('categorizedModeNote') || 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:", "Leitura Opcional/Complementar:" e "Outras Referências:" para preservar a categorização.'}
+                      {t('categorizedModeNote') || 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:", "Leitura Complementar:" e "Outras Referências:" para preservar a categorização.'}
                     </p>
                   </div>
                 )}
@@ -1208,13 +1169,13 @@ function SyllabusForm() {
                             }
                             
                             if (opcionais.length > 0) {
-                              html += `<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul>`;
+                              html += `<h4><strong>Leitura Complementar:</strong></h4><ul>`;
                               opcionais.forEach(ref => {
                                 html += `<li><p>${ref.text}</p></li>`;
                               });
                               html += `</ul>`;
                             } else {
-                              html += `<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul></ul>`;
+                              html += `<h4><strong>Leitura Complementar:</strong></h4><ul></ul>`;
                             }
                             
                             if (outras.length > 0) {
@@ -1246,7 +1207,7 @@ function SyllabusForm() {
                       
                       // Se não tem conteúdo ou não é JSON válido, criar estrutura inicial com títulos
                       html = `<h4><strong>Leitura Obrigatória:</strong></h4><ul></ul>
-<h4><strong>Leitura Opcional/Complementar:</strong></h4><ul></ul>
+<h4><strong>Leitura Complementar:</strong></h4><ul></ul>
 <h4><strong>Outras Referências:</strong></h4><ul></ul>`;
                       return html;
                     }
@@ -1355,7 +1316,7 @@ function SyllabusForm() {
                 />
                 <p className="editor-note">
                   {formData.referencias_layout === 'categorizado' 
-                    ? (t('categorizedEditorNote') || '💡 Dica: Use títulos "Leitura Obrigatória:", "Leitura Opcional/Complementar:" e "Outras Referências:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.')
+                    ? (t('categorizedEditorNote') || '💡 Dica: Use títulos "Leitura Obrigatória:", "Leitura Complementar:" e "Outras Referências:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.')
                     : t('referencesNote')
                   }
                 </p>

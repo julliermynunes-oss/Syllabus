@@ -92,9 +92,9 @@ export const translations = {
     listLayout: 'Lista (todas as referências juntas)',
     categorizedLayout: 'Categorizado (Obrigatória/Opcional)',
     requiredReading: 'Leitura Obrigatória:',
-    optionalReading: 'Leitura Opcional/Complementar:',
-    categorizedModeNote: 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para preservar a categorização.',
-    categorizedEditorNote: '💡 Dica: Use títulos "Leitura Obrigatória:" e "Leitura Opcional/Complementar:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.',
+    optionalReading: 'Leitura Complementar:',
+    categorizedModeNote: 'No modo categorizado, você pode editar manualmente abaixo. Mantenha o formato com títulos "Leitura Obrigatória:" e "Leitura Complementar:" para preservar a categorização.',
+    categorizedEditorNote: '💡 Dica: Use títulos "Leitura Obrigatória:" e "Leitura Complementar:" para manter a categorização. As referências podem ser em formato de lista ou parágrafos.',
     competenciesLabel: 'Competências da Disciplina',
     expectedFromStudentLabel: 'O que é esperado do aluno(a):',
     
