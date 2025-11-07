@@ -1110,53 +1110,45 @@ function SyllabusForm() {
                     type="button"
                     className={`layout-option-btn ${formData.referencias_layout === 'categorizado' ? 'active' : ''}`}
                     onClick={() => {
-                      // Se estava em categorizado e tem conteúdo JSON, converter para lista simples
-                      if (formData.referencias_layout === 'categorizado' && formData.referencias) {
+                      // Se estava em lista e tem conteúdo HTML, converter para categorizado
+                      if (formData.referencias_layout === 'lista' && formData.referencias) {
                         try {
-                          const parsed = JSON.parse(formData.referencias);
-                          if (parsed.references && Array.isArray(parsed.references) && parsed.references.length > 0) {
-                            // Converter todas as referências para uma lista HTML simples
-                            let html = '<ul>';
-                            parsed.references.forEach(ref => {
-                              html += `<li><p>${ref.text}</p></li>`;
-                            });
-                            html += '</ul>';
-                            setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
-                            return;
-                          }
+                          // Verificar se já é JSON (não deveria ser, mas por segurança)
+                          JSON.parse(formData.referencias);
+                          // Se chegou aqui, é JSON, então apenas mudar o layout
+                          setFormData(prev => ({ ...prev, referencias_layout: 'categorizado' }));
+                          return;
                         } catch (e) {
-                          // Se não for JSON, verificar se tem títulos de categorias no HTML
+                          // Não é JSON, então é HTML - converter para categorizado
                           const tempDiv = document.createElement('div');
                           tempDiv.innerHTML = formData.referencias;
-                          const hasCategories = tempDiv.textContent.toLowerCase().includes('obrigatória') || 
-                                             tempDiv.textContent.toLowerCase().includes('opcional') ||
-                                             tempDiv.textContent.toLowerCase().includes('outras referências');
-                          if (hasCategories) {
-                            // Extrair todas as referências (listas e parágrafos) e criar uma lista simples
-                            const allTexts = [];
-                            tempDiv.querySelectorAll('ul li, ol li, p').forEach(el => {
-                              const text = el.textContent.trim();
-                              if (text && !text.toLowerCase().includes('obrigatória') && 
-                                  !text.toLowerCase().includes('opcional') && 
-                                  !text.toLowerCase().includes('complementar') &&
-                                  !text.toLowerCase().includes('outras referências')) {
-                                allTexts.push(text);
-                              }
-                            });
-                            if (allTexts.length > 0) {
-                              let html = '<ul>';
-                              allTexts.forEach(text => {
-                                html += `<li><p>${text}</p></li>`;
-                              });
-                              html += '</ul>';
-                              setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
-                              return;
+                          
+                          // Extrair todas as referências (listas e parágrafos)
+                          const allTexts = [];
+                          tempDiv.querySelectorAll('ul li, ol li, p').forEach(el => {
+                            const text = el.textContent.trim();
+                            if (text) {
+                              allTexts.push(text);
                             }
+                          });
+                          
+                          // Se tem referências, criar estrutura JSON categorizada (todas em "Outras Referências" por padrão)
+                          if (allTexts.length > 0) {
+                            const references = allTexts.map(text => ({
+                              text: text,
+                              category: 'outras' // Por padrão, colocar em "Outras Referências"
+                            }));
+                            const jsonData = {
+                              layout: 'categorizado',
+                              references: references
+                            };
+                            setFormData(prev => ({ ...prev, referencias_layout: 'categorizado', referencias: JSON.stringify(jsonData) }));
+                            return;
                           }
                         }
                       }
-                      // Se não tinha conteúdo categorizado ou estava vazio, apenas mudar o layout
-                      setFormData(prev => ({ ...prev, referencias_layout: 'lista' }));
+                      // Se não tinha conteúdo ou estava vazio, apenas mudar o layout
+                      setFormData(prev => ({ ...prev, referencias_layout: 'categorizado' }));
                     }}
                   >
                     <div className="layout-icon">
