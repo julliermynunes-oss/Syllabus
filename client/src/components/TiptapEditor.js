@@ -221,15 +221,19 @@ const TiptapEditor = ({ content, onChange, showCharCount = false }) => {
     };
   }, []);
 
-  // Close context menu when clicking outside
+  // Close context menu and color picker when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (e) => {
       if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
         closeContextMenu();
       }
+      if (colorPickerRef.current && !colorPickerRef.current.contains(e.target) && 
+          !e.target.closest('.color-picker-wrapper')) {
+        setShowColorPicker(false);
+      }
     };
 
-    if (contextMenu) {
+    if (contextMenu || showColorPicker) {
       document.addEventListener('click', handleClickOutside);
       document.addEventListener('contextmenu', handleClickOutside);
       return () => {
@@ -237,7 +241,7 @@ const TiptapEditor = ({ content, onChange, showCharCount = false }) => {
         document.removeEventListener('contextmenu', handleClickOutside);
       };
     }
-  }, [contextMenu]);
+  }, [contextMenu, showColorPicker]);
 
   // Context menu actions
   const handleCut = () => {
