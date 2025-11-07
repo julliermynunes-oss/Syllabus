@@ -263,13 +263,12 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
               <th className="col-competencia">Competência</th>
               <th className="col-descricao">Descrição</th>
               <th className="col-contribuicao">Grau de Contribuição</th>
-              <th className="col-actions">Ações</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
               <tr className="empty-row">
-                <td colSpan="4" className="empty-message">
+                <td colSpan="3" className="empty-message">
                   {curso 
                     ? 'Nenhuma competência encontrada para este curso.' 
                     : 'Selecione um curso e disciplina para carregar as competências automaticamente.'}
@@ -309,9 +308,6 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
                   >
                     {getContribuicao(row.grau || 0)}
                   </button>
-                </td>
-                <td className="col-actions">
-                  {/* Não mostrar botão de excluir, pois competências vêm do XLSX */}
                 </td>
               </tr>
             ))}
