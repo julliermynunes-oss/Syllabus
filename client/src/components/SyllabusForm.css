@@ -1241,6 +1241,17 @@
   .pdf-container > div {
     page-break-inside: avoid;
   }
+
+  /* Permitir quebra de página após seções com pouco conteúdo para evitar muito espaço vazio */
+  .pdf-container > div[key="compromisso_etico"] {
+    page-break-after: auto;
+    margin-bottom: 15px !important;
+  }
+
+  /* Permitir que o próximo conteúdo comece na mesma página se houver espaço */
+  .pdf-container > div[key="compromisso_etico"] + div {
+    page-break-before: auto;
+  }
   
   /* Cores e backgrounds */
   body {
