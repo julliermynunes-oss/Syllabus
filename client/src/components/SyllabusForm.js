@@ -1156,6 +1156,7 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.compromisso_etico}
                 onChange={(content) => setFormData(prev => ({ ...prev, compromisso_etico: content }))}
+                showCharCount={true}
               />
               <p className="editor-note">
                 {t('editorNote')}
@@ -1186,6 +1187,7 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.contatos}
                 onChange={(content) => setFormData(prev => ({ ...prev, contatos: content }))}
+                showCharCount={true}
               />
               <p className="editor-note">
                 {t('editorNote')}
@@ -1202,6 +1204,7 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.ods}
                 onChange={(content) => setFormData(prev => ({ ...prev, ods: content }))}
+                showCharCount={true}
               />
               <p className="editor-note">
                 {t('editorNote')}
@@ -1530,6 +1533,7 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.o_que_e_esperado}
                 onChange={(content) => setFormData(prev => ({ ...prev, o_que_e_esperado: content }))}
+                showCharCount={true}
               />
               <p className="editor-note">
                 {t('editorNote')}
@@ -1546,6 +1550,7 @@ function SyllabusForm() {
               <TiptapEditor
                 content={formData.custom_tab_content}
                 onChange={(content) => setFormData(prev => ({ ...prev, custom_tab_content: content }))}
+                showCharCount={true}
               />
             </div>
           </div>
