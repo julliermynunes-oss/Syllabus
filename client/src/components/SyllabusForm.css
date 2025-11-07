@@ -1243,14 +1243,16 @@
   }
 
   /* Permitir quebra de página após seções com pouco conteúdo para evitar muito espaço vazio */
-  .pdf-container > div[key="compromisso_etico"] {
-    page-break-after: auto;
+  .pdf-container > div[key="compromisso_etico"],
+  .pdf-container .compromisso-etico-section {
+    page-break-after: auto !important;
     margin-bottom: 15px !important;
   }
 
   /* Permitir que o próximo conteúdo comece na mesma página se houver espaço */
-  .pdf-container > div[key="compromisso_etico"] + div {
-    page-break-before: auto;
+  .pdf-container > div[key="compromisso_etico"] + div,
+  .pdf-container .compromisso-etico-section + div {
+    page-break-before: auto !important;
   }
   
   /* Cores e backgrounds */

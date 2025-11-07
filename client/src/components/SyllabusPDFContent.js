@@ -288,12 +288,12 @@ function SyllabusPDFContent({ formData, professoresList }) {
       });
     }
 
-    // 4. Compromisso Ético (se existir)
+    // 4. Compromisso Ético (se existir) - após Sobre a Disciplina, antes de Competências
     if (formData.compromisso_etico) {
       sections.push({
         id: 'compromisso_etico',
         component: (
-          <div key="compromisso_etico" style={{ marginBottom: '15px', pageBreakInside: 'avoid' }}>
+          <div key="compromisso_etico" className="compromisso-etico-section" style={{ marginBottom: '15px' }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('ethicsTitle') || 'COMPROMISSO ÉTICO'}
             </h3>
