@@ -691,6 +691,23 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         </div>
       )}
 
+      {/* Compromisso Ético */}
+      {formData.compromisso_etico && (
+        <div style={{ marginBottom: '15px' }}>
+          <h3 style={{ fontSize: '18px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '15px' }}>
+            {t('ethicsTitle') || 'COMPROMISSO ÉTICO'}
+          </h3>
+          <div 
+            style={{ 
+              fontSize: '14px', 
+              lineHeight: '1.6',
+            }}
+            className="preview-content"
+            dangerouslySetInnerHTML={{ __html: formData.compromisso_etico }}
+          />
+        </div>
+      )}
+
       {/* Competências */}
       {formData.competencias && (() => {
         const getCursoSigla = (cursoNome) => {
