@@ -95,7 +95,8 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
           
           return {
             competencia: competencia,
-            descricao: saved ? saved.descricao : (item.descricao || ''),
+            descricao: saved ? saved.descricao : '', // Descrição sempre vazia por padrão
+            descricaoBase: saved && saved.descricaoBase ? saved.descricaoBase : (item.descricao || ''), // Descrição base para tooltip
             grau: saved ? saved.grau : 0
           };
         });
