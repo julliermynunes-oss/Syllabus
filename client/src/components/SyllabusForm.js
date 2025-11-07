@@ -858,6 +858,8 @@ function SyllabusForm() {
                         }
                       }
                     }}
+                    onFocus={() => currentProfessor && setShowProfessoresDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowProfessoresDropdown(false), 200)}
                   />
                   {showProfessoresDropdown && filteredProfessores.length > 0 && (
                     <div className="autocomplete-dropdown">
