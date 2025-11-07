@@ -377,32 +377,32 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
 
     // Verificar título
     if (item.type === 'book') {
-      hasTitle = !!(item.volumeInfo?.title && item.volumeInfo.title.trim() !== '' && item.volumeInfo.title !== 'Sem título');
+      hasTitle = !!(item.volumeInfo?.title && typeof item.volumeInfo.title === 'string' && item.volumeInfo.title.trim() !== '' && item.volumeInfo.title !== 'Sem título');
     } else if (item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex') {
-      hasTitle = !!(item.title && item.title.trim() !== '' && item.title !== 'Sem título');
+      hasTitle = !!(item.title && typeof item.title === 'string' && item.title.trim() !== '' && item.title !== 'Sem título');
     } else if (item.type === 'article') {
-      hasTitle = !!(item.title?.[0] && item.title[0].trim() !== '' && item.title[0] !== 'Sem título') ||
-                 !!(item['container-title']?.[0] && item['container-title'][0].trim() !== '');
+      hasTitle = !!(item.title?.[0] && typeof item.title[0] === 'string' && item.title[0].trim() !== '' && item.title[0] !== 'Sem título') ||
+                 !!(item['container-title']?.[0] && typeof item['container-title'][0] === 'string' && item['container-title'][0].trim() !== '');
     }
 
     // Verificar autor
     if (item.type === 'book') {
       hasAuthor = !!(item.volumeInfo?.authors && item.volumeInfo.authors.length > 0 && 
-                     item.volumeInfo.authors.some(a => a && a.trim() !== ''));
+                     item.volumeInfo.authors.some(a => a && typeof a === 'string' && a.trim() !== ''));
     } else if (item.type === 'scholar') {
       hasAuthor = !!(item.authors && item.authors.length > 0 && 
                      item.authors.some(a => {
                        const name = a.name || a;
-                       return name && name.trim() !== '' && name !== 'Autor não especificado';
+                       return name && typeof name === 'string' && name.trim() !== '' && name !== 'Autor não especificado';
                      }));
     } else if (item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex') {
-      hasAuthor = !!(item.authors && item.authors.trim() !== '' && item.authors !== 'Autor não especificado');
+      hasAuthor = !!(item.authors && typeof item.authors === 'string' && item.authors.trim() !== '' && item.authors !== 'Autor não especificado');
     } else if (item.type === 'article') {
       if (item.author && Array.isArray(item.author) && item.author.length > 0) {
         hasAuthor = item.author.some(author => {
           const name = (author.given && author.family) ? `${author.given} ${author.family}`.trim() :
                       author.family || author.given || author.name || author.literal || author.fullName || '';
-          return name && name.trim() !== '';
+          return name && typeof name === 'string' && name.trim() !== '';
         });
       } else if (item.author && typeof item.author === 'string') {
         hasAuthor = item.author.trim() !== '';

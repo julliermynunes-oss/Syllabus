@@ -86,8 +86,7 @@
   cursor: pointer;
   transition: border-color 0.3s ease;
   font-weight: 500;
-  min-width: 140px;
-  max-width: 140px;
+  min-width: 180px;
   height: 42px;
   box-sizing: border-box;
 }
