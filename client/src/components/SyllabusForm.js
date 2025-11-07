@@ -861,7 +861,6 @@ function SyllabusForm() {
                         }
                       }
                     }}
-                    disabled={!formData.departamento}
                   />
                   {showProfessoresDropdown && filteredProfessores.length > 0 && (
                     <div className="autocomplete-dropdown">
