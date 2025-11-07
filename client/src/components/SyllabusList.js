@@ -46,20 +46,13 @@ const SyllabusList = () => {
       
       let filteredData = response.data;
       
-      // Filter by professor name if search is provided (apenas no campo professores, não em coordenador)
+      // Filter by professor name if search is provided (buscar apenas no campo professores)
       if (professorSearch) {
         filteredData = filteredData.filter(s => {
-          const professores = (s.professores || '').toString().trim();
-          const searchLower = professorSearch.toLowerCase().trim();
-          
-          // Se o campo professores está vazio, não incluir no resultado
-          if (!professores) {
-            return false;
-          }
-          
-          // Buscar apenas no campo professores (ignorar coordenador completamente)
-          const matchProfessores = professores.toLowerCase().includes(searchLower);
-          return matchProfessores;
+          const professores = s.professores || '';
+          const searchLower = professorSearch.toLowerCase();
+          // Buscar apenas no campo professores
+          return professores.toLowerCase().includes(searchLower);
         });
       }
       
