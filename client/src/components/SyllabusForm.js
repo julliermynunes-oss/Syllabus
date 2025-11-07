@@ -541,17 +541,17 @@ function SyllabusForm() {
       },
       {
         id: 'conteudo',
-        name: t('contentLabel') || 'Conteúdo',
+        name: t('content') || 'Conteúdo',
         hasContent: !!(formData.conteudo && formData.conteudo.trim() !== '')
       },
       {
         id: 'metodologia',
-        name: t('methodologyLabel') || 'Metodologia',
+        name: t('methodology') || 'Metodologia',
         hasContent: !!(formData.metodologia && formData.metodologia.trim() !== '')
       },
       {
         id: 'avaliacao',
-        name: t('evaluationLabel') || 'Avaliação',
+        name: t('evaluation') || 'Avaliação',
         hasContent: !!(formData.criterio_avaliacao && formData.criterio_avaliacao.trim() !== '')
       },
       {
@@ -561,12 +561,12 @@ function SyllabusForm() {
       },
       {
         id: 'professores',
-        name: t('professorsLabel') || 'Professores',
+        name: t('professors') || 'Professores',
         hasContent: !!(formData.professores_data && formData.professores_data.trim() !== '')
       },
       {
         id: 'contatos',
-        name: t('contactsLabel') || 'Contatos',
+        name: t('contacts') || 'Contatos',
         hasContent: !!(formData.contatos && formData.contatos.trim() !== '')
       },
       {
