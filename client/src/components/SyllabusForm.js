@@ -1042,7 +1042,55 @@ function SyllabusForm() {
                   <button
                     type="button"
                     className={`layout-option-btn ${formData.referencias_layout === 'lista' ? 'active' : ''}`}
-                    onClick={() => setFormData(prev => ({ ...prev, referencias_layout: 'lista' }))}
+                    onClick={() => {
+                      // Se estava em categorizado e tem conteúdo JSON, converter para lista simples
+                      if (formData.referencias_layout === 'categorizado' && formData.referencias) {
+                        try {
+                          const parsed = JSON.parse(formData.referencias);
+                          if (parsed.references && Array.isArray(parsed.references) && parsed.references.length > 0) {
+                            // Converter todas as referências para uma lista HTML simples
+                            let html = '<ul>';
+                            parsed.references.forEach(ref => {
+                              html += `<li><p>${ref.text}</p></li>`;
+                            });
+                            html += '</ul>';
+                            setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
+                            return;
+                          }
+                        } catch (e) {
+                          // Se não for JSON, verificar se tem títulos de categorias no HTML
+                          const tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = formData.referencias;
+                          const hasCategories = tempDiv.textContent.toLowerCase().includes('obrigatória') || 
+                                             tempDiv.textContent.toLowerCase().includes('opcional') ||
+                                             tempDiv.textContent.toLowerCase().includes('outras referências');
+                          if (hasCategories) {
+                            // Extrair todas as referências (listas e parágrafos) e criar uma lista simples
+                            const allTexts = [];
+                            tempDiv.querySelectorAll('ul li, ol li, p').forEach(el => {
+                              const text = el.textContent.trim();
+                              if (text && !text.toLowerCase().includes('obrigatória') && 
+                                  !text.toLowerCase().includes('opcional') && 
+                                  !text.toLowerCase().includes('complementar') &&
+                                  !text.toLowerCase().includes('outras referências')) {
+                                allTexts.push(text);
+                              }
+                            });
+                            if (allTexts.length > 0) {
+                              let html = '<ul>';
+                              allTexts.forEach(text => {
+                                html += `<li><p>${text}</p></li>`;
+                              });
+                              html += '</ul>';
+                              setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
+                              return;
+                            }
+                          }
+                        }
+                      }
+                      // Se não tinha conteúdo categorizado ou estava vazio, apenas mudar o layout
+                      setFormData(prev => ({ ...prev, referencias_layout: 'lista' }));
+                    }}
                   >
                     <div className="layout-icon">
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1056,13 +1104,60 @@ function SyllabusForm() {
                     </div>
                     <div className="layout-label">
                       <strong>{t('listLayout') || 'Lista'}</strong>
-                      <span>{t('listLayoutDesc') || 'Todas as referências juntas'}</span>
                     </div>
                   </button>
                   <button
                     type="button"
                     className={`layout-option-btn ${formData.referencias_layout === 'categorizado' ? 'active' : ''}`}
-                    onClick={() => setFormData(prev => ({ ...prev, referencias_layout: 'categorizado' }))}
+                    onClick={() => {
+                      // Se estava em categorizado e tem conteúdo JSON, converter para lista simples
+                      if (formData.referencias_layout === 'categorizado' && formData.referencias) {
+                        try {
+                          const parsed = JSON.parse(formData.referencias);
+                          if (parsed.references && Array.isArray(parsed.references) && parsed.references.length > 0) {
+                            // Converter todas as referências para uma lista HTML simples
+                            let html = '<ul>';
+                            parsed.references.forEach(ref => {
+                              html += `<li><p>${ref.text}</p></li>`;
+                            });
+                            html += '</ul>';
+                            setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
+                            return;
+                          }
+                        } catch (e) {
+                          // Se não for JSON, verificar se tem títulos de categorias no HTML
+                          const tempDiv = document.createElement('div');
+                          tempDiv.innerHTML = formData.referencias;
+                          const hasCategories = tempDiv.textContent.toLowerCase().includes('obrigatória') || 
+                                             tempDiv.textContent.toLowerCase().includes('opcional') ||
+                                             tempDiv.textContent.toLowerCase().includes('outras referências');
+                          if (hasCategories) {
+                            // Extrair todas as referências (listas e parágrafos) e criar uma lista simples
+                            const allTexts = [];
+                            tempDiv.querySelectorAll('ul li, ol li, p').forEach(el => {
+                              const text = el.textContent.trim();
+                              if (text && !text.toLowerCase().includes('obrigatória') && 
+                                  !text.toLowerCase().includes('opcional') && 
+                                  !text.toLowerCase().includes('complementar') &&
+                                  !text.toLowerCase().includes('outras referências')) {
+                                allTexts.push(text);
+                              }
+                            });
+                            if (allTexts.length > 0) {
+                              let html = '<ul>';
+                              allTexts.forEach(text => {
+                                html += `<li><p>${text}</p></li>`;
+                              });
+                              html += '</ul>';
+                              setFormData(prev => ({ ...prev, referencias_layout: 'lista', referencias: html }));
+                              return;
+                            }
+                          }
+                        }
+                      }
+                      // Se não tinha conteúdo categorizado ou estava vazio, apenas mudar o layout
+                      setFormData(prev => ({ ...prev, referencias_layout: 'lista' }));
+                    }}
                   >
                     <div className="layout-icon">
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1074,7 +1169,6 @@ function SyllabusForm() {
                     </div>
                     <div className="layout-label">
                       <strong>{t('categorizedLayout') || 'Categorizado'}</strong>
-                      <span>{t('categorizedLayoutDesc') || 'Obrigatória / Opcional / Outras'}</span>
                     </div>
                   </button>
                 </div>
