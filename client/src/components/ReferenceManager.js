@@ -9,7 +9,6 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
-  const [selectedSource, setSelectedSource] = useState('all'); // 'all', 'articles', 'books', 'scholar', 'dataverse', 'arxiv', 'openalex'
   const [searchBy, setSearchBy] = useState('title'); // 'title' ou 'author'
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [pendingReference, setPendingReference] = useState(null);
@@ -328,21 +327,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
       return;
     }
 
-    if (selectedSource === 'all') {
-      searchAll();
-    } else if (selectedSource === 'articles') {
-      searchCrossRef();
-    } else if (selectedSource === 'books') {
-      searchGoogleBooks();
-    } else if (selectedSource === 'scholar') {
-      searchGoogleScholar();
-    } else if (selectedSource === 'dataverse') {
-      searchDataverse();
-    } else if (selectedSource === 'arxiv') {
-      searcharXiv();
-    } else if (selectedSource === 'openalex') {
-      searchOpenAlex();
-    }
+    // Sempre buscar em todas as fontes
+    searchAll();
   };
 
   const isOutdated = (item) => {
@@ -647,19 +633,6 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     <div className="reference-manager">
       <div className="reference-search">
         <div className="search-input-group">
-          <select
-            value={selectedSource}
-            onChange={(e) => setSelectedSource(e.target.value)}
-            className="reference-source-select"
-          >
-            <option value="all">Todas as fontes</option>
-            <option value="articles">Artigos (Crossref)</option>
-            <option value="books">Livros (Google Books)</option>
-            <option value="scholar">Google Scholar</option>
-            <option value="dataverse">Dataverse</option>
-            <option value="arxiv">arXiv</option>
-            <option value="openalex">OpenAlex</option>
-          </select>
           <div className="search-by-buttons">
             <button
               type="button"
@@ -701,6 +674,12 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
           >
             {isSearching ? <FaSpinner className="spinner" /> : <FaSearch />}
           </button>
+        </div>
+        <div className="sources-description">
+          <p>
+            <strong>Bases de dados consultadas:</strong> A busca é realizada simultaneamente em todas as seguintes fontes: 
+            Artigos (Crossref), Livros (Google Books), Google Scholar, Dataverse (Harvard), arXiv e OpenAlex.
+          </p>
         </div>
         
         {searchResults.filter(hasTitleAndAuthor).length > 0 && (
