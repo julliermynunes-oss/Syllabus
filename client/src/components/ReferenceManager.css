@@ -73,6 +73,34 @@
   display: flex;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  align-items: center;
+}
+
+.reference-source-select,
+.reference-search-by-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  font-weight: 500;
+}
+
+.reference-source-select {
+  min-width: 180px;
+}
+
+.reference-search-by-select {
+  min-width: 120px;
+}
+
+.reference-source-select:focus,
+.reference-search-by-select:focus {
+  outline: none;
+  border-color: #235795;
 }
 
 .reference-search-input {

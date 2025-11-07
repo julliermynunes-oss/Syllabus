@@ -9,7 +9,8 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
-  const [searchType, setSearchType] = useState('articles'); // 'articles', 'books', 'scholar', 'dataverse', 'arxiv', 'openalex'
+  const [selectedSource, setSelectedSource] = useState('all'); // 'all', 'articles', 'books', 'scholar', 'dataverse', 'arxiv', 'openalex'
+  const [searchBy, setSearchBy] = useState('title'); // 'title' ou 'author'
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [pendingReference, setPendingReference] = useState(null);
   const [pendingIndex, setPendingIndex] = useState(null);
@@ -89,8 +90,16 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
 
     if (!append) setIsSearching(true);
     try {
+      // Ajustar query baseado em searchBy
+      let query = searchTerm;
+      if (searchBy === 'author') {
+        query = `inauthor:"${searchTerm}"`;
+      } else {
+        query = `intitle:"${searchTerm}"`;
+      }
+      
       const response = await axios.get(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(searchTerm)}&maxResults=10`,
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=10`,
         {
           headers: {
             'Accept': 'application/json'
@@ -300,18 +309,32 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     }
   };
 
+  // Limpar resultados quando o campo estiver vazio
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+    }
+  }, [searchTerm]);
+
   const performSearch = () => {
-    if (searchType === 'articles') {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    if (selectedSource === 'all') {
+      searchAll();
+    } else if (selectedSource === 'articles') {
       searchCrossRef();
-    } else if (searchType === 'books') {
+    } else if (selectedSource === 'books') {
       searchGoogleBooks();
-    } else if (searchType === 'scholar') {
+    } else if (selectedSource === 'scholar') {
       searchGoogleScholar();
-    } else if (searchType === 'dataverse') {
+    } else if (selectedSource === 'dataverse') {
       searchDataverse();
-    } else if (searchType === 'arxiv') {
+    } else if (selectedSource === 'arxiv') {
       searcharXiv();
-    } else if (searchType === 'openalex') {
+    } else if (selectedSource === 'openalex') {
       searchOpenAlex();
     }
   };
@@ -586,76 +609,38 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   };
 
   const getPlaceholder = () => {
-    if (searchType === 'books') {
-      return 'Pesquisar livros por título ou autor no Google Books...';
-    } else if (searchType === 'scholar') {
-      return 'Pesquisar artigos no Google Scholar...';
-    } else if (searchType === 'dataverse') {
-      return 'Pesquisar datasets no Dataverse (Harvard)...';
-    } else if (searchType === 'arxiv') {
-      return 'Pesquisar pré-publicações no arXiv...';
-    } else if (searchType === 'openalex') {
-      return 'Pesquisar artigos (inclui conteúdo brasileiro/português)...';
+    if (searchBy === 'author') {
+      return 'Digite o nome do autor...';
     } else {
-      return 'Pesquisar por título, autor ou DOI na API do Crossref...';
+      return 'Digite o título...';
     }
   };
 
   return (
     <div className="reference-manager">
       <div className="reference-search">
-        <div className="search-type-selector">
-          <button
-            type="button"
-            className={`search-type-btn ${searchType === 'articles' ? 'active' : ''}`}
-            onClick={() => setSearchType('articles')}
-            title="Buscar Artigos"
-          >
-            <FaFileAlt /> Artigos (Crossref)
-          </button>
-          <button
-            type="button"
-            className={`search-type-btn ${searchType === 'books' ? 'active' : ''}`}
-            onClick={() => setSearchType('books')}
-            title="Buscar Livros"
-          >
-            <FaBook /> Livros (Google Books)
-          </button>
-          <button
-            type="button"
-            className={`search-type-btn ${searchType === 'scholar' ? 'active' : ''}`}
-            onClick={() => setSearchType('scholar')}
-            title="Buscar no Google Scholar"
-          >
-            <FaFileAlt /> Google Scholar
-          </button>
-          <button
-            type="button"
-            className={`search-type-btn ${searchType === 'dataverse' ? 'active' : ''}`}
-            onClick={() => setSearchType('dataverse')}
-            title="Buscar Datasets no Dataverse"
-          >
-            <FaDatabase /> Dataverse
-          </button>
-          <button
-            type="button"
-            className={`search-type-btn ${searchType === 'arxiv' ? 'active' : ''}`}
-            onClick={() => setSearchType('arxiv')}
-            title="Buscar Pré-publicações no arXiv"
-          >
-            <FaFlask /> arXiv
-          </button>
-          <button
-            type="button"
-            className={`search-type-btn ${searchType === 'openalex' ? 'active' : ''}`}
-            onClick={() => setSearchType('openalex')}
-            title="Buscar no OpenAlex (inclui conteúdo brasileiro)"
-          >
-            <FaFileAlt /> OpenAlex
-          </button>
-        </div>
-        
         <div className="search-input-group">
+          <select
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
+            className="reference-source-select"
+          >
+            <option value="all">Todas as fontes</option>
+            <option value="articles">Artigos (Crossref)</option>
+            <option value="books">Livros (Google Books)</option>
+            <option value="scholar">Google Scholar</option>
+            <option value="dataverse">Dataverse</option>
+            <option value="arxiv">arXiv</option>
+            <option value="openalex">OpenAlex</option>
+          </select>
+          <select
+            value={searchBy}
+            onChange={(e) => setSearchBy(e.target.value)}
+            className="reference-search-by-select"
+          >
+            <option value="title">Título</option>
+            <option value="author">Autor</option>
+          </select>
           <input
             type="text"
             placeholder={getPlaceholder()}
@@ -667,25 +652,17 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
                 e.stopPropagation();
+                performSearch();
               }
             }}
           />
           <button
             type="button"
             onClick={performSearch}
-            disabled={isSearching}
+            disabled={isSearching || !searchTerm.trim()}
             className="reference-search-btn"
           >
             {isSearching ? <FaSpinner className="spinner" /> : <FaSearch />}
-          </button>
-          <button
-            type="button"
-            onClick={searchAll}
-            disabled={isSearching}
-            className="reference-search-btn reference-search-all-btn"
-            title="Buscar em todas as APIs"
-          >
-            {isSearching ? <FaSpinner className="spinner" /> : '🔍 Todas'}
           </button>
         </div>
         
