@@ -1493,9 +1493,30 @@
     border-bottom: none !important;
   }
   
+  /* Remover cores de TODAS as tabelas no PDF */
+  .pdf-container table {
+    background-color: transparent !important;
+    background: none !important;
+  }
+  
+  .pdf-container table thead tr,
+  .pdf-container table tbody tr {
+    background-color: transparent !important;
+    background: none !important;
+  }
+  
+  .pdf-container table th,
+  .pdf-container table td {
+    background-color: transparent !important;
+    background: none !important;
+    border: none !important;
+  }
+  
   .pdf-container table th {
-    background-color: #235795 !important;
-    color: white !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    background-color: transparent !important;
+    background: none !important;
   }
   
   /* Listas */
