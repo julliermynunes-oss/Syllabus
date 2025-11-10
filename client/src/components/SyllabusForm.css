@@ -1037,8 +1037,9 @@
   margin: 20px 0 10px 0;
 }
 
-#pdf-content table tr:nth-child(even) td,
-#pdf-temp-content table tr:nth-child(even) td {
+/* Removido para evitar cores alternadas - agora controlado por regras específicas */
+/* #pdf-content table tr:nth-child(even) td,
+#pdf-temp-content table tr:nth-child(even) td { */
   background-color: #f9f9f9 !important;
 }
 
