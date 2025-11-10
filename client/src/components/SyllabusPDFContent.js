@@ -459,8 +459,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
             );
           }
           // Fallback para formato antigo (rich text)
+          const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
-            <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <div style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
               <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
@@ -472,8 +473,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
           );
         } catch (e) {
           // Se não for JSON, tratar como rich text antigo
+          const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
-            <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+            <div style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
               <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
