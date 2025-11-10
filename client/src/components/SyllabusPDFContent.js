@@ -504,9 +504,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   </tbody>
                 </table>
                 {parsed.observacoes && parsed.observacoes.trim() !== '' && (
-                  <div style={{ marginTop: '12px', padding: '10px', background: '#f9f9f9', borderRadius: '4px', fontSize: '15px', lineHeight: '1.5' }}>
+                  <div style={{ marginTop: '8px', padding: '6px 8px', background: 'transparent', borderRadius: '0', fontSize: '11px', lineHeight: '1.3' }}>
                     <strong>{t('additionalObservations')}</strong>
-                    <div style={{ marginTop: '8px' }} dangerouslySetInnerHTML={{ __html: parsed.observacoes }} />
+                    <div style={{ marginTop: '4px' }} dangerouslySetInnerHTML={{ __html: parsed.observacoes }} />
                   </div>
                 )}
               </div>
