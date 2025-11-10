@@ -1427,6 +1427,7 @@
     line-height: 1.0 !important;
     height: auto !important;
     min-height: auto !important;
+    text-align: center !important;
   }
   
   /* Seção de Professores - evitar quebra de página antes e reduzir espaçamento */
