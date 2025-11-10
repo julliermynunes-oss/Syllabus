@@ -611,10 +611,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
         );
       };
 
+      const hasTableOrImg = hasTablesOrImages(formData.referencias);
       sections.push({
         id: 'referencias',
         component: (
-          <div key="referencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="referencias" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('referencesTitle')}
             </h3>
@@ -626,10 +627,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 11. Contatos (sempre por último)
     if (formData.contatos) {
+      const hasTableOrImg = hasTablesOrImages(formData.contatos);
       sections.push({
         id: 'contatos',
         component: (
-          <div key="contatos" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="contatos" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('contactsTitle')}
             </h3>
