@@ -452,6 +452,7 @@ export const translations = {
     credits: 'Créditos',
     curricularSemester: 'Semestre Curricular',
     selectCurricularSemester: 'Seleccione el Semestre Curricular',
+    semester: 'Semestre',
     language: 'Idioma',
     selectLanguage: 'Seleccione el Idioma',
     selectSemesterYear: 'Seleccione el Período',
