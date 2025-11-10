@@ -1400,23 +1400,7 @@
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
-  .pdf-container::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 200px;
-    height: 55px;
-    background-image: url('%PUBLIC_URL%/FGV LOGO NOVO.png');
-    background-repeat: no-repeat;
-    background-position: right top;
-    background-size: auto 55px;
-    z-index: 1000;
-    pointer-events: none;
-    page-break-inside: avoid;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
+  /* Nota: O logo será adicionado via JavaScript para evitar problemas de build */
   
   /* Container do PDF */
   .pdf-container {

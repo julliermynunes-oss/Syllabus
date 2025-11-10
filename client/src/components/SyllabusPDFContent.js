@@ -717,6 +717,28 @@ function SyllabusPDFContent({ formData, professoresList }) {
       position: 'relative',
       overflow: 'visible'
     }}>
+      {/* Logo fixo em todas as páginas */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        width: '200px',
+        height: '55px',
+        zIndex: 1000,
+        pointerEvents: 'none',
+        pageBreakInside: 'avoid'
+      }}>
+        <img 
+          src="/FGV LOGO NOVO.png" 
+          alt="FGV Logo" 
+          style={{ 
+            maxHeight: '55px', 
+            height: '55px',
+            width: 'auto',
+            display: 'block'
+          }} 
+        />
+      </div>
       {/* Renderizar seções na ordem correta */}
       {getOrderedSections().map(section => section.component)}
     </div>
