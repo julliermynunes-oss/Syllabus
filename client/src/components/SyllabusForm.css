@@ -1039,9 +1039,9 @@
 
 /* Removido para evitar cores alternadas - agora controlado por regras específicas */
 /* #pdf-content table tr:nth-child(even) td,
-#pdf-temp-content table tr:nth-child(even) td { */
+#pdf-temp-content table tr:nth-child(even) td {
   background-color: #f9f9f9 !important;
-}
+} */
 
 /* Botão de Preview */
 .preview-btn {
