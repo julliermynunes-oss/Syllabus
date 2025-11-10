@@ -20,20 +20,20 @@ const CompetenciesTablePDF = ({ data }) => {
     }
     
     return (
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '12px', fontSize: '15px' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', fontSize: '11px', border: 'none', backgroundColor: 'transparent' }}>
         <thead>
-          <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '15px' }}>{t('competence')}</th>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '15px' }}>{t('descriptionField')}</th>
-            <th style={{ padding: '10px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '15px', width: '130px' }}>{t('contributionDegree')}</th>
+          <tr style={{ backgroundColor: 'transparent', background: 'none', border: 'none' }}>
+            <th style={{ padding: '4px 6px', textAlign: 'left', border: 'none', fontSize: '11px', backgroundColor: 'transparent', background: 'none', color: '#000', fontWeight: 'bold' }}>{t('competence')}</th>
+            <th style={{ padding: '4px 6px', textAlign: 'left', border: 'none', fontSize: '11px', backgroundColor: 'transparent', background: 'none', color: '#000', fontWeight: 'bold' }}>{t('descriptionField')}</th>
+            <th style={{ padding: '4px 6px', textAlign: 'center', border: 'none', fontSize: '11px', width: '130px', backgroundColor: 'transparent', background: 'none', color: '#000', fontWeight: 'bold' }}>{t('contributionDegree')}</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row, index) => (
-            <tr key={index}>
-              <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.competencia || '-'}</td>
-              <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.descricao || '-'}</td>
-              <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px' }}>
+            <tr key={index} style={{ backgroundColor: 'transparent', background: 'none', border: 'none' }}>
+              <td style={{ padding: '3px 6px', border: 'none', fontSize: '11px', backgroundColor: 'transparent', background: 'none' }}>{row.competencia || '-'}</td>
+              <td style={{ padding: '3px 6px', border: 'none', fontSize: '11px', backgroundColor: 'transparent', background: 'none' }}>{row.descricao || '-'}</td>
+              <td style={{ padding: '3px 6px', border: 'none', textAlign: 'center', fontSize: '11px', backgroundColor: 'transparent', background: 'none' }}>
                 {'●'.repeat(row.grau || 0)}{'○'.repeat(3 - (row.grau || 0))}
               </td>
             </tr>
@@ -479,24 +479,24 @@ function SyllabusPDFContent({ formData, professoresList }) {
                 <h3 style={{ fontSize: '10px', color: 'white', backgroundColor: '#808080', padding: '2px 6px', marginBottom: '6px', border: 'none', lineHeight: '1.2' }}>
                   {t('evaluationCriteriaTitle')}
                 </h3>
-                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '15px', fontSize: '15px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '11px', border: 'none', backgroundColor: 'transparent' }}>
                   <thead>
-                    <tr style={{ background: '#235795', color: 'white' }}>
-                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>{t('type')}</th>
-                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>{t('criteria')}</th>
-                      <th style={{ padding: '10px', textAlign: 'left', border: '1px solid #1a4270' }}>{t('weight')}</th>
+                    <tr style={{ background: 'transparent', background: 'none', backgroundColor: 'transparent', border: 'none' }}>
+                      <th style={{ padding: '4px 6px', textAlign: 'left', border: 'none', backgroundColor: 'transparent', background: 'none', color: '#000', fontWeight: 'bold' }}>{t('type')}</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'left', border: 'none', backgroundColor: 'transparent', background: 'none', color: '#000', fontWeight: 'bold' }}>{t('criteria')}</th>
+                      <th style={{ padding: '4px 6px', textAlign: 'left', border: 'none', backgroundColor: 'transparent', background: 'none', color: '#000', fontWeight: 'bold' }}>{t('weight')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {parsed.rows.map((row, index) => (
-                      <tr key={index} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                      <tr key={index} style={{ borderBottom: 'none', backgroundColor: 'transparent', background: 'none', border: 'none' }}>
+                        <td style={{ padding: '3px 6px', border: 'none', verticalAlign: 'top', backgroundColor: 'transparent', background: 'none' }}>
                           {row.tipo || '-'}
                         </td>
-                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                        <td style={{ padding: '3px 6px', border: 'none', verticalAlign: 'top', backgroundColor: 'transparent', background: 'none' }}>
                           {row.criterio || '-'}
                         </td>
-                        <td style={{ padding: '10px', border: '1px solid #e0e0e0', verticalAlign: 'top' }}>
+                        <td style={{ padding: '3px 6px', border: 'none', verticalAlign: 'top', backgroundColor: 'transparent', background: 'none' }}>
                           {row.peso || '-'}
                         </td>
                       </tr>
