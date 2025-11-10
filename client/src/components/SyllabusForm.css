@@ -1427,7 +1427,32 @@
     line-height: 1.0 !important;
     height: auto !important;
     min-height: auto !important;
-    text-align: center !important;
+    text-align: left !important;
+  }
+  
+  /* Logo fixo apenas no print */
+  .pdf-logo-fixed {
+    display: none !important;
+  }
+  
+  @media print {
+    .pdf-logo-fixed {
+      display: block !important;
+      position: fixed !important;
+      top: 5mm !important;
+      right: 20mm !important;
+      z-index: 9999 !important;
+    }
+    
+    /* Garantir que o logo não interfira no conteúdo */
+    .pdf-container {
+      position: relative !important;
+    }
+    
+    .pdf-container > * {
+      position: relative !important;
+      z-index: 1 !important;
+    }
   }
   
   /* Seção de Professores - evitar quebra de página antes e reduzir espaçamento */
@@ -1510,6 +1535,23 @@
     border-width: 0 !important;
     border-style: none !important;
     border-color: transparent !important;
+    outline: none !important;
+  }
+  
+  /* Garantir que não há bordas em nenhum elemento da tabela */
+  .pdf-container > div:first-child table,
+  .pdf-container > div:first-child table tbody,
+  .pdf-container > div:first-child table thead,
+  .pdf-container > div:first-child table tfoot,
+  .pdf-container > div:first-child table tr,
+  .pdf-container > div:first-child table td,
+  .pdf-container > div:first-child table th {
+    border: 0 !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
   }
   
   /* Garantir que células da tabela de Informações Gerais não tenham cores */
