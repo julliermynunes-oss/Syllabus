@@ -496,10 +496,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 8. O que é esperado do aluno (se não for curso restrito)
     if (formData.o_que_e_esperado && !isRestrictedCourse(formData.curso)) {
+      const hasTableOrImg = hasTablesOrImages(formData.o_que_e_esperado);
       sections.push({
         id: 'o_que_e_esperado',
         component: (
-          <div key="o_que_e_esperado" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="o_que_e_esperado" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('expectedFromStudentTitle')}
             </h3>
@@ -514,10 +515,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // Inserir a aba personalizada na posição correta
     if (formData.custom_tab_name && formData.custom_tab_content) {
+      const hasTableOrImg = hasTablesOrImages(formData.custom_tab_content);
       const customSection = {
         id: 'custom',
         component: (
-          <div key="custom" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="custom" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {formData.custom_tab_name.toUpperCase()}
             </h3>
