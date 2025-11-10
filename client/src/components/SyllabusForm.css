@@ -1468,15 +1468,17 @@
     padding: 8px !important;
   }
   
-  /* Tabela de Informações Gerais - sem bordas */
+  /* Tabela de Informações Gerais - sem bordas e sem cores */
   .pdf-container > div:first-child table {
     border: none !important;
+    background-color: transparent !important;
   }
   
   .pdf-container > div:first-child table td,
   .pdf-container > div:first-child table th,
   .pdf-container > div:first-child table tr {
     border: none !important;
+    background-color: transparent !important;
   }
   
   .pdf-container table th {

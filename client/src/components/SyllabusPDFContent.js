@@ -105,114 +105,114 @@ function SyllabusPDFContent({ formData, professoresList }) {
               }} 
             />
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', marginTop: '3px', border: 'none', borderSpacing: '0' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', marginTop: '2px', border: 'none', borderSpacing: '0', backgroundColor: 'transparent' }}>
             <tbody>
               {formData.disciplina && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('discipline')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.disciplina}
                   </td>
                 </tr>
               )}
               {formData.curso && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('course')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.curso}
                   </td>
                 </tr>
               )}
               {formData.semestre_ano && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('period')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.semestre_ano}
                   </td>
                 </tr>
               )}
               {formData.linha && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('line')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.linha}
                   </td>
                 </tr>
               )}
               {formData.turma && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('class')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.turma}
                   </td>
                 </tr>
               )}
               {formData.departamento && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('department')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.departamento}
                   </td>
                 </tr>
               )}
               {formData.num_creditos && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('credits')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.num_creditos}
                   </td>
                 </tr>
               )}
               {formData.sem_curricular && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('semester')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.sem_curricular}
                   </td>
                 </tr>
               )}
               {formData.coordenador && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('disciplineLeader')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.coordenador}
                   </td>
                 </tr>
               )}
               {formData.idioma && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('language')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {formData.idioma}
                   </td>
                 </tr>
               )}
               {professoresList && professoresList.length > 0 && (
-                <tr>
-                  <td style={{ padding: '0px 4px 0px 0', lineHeight: '1.0', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0' }}>
+                <tr style={{ backgroundColor: 'transparent' }}>
+                  <td style={{ padding: '0px 3px 0px 0', lineHeight: '0.95', verticalAlign: 'top', width: 'auto', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     <strong>{t('professorsList')}:</strong>
                   </td>
-                  <td style={{ padding: '0px 0', lineHeight: '1.0', verticalAlign: 'top', border: 'none', margin: '0' }}>
+                  <td style={{ padding: '0px 0', lineHeight: '0.95', verticalAlign: 'top', border: 'none', margin: '0', backgroundColor: 'transparent' }}>
                     {professoresList.join(', ')}
                   </td>
                 </tr>
