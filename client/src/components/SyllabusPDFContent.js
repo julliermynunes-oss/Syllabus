@@ -240,7 +240,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             id: 'professores',
             component: (
               <div key="professores" className="professores-section" style={{ marginBottom: '30px', marginTop: '0', paddingTop: '0', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', marginTop: '0', paddingTop: '0px', paddingBottom: '0px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+                <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', marginTop: '0', paddingTop: '2px', paddingBottom: '2px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
                   {t('professorsTitle')}
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
@@ -342,7 +342,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'sobre',
         component: (
           <div key="sobre" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('aboutDisciplineTitle')}
             </h3>
             <div 
@@ -360,7 +360,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'compromisso_etico',
         component: (
           <div key="compromisso_etico" className="compromisso-etico-section" style={{ marginBottom: '15px' }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('ethicalCommitmentTitle')}
             </h3>
             <div 
@@ -391,7 +391,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'competencias',
         component: (
           <div key="competencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('competenciesTitle')}
             </h3>
             {formData.curso && (
@@ -415,7 +415,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'ods',
         component: (
           <div key="ods" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('odsTitle')}
             </h3>
             <div 
@@ -434,7 +434,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'conteudo',
         component: (
           <div key="conteudo" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('contentTitle')}
             </h3>
             <div 
@@ -453,7 +453,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'metodologia',
         component: (
           <div key="metodologia" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('methodologyTitle')}
             </h3>
             <div 
@@ -476,7 +476,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           if (parsed && parsed.rows && parsed.rows.length > 0) {
             return (
               <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+                <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
                   {t('evaluationCriteriaTitle')}
                 </h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '11px' }}>
@@ -516,7 +516,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
             <div style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-              <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+              <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
@@ -530,7 +530,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
             <div style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-              <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+              <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
@@ -555,7 +555,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'o_que_e_esperado',
         component: (
           <div key="o_que_e_esperado" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('expectedFromStudentTitle')}
             </h3>
             <div 
@@ -574,7 +574,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'custom',
         component: (
           <div key="custom" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {formData.custom_tab_name.toUpperCase()}
             </h3>
             <div 
@@ -674,7 +674,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'referencias',
         component: (
           <div key="referencias" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('referencesTitle')}
             </h3>
             {renderReferences()}
@@ -690,7 +690,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'contatos',
         component: (
           <div key="contatos" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '0px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.0', height: 'auto', minHeight: 'auto', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '13px', color: '#000', fontWeight: 'bold', backgroundColor: '#d3d3d3', padding: '2px 8px', marginBottom: '8px', border: 'none', lineHeight: '1.2', height: 'auto', minHeight: 'auto', textAlign: 'left', display: 'flex', alignItems: 'center' }}>
               {t('contactsTitle')}
             </h3>
             <div 
@@ -718,19 +718,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
       position: 'relative',
       overflow: 'visible'
     }}>
-      {/* Logo fixo em todas as páginas - apenas no print */}
-      <div className="pdf-logo-fixed" style={{
-        position: 'fixed',
-        top: '5mm',
-        right: '20mm',
-        width: 'auto',
-        height: '55px',
-        zIndex: 9999,
-        pointerEvents: 'none',
-        pageBreakInside: 'avoid',
-        pageBreakAfter: 'avoid',
-        pageBreakBefore: 'avoid'
-      }}>
+      {/* Logo fixo em todas as páginas */}
+      <div className="pdf-logo-fixed">
         <img 
           src="/FGV LOGO NOVO.png" 
           alt="FGV Logo" 

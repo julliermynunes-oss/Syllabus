@@ -1416,23 +1416,35 @@
     color: #000 !important;
     font-weight: bold !important;
     background-color: #d3d3d3 !important;
-    padding: 0px 8px !important;
+    padding: 2px 8px !important;
     margin-bottom: 8px !important;
     margin-top: 15px !important;
-    padding-top: 0px !important;
-    padding-bottom: 0px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
     page-break-after: avoid;
     border: none !important;
     border-radius: 0 !important;
-    line-height: 1.0 !important;
+    line-height: 1.2 !important;
     height: auto !important;
     min-height: auto !important;
     text-align: left !important;
+    display: flex !important;
+    align-items: center !important;
+    vertical-align: middle !important;
   }
   
-  /* Logo fixo apenas no print */
+  /* Logo fixo - visível sempre, mas posicionado corretamente */
   .pdf-logo-fixed {
-    display: none !important;
+    position: fixed;
+    top: 5mm;
+    right: 20mm;
+    width: auto;
+    height: 55px;
+    z-index: 9999;
+    pointer-events: none;
+    page-break-inside: avoid;
+    page-break-after: avoid;
+    page-break-before: avoid;
   }
   
   @media print {
