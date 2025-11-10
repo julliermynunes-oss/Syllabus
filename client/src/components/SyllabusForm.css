@@ -1410,7 +1410,7 @@
   .pdf-container h3 {
     font-size: 15px !important;
     color: white !important;
-    background-color: #235795 !important;
+    background-color: #808080 !important;
     padding: 5px 10px !important;
     margin-bottom: 12px !important;
     margin-top: 20px !important;
@@ -1466,6 +1466,17 @@
   .pdf-container table th {
     border: 1px solid #ddd !important;
     padding: 8px !important;
+  }
+  
+  /* Tabela de Informações Gerais - sem bordas */
+  .pdf-container > div:first-child table {
+    border: none !important;
+  }
+  
+  .pdf-container > div:first-child table td,
+  .pdf-container > div:first-child table th,
+  .pdf-container > div:first-child table tr {
+    border: none !important;
   }
   
   .pdf-container table th {
