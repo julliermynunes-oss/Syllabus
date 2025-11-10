@@ -1489,10 +1489,7 @@
     page-break-inside: avoid;
   }
   
-  /* Evitar quebra de página em elementos importantes */
-  .pdf-container > div {
-    page-break-inside: avoid;
-  }
+  /* Evitar quebra de página apenas em elementos com tabelas ou imagens (será aplicado via inline style) */
 
   /* Permitir quebra de página após seções com pouco conteúdo para evitar muito espaço vazio */
   .pdf-container > div[key="compromisso_etico"],
@@ -1546,10 +1543,9 @@
     page-break-after: avoid;
   }
   
-  /* Evitar quebra de página dentro de parágrafos e divs com texto */
+  /* Permitir quebra de página em parágrafos e divs com texto */
   .pdf-container p,
   .pdf-container div[style*="fontSize"] {
-    page-break-inside: avoid;
     orphans: 3;
     widows: 3;
   }
@@ -1560,10 +1556,7 @@
     break-inside: avoid;
   }
   
-  /* Garantir que parágrafos não sejam cortados */
-  .pdf-container p {
-    page-break-inside: avoid;
-  }
+  /* Parágrafos podem quebrar entre páginas normalmente */
   
   #pdf-content table {
     page-break-inside: avoid;

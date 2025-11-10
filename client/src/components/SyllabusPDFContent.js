@@ -50,7 +50,18 @@ const CompetenciesTablePDF = ({ data }) => {
 // Componente separado para a visualização do PDF
 function SyllabusPDFContent({ formData, professoresList }) {
   const { t } = useTranslation();
-
+  
+  // Função auxiliar para verificar se o HTML contém tabelas ou imagens
+  const hasTablesOrImages = (html) => {
+    if (!html) return false;
+    // Criar um elemento temporário para verificar
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const hasTable = tempDiv.querySelector('table') !== null;
+    const hasImage = tempDiv.querySelector('img') !== null;
+    return hasTable || hasImage;
+  };
+  
   // Função auxiliar para verificar se o curso é restrito
   const isRestrictedCourse = (curso) => {
     if (!curso) return false;
@@ -272,10 +283,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 3. Sobre a Disciplina
     if (formData.sobre_disciplina) {
+      const hasTableOrImg = hasTablesOrImages(formData.sobre_disciplina);
       sections.push({
         id: 'sobre',
         component: (
-          <div key="sobre" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="sobre" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('aboutDisciplineTitle')}
             </h3>
@@ -344,10 +356,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 5. ODS (se não for curso restrito)
     if (formData.ods && !isRestrictedCourse(formData.curso)) {
+      const hasTableOrImg = hasTablesOrImages(formData.ods);
       sections.push({
         id: 'ods',
         component: (
-          <div key="ods" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="ods" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('odsTitle')}
             </h3>
@@ -362,10 +375,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 6. Conteúdo
     if (formData.conteudo) {
+      const hasTableOrImg = hasTablesOrImages(formData.conteudo);
       sections.push({
         id: 'conteudo',
         component: (
-          <div key="conteudo" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="conteudo" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('contentTitle')}
             </h3>
@@ -380,10 +394,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 7. Metodologia
     if (formData.metodologia) {
+      const hasTableOrImg = hasTablesOrImages(formData.metodologia);
       sections.push({
         id: 'metodologia',
         component: (
-          <div key="metodologia" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
+          <div key="metodologia" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px' }}>
               {t('methodologyTitle')}
             </h3>
