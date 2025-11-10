@@ -395,8 +395,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
               {t('competenciesTitle')}
             </h3>
             {formData.curso && (
-              <div style={{ marginBottom: '15px', padding: '14px 20px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
-                <p style={{ margin: 0, fontSize: '15px', color: '#4a5568', lineHeight: '1.5' }}>
+              <div style={{ marginBottom: '10px', padding: '8px 12px', background: 'transparent', borderLeft: 'none', borderRadius: '0' }}>
+                <p style={{ margin: 0, fontSize: '11px', color: '#000', lineHeight: '1.3' }}>
                   Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
                   demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(formData.curso)}.
                 </p>
