@@ -105,62 +105,59 @@ function SyllabusPDFContent({ formData, professoresList }) {
               }} 
             />
           </div>
-          <h3 style={{ fontSize: '20px', color: '#235795', borderBottom: '2px solid #a4a4a4', paddingBottom: '8px', marginBottom: '12px', marginTop: '0', paddingTop: '0' }}>
-            {t('generalInformation')}
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '15px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '15px', width: '100%', lineHeight: '1.3' }}>
             {formData.disciplina && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('discipline')}:</strong> {formData.disciplina}
               </div>
             )}
             {formData.curso && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('course')}:</strong> {formData.curso}
               </div>
             )}
             {formData.semestre_ano && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('period')}:</strong> {formData.semestre_ano}
               </div>
             )}
             {formData.linha && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('line')}:</strong> {formData.linha}
               </div>
             )}
             {formData.turma && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('class')}:</strong> {formData.turma}
               </div>
             )}
             {formData.departamento && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('department')}:</strong> {formData.departamento}
               </div>
             )}
             {formData.num_creditos && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('credits')}:</strong> {formData.num_creditos}
               </div>
             )}
             {formData.sem_curricular && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('curricularSemester')}:</strong> {formData.sem_curricular}
               </div>
             )}
             {formData.coordenador && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('disciplineLeader')}:</strong> {formData.coordenador}
               </div>
             )}
             {formData.idioma && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('language')}:</strong> {formData.idioma}
               </div>
             )}
             {professoresList && professoresList.length > 0 && (
-              <div>
+              <div style={{ lineHeight: '1.3' }}>
                 <strong>{t('professorsList')}:</strong> {professoresList.join(', ')}
               </div>
             )}
