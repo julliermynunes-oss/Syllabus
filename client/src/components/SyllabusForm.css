@@ -1500,6 +1500,23 @@
     background: none !important;
   }
   
+  /* Remover cores alternadas (zebra striping) da tabela de Informações Gerais */
+  .pdf-container > div:first-child table tr:nth-child(even),
+  .pdf-container > div:first-child table tr:nth-child(odd),
+  .pdf-container > div:first-child table tr:nth-child(2n),
+  .pdf-container > div:first-child table tr:nth-child(2n+1) {
+    background-color: transparent !important;
+    background: none !important;
+  }
+  
+  .pdf-container > div:first-child table tr:nth-child(even) td,
+  .pdf-container > div:first-child table tr:nth-child(odd) td,
+  .pdf-container > div:first-child table tr:nth-child(2n) td,
+  .pdf-container > div:first-child table tr:nth-child(2n+1) td {
+    background-color: transparent !important;
+    background: none !important;
+  }
+  
   /* Tabelas normais mantêm bordas e cores */
   .pdf-container table th {
     background-color: #235795 !important;
