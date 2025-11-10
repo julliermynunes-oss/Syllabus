@@ -1391,12 +1391,38 @@
   /* Configurações de página A4 */
   @page {
     size: A4;
-    margin: 25mm 20mm;
+    margin: 25mm 20mm 20mm 20mm;
+    @top-right {
+      content: '';
+      background-image: url('/FGV LOGO NOVO.png');
+      background-repeat: no-repeat;
+      background-position: right top;
+      background-size: auto 40px;
+      height: 50px;
+      width: 100%;
+    }
   }
   
   /* Primeira página - reduzir margem superior para caber mais conteúdo */
   @page:first {
     margin-top: 15mm;
+  }
+  
+  /* Logo fixo em todas as páginas usando pseudo-elemento */
+  .pdf-container::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 55px;
+    background-image: url('/FGV LOGO NOVO.png');
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-size: auto 55px;
+    z-index: 1000;
+    pointer-events: none;
+    page-break-inside: avoid;
   }
   
   /* Container do PDF */
@@ -1405,6 +1431,7 @@
     margin: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    padding-top: 60px !important;
   }
   
   /* Títulos - estilo de barra */
@@ -1421,7 +1448,9 @@
     page-break-after: avoid;
     border: none !important;
     border-radius: 0 !important;
-    line-height: 1.4 !important;
+    line-height: 1.0 !important;
+    height: auto !important;
+    min-height: auto !important;
   }
   
   /* Seção de Professores - evitar quebra de página antes e reduzir espaçamento */
