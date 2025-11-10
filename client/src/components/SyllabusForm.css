@@ -1408,18 +1408,18 @@
   
   /* Títulos - estilo de barra */
   .pdf-container h3 {
-    font-size: 10px !important;
+    font-size: 13px !important;
     color: white !important;
     background-color: #808080 !important;
-    padding: 2px 6px !important;
-    margin-bottom: 6px !important;
-    margin-top: 12px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
+    padding: 1px 8px !important;
+    margin-bottom: 8px !important;
+    margin-top: 15px !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
     page-break-after: avoid;
     border: none !important;
     border-radius: 0 !important;
-    line-height: 1.2 !important;
+    line-height: 1.3 !important;
   }
   
   /* Seção de Professores - evitar quebra de página antes e reduzir espaçamento */
@@ -1469,7 +1469,7 @@
     padding: 8px !important;
   }
   
-  /* Tabela de Informações Gerais - sem bordas e sem cores */
+  /* Tabela de Informações Gerais - sem bordas e sem cores (apenas esta tabela) */
   .pdf-container > div:first-child table {
     border: none !important;
     background-color: transparent !important;
@@ -1493,30 +1493,17 @@
     border-bottom: none !important;
   }
   
-  /* Remover cores de TODAS as tabelas no PDF */
-  .pdf-container table {
+  /* Garantir que células da tabela de Informações Gerais não tenham cores */
+  .pdf-container > div:first-child table td,
+  .pdf-container > div:first-child table th {
     background-color: transparent !important;
     background: none !important;
   }
   
-  .pdf-container table thead tr,
-  .pdf-container table tbody tr {
-    background-color: transparent !important;
-    background: none !important;
-  }
-  
-  .pdf-container table th,
-  .pdf-container table td {
-    background-color: transparent !important;
-    background: none !important;
-    border: none !important;
-  }
-  
+  /* Tabelas normais mantêm bordas e cores */
   .pdf-container table th {
-    color: #000 !important;
-    font-weight: bold !important;
-    background-color: transparent !important;
-    background: none !important;
+    background-color: #235795 !important;
+    color: white !important;
   }
   
   /* Listas */
@@ -1640,3 +1627,4 @@
   padding-left: 8px !important;
   margin-bottom: 4px !important;
 }
+
