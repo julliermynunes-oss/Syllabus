@@ -105,114 +105,114 @@ function SyllabusPDFContent({ formData, professoresList }) {
               }} 
             />
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '15px', marginTop: '5px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '15px', marginTop: '5px', border: 'none' }}>
             <tbody>
               {formData.disciplina && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('discipline')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.disciplina}
                   </td>
                 </tr>
               )}
               {formData.curso && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('course')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.curso}
                   </td>
                 </tr>
               )}
               {formData.semestre_ano && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('period')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.semestre_ano}
                   </td>
                 </tr>
               )}
               {formData.linha && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('line')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.linha}
                   </td>
                 </tr>
               )}
               {formData.turma && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('class')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.turma}
                   </td>
                 </tr>
               )}
               {formData.departamento && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('department')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.departamento}
                   </td>
                 </tr>
               )}
               {formData.num_creditos && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('credits')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.num_creditos}
                   </td>
                 </tr>
               )}
               {formData.sem_curricular && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
-                    <strong>{t('curricularSemester')}:</strong>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
+                    <strong>{t('semester')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.sem_curricular}
                   </td>
                 </tr>
               )}
               {formData.coordenador && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('disciplineLeader')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.coordenador}
                   </td>
                 </tr>
               )}
               {formData.idioma && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('language')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {formData.idioma}
                   </td>
                 </tr>
               )}
               {professoresList && professoresList.length > 0 && (
                 <tr>
-                  <td style={{ padding: '2px 8px 2px 0', lineHeight: '1.2', verticalAlign: 'top', width: 'auto' }}>
+                  <td style={{ padding: '1px 6px 1px 0', lineHeight: '1.1', verticalAlign: 'top', width: 'auto', border: 'none' }}>
                     <strong>{t('professorsList')}:</strong>
                   </td>
-                  <td style={{ padding: '2px 0', lineHeight: '1.2', verticalAlign: 'top' }}>
+                  <td style={{ padding: '1px 0', lineHeight: '1.1', verticalAlign: 'top', border: 'none' }}>
                     {professoresList.join(', ')}
                   </td>
                 </tr>
@@ -240,7 +240,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             id: 'professores',
             component: (
               <div key="professores" className="professores-section" style={{ marginBottom: '30px', marginTop: '0', paddingTop: '0', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '10px', marginTop: '0', paddingTop: '6px', paddingBottom: '6px', border: 'none' }}>
+                <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '10px', marginTop: '0', paddingTop: '5px', paddingBottom: '5px', border: 'none' }}>
                   {t('professorsTitle')}
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
@@ -342,7 +342,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'sobre',
         component: (
           <div key="sobre" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('aboutDisciplineTitle')}
             </h3>
             <div 
@@ -360,7 +360,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'compromisso_etico',
         component: (
           <div key="compromisso_etico" className="compromisso-etico-section" style={{ marginBottom: '15px' }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('ethicalCommitmentTitle')}
             </h3>
             <div 
@@ -391,7 +391,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'competencias',
         component: (
           <div key="competencias" style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('competenciesTitle')}
             </h3>
             {formData.curso && (
@@ -415,7 +415,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'ods',
         component: (
           <div key="ods" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('odsTitle')}
             </h3>
             <div 
@@ -434,7 +434,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'conteudo',
         component: (
           <div key="conteudo" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('contentTitle')}
             </h3>
             <div 
@@ -453,7 +453,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'metodologia',
         component: (
           <div key="metodologia" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('methodologyTitle')}
             </h3>
             <div 
@@ -476,7 +476,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           if (parsed && parsed.rows && parsed.rows.length > 0) {
             return (
               <div style={{ marginBottom: '30px', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+                <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
                   {t('evaluationCriteriaTitle')}
                 </h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '15px', fontSize: '15px' }}>
@@ -516,7 +516,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
             <div style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-              <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+              <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
@@ -530,7 +530,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
             <div style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-              <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+              <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
@@ -555,7 +555,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'o_que_e_esperado',
         component: (
           <div key="o_que_e_esperado" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('expectedFromStudentTitle')}
             </h3>
             <div 
@@ -574,7 +574,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'custom',
         component: (
           <div key="custom" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {formData.custom_tab_name.toUpperCase()}
             </h3>
             <div 
@@ -674,7 +674,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'referencias',
         component: (
           <div key="referencias" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('referencesTitle')}
             </h3>
             {renderReferences()}
@@ -690,7 +690,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'contatos',
         component: (
           <div key="contatos" style={{ marginBottom: '30px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '17px', color: 'white', backgroundColor: '#235795', padding: '6px 12px', marginBottom: '12px', border: 'none' }}>
+            <h3 style={{ fontSize: '15px', color: 'white', backgroundColor: '#235795', padding: '5px 10px', marginBottom: '12px', border: 'none' }}>
               {t('contactsTitle')}
             </h3>
             <div 
