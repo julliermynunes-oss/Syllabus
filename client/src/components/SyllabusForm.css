@@ -1408,14 +1408,14 @@
   
   /* Títulos - estilo de barra */
   .pdf-container h3 {
-    font-size: 15px !important;
+    font-size: 13px !important;
     color: white !important;
     background-color: #808080 !important;
-    padding: 5px 10px !important;
-    margin-bottom: 12px !important;
-    margin-top: 20px !important;
-    padding-top: 5px !important;
-    padding-bottom: 5px !important;
+    padding: 3px 8px !important;
+    margin-bottom: 8px !important;
+    margin-top: 15px !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
     page-break-after: avoid;
     border: none !important;
     border-radius: 0 !important;
@@ -1472,6 +1472,7 @@
   .pdf-container > div:first-child table {
     border: none !important;
     background-color: transparent !important;
+    background: none !important;
   }
   
   .pdf-container > div:first-child table td,
@@ -1479,6 +1480,16 @@
   .pdf-container > div:first-child table tr {
     border: none !important;
     background-color: transparent !important;
+    background: none !important;
+    border-color: transparent !important;
+  }
+  
+  .pdf-container > div:first-child table td:first-child,
+  .pdf-container > div:first-child table td:last-child {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
   }
   
   .pdf-container table th {
