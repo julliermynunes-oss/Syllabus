@@ -1460,13 +1460,13 @@
   
   /* Garantir que títulos não sejam sobrepostos pelo logo */
   .pdf-container h3 {
-    margin-top: 12px !important;
+    margin-top: 15px !important;
     padding-top: 0 !important;
   }
   
   /* Títulos que aparecem no início de uma nova página precisam de espaço extra */
   .pdf-container > div h3:first-of-type {
-    margin-top: 8px !important;
+    margin-top: 10px !important;
     padding-top: 0 !important;
   }
   
@@ -1511,8 +1511,8 @@
     font-weight: bold !important;
     background-color: transparent !important;
     padding: 0 !important;
-    margin-bottom: 8px !important;
-    margin-top: 12px !important;
+    margin-bottom: 10px !important;
+    margin-top: 15px !important;
     page-break-after: avoid;
     border: none !important;
     line-height: 1.4 !important;
