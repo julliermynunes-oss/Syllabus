@@ -1421,18 +1421,13 @@
     margin-top: 0 !important;
   }
   
-  /* Remover padding-top das outras seções - espaçamento será controlado apenas por marginBottom */
+  /* Remover padding-top das outras seções e garantir espaçamento entre seções */
   .pdf-container > div:not(:first-child) {
     padding-top: 0 !important;
-    margin-top: 0 !important;
+    margin-top: 18px !important;
   }
   
   /* O espaço para o logo quando quebra para nova página é garantido pela margem da página (@page) */
-  
-  /* Garantir espaçamento mínimo entre seções */
-  .pdf-container > div:not(:first-child) {
-    margin-top: 18px !important;
-  }
   
   /* Garantir que o primeiro elemento dentro de cada seção não adicione padding extra */
   .pdf-container > div > *:first-child {
