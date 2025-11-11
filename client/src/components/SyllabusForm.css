@@ -1391,12 +1391,12 @@
   /* Configurações de página A4 */
   @page {
     size: A4;
-    margin: 25mm 20mm 20mm 20mm;
+    margin: 60px 20mm 20mm 20mm;
   }
   
   /* Primeira página - reduzir margem superior para caber mais conteúdo */
   @page:first {
-    margin-top: 15mm;
+    margin-top: 60px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
@@ -1443,6 +1443,8 @@
       page-break-inside: avoid !important;
       page-break-after: avoid !important;
       page-break-before: avoid !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
     
     /* Garantir que o logo não interfira no conteúdo */
@@ -1459,11 +1461,6 @@
     .pdf-container > * {
       position: relative !important;
       z-index: 1 !important;
-    }
-    
-    /* Garantir que o logo apareça em todas as páginas */
-    @page {
-      margin-top: 0;
     }
   }
   
