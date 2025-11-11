@@ -1388,10 +1388,56 @@
     visibility: hidden !important;
   }
   
+  /* Logo fixo em todas as páginas - position fixed funciona no print */
+  .pdf-logo-fixed {
+    display: block !important;
+    visibility: visible !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: 55px !important;
+    z-index: 9999 !important;
+    pointer-events: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
+  }
+  
+  /* Garantir que o logo não interfira no conteúdo */
+  .pdf-container {
+    position: relative !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Adicionar padding superior apenas na primeira seção para evitar sobreposição do logo */
+  .pdf-container > div:first-child {
+    padding-top: 60px !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Remover qualquer padding extra que possa estar causando espaçamento excessivo */
+  .pdf-container > div:first-child > *:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  .pdf-container > * {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
   /* Configurações de página A4 */
   @page {
     size: A4;
-    margin: 20mm;
+    margin: 60px 20mm 20mm 20mm;
+  }
+  
+  @page:first {
+    margin-top: 60px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
@@ -1423,56 +1469,6 @@
   /* Logo fixo - oculto por padrão */
   .pdf-logo-fixed {
     display: none;
-  }
-  
-  @media print {
-    /* Resetar posicionamento do container pdf-content no print */
-    #pdf-content {
-      position: static !important;
-      left: auto !important;
-      display: block !important;
-    }
-    
-    /* Logo fixo em todas as páginas - position fixed funciona no print */
-    .pdf-logo-fixed {
-      display: block !important;
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: auto !important;
-      height: 55px !important;
-      z-index: 9999 !important;
-      pointer-events: none !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      page-break-inside: avoid !important;
-      page-break-after: avoid !important;
-      page-break-before: avoid !important;
-    }
-    
-    /* Garantir que o logo não interfira no conteúdo */
-    .pdf-container {
-      position: relative !important;
-      padding-top: 0 !important;
-      margin-top: 0 !important;
-    }
-    
-    /* Adicionar padding superior apenas na primeira seção para evitar sobreposição do logo */
-    .pdf-container > div:first-child {
-      padding-top: 60px !important;
-      margin-top: 0 !important;
-    }
-    
-    /* Remover qualquer padding extra que possa estar causando espaçamento excessivo */
-    .pdf-container > div:first-child > *:first-child {
-      margin-top: 0 !important;
-      padding-top: 0 !important;
-    }
-    
-    .pdf-container > * {
-      position: relative !important;
-      z-index: 1 !important;
-    }
   }
   
   /* Seção de Professores - evitar quebra de página antes e reduzir espaçamento */
