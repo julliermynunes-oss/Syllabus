@@ -1438,6 +1438,23 @@
     padding-top: 0 !important;
   }
   
+  /* IMPORTANTE: Garantir que quando o conteúdo quebra para uma nova página no meio de um parágrafo,
+     ele tenha espaço suficiente. Usamos padding-top em todos os elementos que podem quebrar */
+  .pdf-container p,
+  .pdf-container div[style*="fontSize"],
+  .pdf-container ul,
+  .pdf-container ol,
+  .pdf-container li {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Quando um parágrafo ou div quebra para uma nova página, garantir espaço no topo */
+  .pdf-container p:first-of-type,
+  .pdf-container > div > div:first-of-type {
+    padding-top: 0 !important;
+  }
+  
   /* Garantir que títulos não sejam sobrepostos pelo logo */
   .pdf-container h3 {
     margin-top: 20px !important;
@@ -1450,19 +1467,34 @@
     padding-top: 0 !important;
   }
   
+  /* Adicionar espaço no topo de elementos que podem quebrar para nova página */
+  .pdf-container > div::before {
+    content: '';
+    display: block;
+    height: 65px;
+    margin-top: -65px;
+    page-break-after: avoid;
+  }
+  
+  /* Primeira seção tem mais espaço */
+  .pdf-container > div:first-child::before {
+    height: 70px;
+    margin-top: -70px;
+  }
+  
   .pdf-container > * {
     position: relative !important;
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 */
+  /* Configurações de página A4 - aumentar margem superior para garantir espaço para o logo */
   @page {
     size: A4;
-    margin: 60px 20mm 20mm 20mm;
+    margin: 70px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 60px;
+    margin-top: 70px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
