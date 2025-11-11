@@ -1394,7 +1394,7 @@
     margin: 60px 20mm 20mm 20mm;
   }
   
-  /* Primeira página - reduzir margem superior para caber mais conteúdo */
+  /* Primeira página - margem superior igual ao tamanho do logo */
   @page:first {
     margin-top: 60px;
   }
@@ -1456,6 +1456,13 @@
     .pdf-container > div:first-child {
       padding-top: 60px !important;
       margin-top: 0 !important;
+    }
+    
+    /* Garantir que o logo apareça em todas as páginas usando position fixed */
+    .pdf-logo-fixed {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
     }
     
     .pdf-container > * {
