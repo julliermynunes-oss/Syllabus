@@ -1439,6 +1439,8 @@
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
       page-break-inside: avoid !important;
+      page-break-after: avoid !important;
+      page-break-before: avoid !important;
     }
     
     /* Garantir que o logo não interfira no conteúdo */
@@ -1463,6 +1465,11 @@
     .pdf-container > * {
       position: relative !important;
       z-index: 1 !important;
+    }
+    
+    /* Garantir que o logo apareça em todas as páginas */
+    body {
+      position: relative !important;
     }
   }
   

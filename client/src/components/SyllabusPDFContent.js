@@ -631,18 +631,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
   };
   
   return (
-    <div className="pdf-container" style={{ 
-      padding: '0',
-      fontFamily: 'Arial, sans-serif',
-      color: '#000',
-      backgroundColor: '#fff',
-      maxWidth: '100%',
-      width: '100%',
-      boxSizing: 'border-box',
-      position: 'relative',
-      overflow: 'visible'
-    }}>
-      {/* Logo fixo em todas as páginas */}
+    <>
+      {/* Logo fixo em todas as páginas - fora do container para funcionar melhor no print */}
       <div className="pdf-logo-fixed">
         <img 
           src="/FGV LOGO NOVO.png" 
@@ -655,9 +645,21 @@ function SyllabusPDFContent({ formData, professoresList }) {
           }} 
         />
       </div>
-      {/* Renderizar seções na ordem correta */}
-      {getOrderedSections().map(section => section.component)}
-    </div>
+      <div className="pdf-container" style={{ 
+        padding: '0',
+        fontFamily: 'Arial, sans-serif',
+        color: '#000',
+        backgroundColor: '#fff',
+        maxWidth: '100%',
+        width: '100%',
+        boxSizing: 'border-box',
+        position: 'relative',
+        overflow: 'visible'
+      }}>
+        {/* Renderizar seções na ordem correta */}
+        {getOrderedSections().map(section => section.component)}
+      </div>
+    </>
   );
 }
 
