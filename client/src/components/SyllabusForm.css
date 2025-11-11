@@ -1448,10 +1448,16 @@
       margin-top: 0 !important;
     }
     
-    /* Adicionar padding superior apenas na primeira seção para evitar sobreposição */
+    /* Adicionar padding superior apenas na primeira seção para evitar sobreposição do logo */
     .pdf-container > div:first-child {
       padding-top: 60px !important;
       margin-top: 0 !important;
+    }
+    
+    /* Remover qualquer padding extra que possa estar causando espaçamento excessivo */
+    .pdf-container > div:first-child > *:first-child {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
     }
     
     .pdf-container > * {
