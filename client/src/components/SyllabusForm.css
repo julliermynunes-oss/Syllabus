@@ -1425,18 +1425,9 @@
     text-align: left !important;
   }
   
-  /* Logo fixo - visível sempre, mas posicionado corretamente */
+  /* Logo fixo - oculto por padrão, visível apenas no print */
   .pdf-logo-fixed {
-    position: fixed;
-    top: 5mm;
-    right: 20mm;
-    width: auto;
-    height: 55px;
-    z-index: 9999;
-    pointer-events: none;
-    page-break-inside: avoid;
-    page-break-after: avoid;
-    page-break-before: avoid;
+    display: none;
   }
   
   @media print {
@@ -1444,13 +1435,24 @@
       display: block !important;
       position: fixed !important;
       top: 5mm !important;
-      right: 20mm !important;
+      left: 0 !important;
+      width: auto !important;
+      height: 55px !important;
       z-index: 9999 !important;
+      pointer-events: none !important;
+      page-break-inside: avoid !important;
+      page-break-after: avoid !important;
+      page-break-before: avoid !important;
     }
     
     /* Garantir que o logo não interfira no conteúdo */
     .pdf-container {
       position: relative !important;
+    }
+    
+    /* Adicionar padding superior apenas na primeira seção para evitar sobreposição */
+    .pdf-container > div:first-child {
+      padding-top: 60px !important;
     }
     
     .pdf-container > * {

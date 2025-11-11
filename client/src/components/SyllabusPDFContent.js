@@ -85,23 +85,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '20px', marginTop: '0' }}>
-          {/* Logo no topo esquerdo */}
-          <div style={{ 
-            marginBottom: '20px',
-            marginTop: '0'
-          }}>
-            <img 
-              src="/FGV LOGO NOVO.png" 
-              alt="FGV Logo" 
-              style={{ 
-                maxHeight: '55px', 
-                height: '55px',
-                width: 'auto',
-                display: 'block'
-              }} 
-            />
-          </div>
+        <div key="info_gerais" style={{ marginBottom: '20px', marginTop: '0', paddingTop: '60px' }}>
           {/* Informações do curso como texto simples */}
           <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
             {formData.disciplina && (
@@ -658,6 +642,19 @@ function SyllabusPDFContent({ formData, professoresList }) {
       position: 'relative',
       overflow: 'visible'
     }}>
+      {/* Logo fixo em todas as páginas */}
+      <div className="pdf-logo-fixed">
+        <img 
+          src="/FGV LOGO NOVO.png" 
+          alt="FGV Logo" 
+          style={{ 
+            maxHeight: '55px', 
+            height: '55px',
+            width: 'auto',
+            display: 'block'
+          }} 
+        />
+      </div>
       {/* Renderizar seções na ordem correta */}
       {getOrderedSections().map(section => section.component)}
     </div>
