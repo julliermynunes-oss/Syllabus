@@ -1391,12 +1391,7 @@
   /* Configurações de página A4 */
   @page {
     size: A4;
-    margin: 60px 20mm 20mm 20mm;
-  }
-  
-  /* Primeira página - margem superior igual ao tamanho do logo */
-  @page:first {
-    margin-top: 60px;
+    margin: 20mm;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
@@ -1425,14 +1420,26 @@
     text-align: left !important;
   }
   
-  /* Logo fixo - oculto por padrão, visível apenas no print */
+  /* Logo fixo - oculto por padrão */
   .pdf-logo-fixed {
     display: none;
   }
   
   @media print {
+    /* Logo fixo em todas as páginas */
     .pdf-logo-fixed {
       display: block !important;
+      position: running(header-logo) !important;
+    }
+    
+    @page {
+      @top-left {
+        content: element(header-logo);
+      }
+    }
+    
+    /* Fallback: usar position fixed se running() não for suportado */
+    .pdf-logo-fixed {
       position: fixed !important;
       top: 0 !important;
       left: 0 !important;
@@ -1440,9 +1447,6 @@
       height: 55px !important;
       z-index: 9999 !important;
       pointer-events: none !important;
-      page-break-inside: avoid !important;
-      page-break-after: avoid !important;
-      page-break-before: avoid !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -1452,17 +1456,10 @@
       position: relative !important;
     }
     
-    /* Adicionar padding superior mínimo apenas na primeira seção para evitar sobreposição */
+    /* Adicionar padding superior apenas na primeira seção para evitar sobreposição */
     .pdf-container > div:first-child {
       padding-top: 60px !important;
       margin-top: 0 !important;
-    }
-    
-    /* Garantir que o logo apareça em todas as páginas usando position fixed */
-    .pdf-logo-fixed {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
     }
     
     .pdf-container > * {
