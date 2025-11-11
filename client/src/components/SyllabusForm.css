@@ -1411,30 +1411,25 @@
   /* Garantir que o logo não interfira no conteúdo */
   .pdf-container {
     position: relative !important;
-    padding-top: 80px !important;
+    padding-top: 0 !important;
     margin-top: 0 !important;
   }
   
   /* Adicionar padding superior na primeira seção para evitar sobreposição do logo */
   .pdf-container > div:first-child {
-    padding-top: 0 !important;
+    padding-top: 75px !important;
     margin-top: 0 !important;
   }
   
-  /* Garantir que todas as seções não tenham padding extra, pois o container já tem */
+  /* Garantir que todas as seções tenham espaço suficiente no topo quando começam uma nova página */
   .pdf-container > div {
-    padding-top: 0 !important;
+    padding-top: 75px !important;
     margin-top: 0 !important;
   }
   
-  /* Adicionar um pseudo-elemento no início de cada seção que cria espaço quando quebra para nova página */
-  .pdf-container > div::before {
-    content: '';
-    display: block;
-    height: 80px;
-    margin-top: -80px;
-    page-break-after: avoid;
-    page-break-inside: avoid;
+  /* A primeira seção já tem padding-top definido acima, então manter consistente */
+  .pdf-container > div:first-child {
+    padding-top: 75px !important;
   }
   
   /* Garantir que o primeiro elemento dentro de cada seção não adicione padding extra */
@@ -1494,14 +1489,14 @@
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 - margem superior mínima */
+  /* Configurações de página A4 - margem superior para garantir espaço para o logo */
   @page {
     size: A4;
-    margin: 0 20mm 20mm 20mm;
+    margin: 80px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 0;
+    margin-top: 80px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
