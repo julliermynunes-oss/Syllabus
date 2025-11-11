@@ -1371,7 +1371,9 @@
   }
   
   #pdf-content,
-  #pdf-content * {
+  #pdf-content *,
+  .pdf-logo-fixed,
+  .pdf-logo-fixed * {
     visibility: visible;
   }
   
