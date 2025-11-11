@@ -1426,6 +1426,13 @@
   }
   
   @media print {
+    /* Resetar posicionamento do container pdf-content no print */
+    #pdf-content {
+      position: static !important;
+      left: auto !important;
+      display: block !important;
+    }
+    
     /* Logo fixo em todas as páginas - position fixed funciona no print */
     .pdf-logo-fixed {
       display: block !important;
@@ -1465,11 +1472,6 @@
     .pdf-container > * {
       position: relative !important;
       z-index: 1 !important;
-    }
-    
-    /* Garantir que o logo apareça em todas as páginas */
-    body {
-      position: relative !important;
     }
   }
   
