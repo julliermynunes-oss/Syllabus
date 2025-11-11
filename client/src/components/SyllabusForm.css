@@ -1417,7 +1417,7 @@
   
   /* Adicionar padding superior apenas na primeira seção para evitar sobreposição do logo */
   .pdf-container > div:first-child {
-    padding-top: 85px !important;
+    padding-top: 100px !important;
     margin-top: 0 !important;
   }
   
@@ -1515,11 +1515,11 @@
   /* Configurações de página A4 - margem superior maior para garantir espaço para o logo em continuações */
   @page {
     size: A4;
-    margin: 85px 20mm 20mm 20mm;
+    margin: 100px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 85px;
+    margin-top: 100px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
