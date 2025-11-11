@@ -85,7 +85,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '20px', marginTop: '0', paddingTop: '60px' }}>
+        <div key="info_gerais" style={{ marginBottom: '20px', marginTop: '0' }}>
           {/* Informações do curso como texto simples */}
           <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
             {formData.disciplina && (
