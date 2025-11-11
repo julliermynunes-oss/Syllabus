@@ -1439,11 +1439,26 @@
   }
   
   /* IMPORTANTE: Quando conteúdo quebra no meio de uma lista ou parágrafo para nova página,
-     garantir que o elemento no topo tenha espaço suficiente */
+     adicionar padding-top para garantir espaço para o logo */
   .pdf-container ul,
   .pdf-container ol {
     padding-top: 0 !important;
     margin-top: 0 !important;
+  }
+  
+  /* Quando uma lista quebra para nova página, o primeiro elemento precisa de espaço */
+  .pdf-container ul:first-of-type,
+  .pdf-container ol:first-of-type {
+    padding-top: 0 !important;
+  }
+  
+  /* Adicionar um pseudo-elemento antes de listas que aparecem no topo de uma página */
+  .pdf-container > div ul::before,
+  .pdf-container > div ol::before {
+    content: '';
+    display: block;
+    height: 0;
+    margin-top: 0;
   }
   
   /* Quando um item de lista aparece no topo de uma nova página, garantir espaço */
@@ -1462,6 +1477,38 @@
   .pdf-container > div > div {
     padding-top: 0 !important;
     margin-top: 0 !important;
+  }
+  
+  /* SOLUÇÃO: Adicionar padding-top em elementos que podem aparecer no topo após quebra de página */
+  /* Usar um seletor mais específico para elementos que estão no início de uma seção após quebra */
+  .pdf-container > div > ul:first-child,
+  .pdf-container > div > ol:first-child,
+  .pdf-container > div > p:first-child,
+  .pdf-container > div > div:first-child {
+    padding-top: 0 !important;
+  }
+  
+  /* Adicionar um elemento spacer invisível no início de cada seção que cria espaço quando quebra */
+  .pdf-container > div::before {
+    content: '';
+    display: block;
+    height: 0;
+    margin-top: 0;
+    page-break-after: avoid;
+  }
+  
+  /* Quando uma seção quebra para nova página, o pseudo-elemento cria espaço */
+  .pdf-container > div {
+    position: relative;
+  }
+  
+  .pdf-container > div::before {
+    content: '';
+    display: block;
+    height: 75px;
+    margin-top: -75px;
+    page-break-after: avoid;
+    page-break-inside: avoid;
   }
   
   /* Garantir que títulos não sejam sobrepostos pelo logo */
@@ -1489,14 +1536,14 @@
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 - margem superior para garantir espaço para o logo */
+  /* Configurações de página A4 - margem superior maior para garantir espaço para o logo em continuações */
   @page {
     size: A4;
-    margin: 80px 20mm 20mm 20mm;
+    margin: 85px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 80px;
+    margin-top: 85px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
