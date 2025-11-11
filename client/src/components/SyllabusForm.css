@@ -1411,36 +1411,31 @@
   /* Garantir que o logo não interfira no conteúdo */
   .pdf-container {
     position: relative !important;
-    padding-top: 75px !important;
+    padding-top: 0 !important;
     margin-top: 0 !important;
   }
   
   /* Adicionar padding superior na primeira seção para evitar sobreposição do logo */
   .pdf-container > div:first-child {
-    padding-top: 0 !important;
+    padding-top: 70px !important;
     margin-top: 0 !important;
   }
   
   /* Garantir que todas as seções tenham espaço suficiente no topo quando começam uma nova página */
   .pdf-container > div {
-    padding-top: 0 !important;
+    padding-top: 70px !important;
     margin-top: 0 !important;
+  }
+  
+  /* A primeira seção já tem padding-top definido acima, então manter consistente */
+  .pdf-container > div:first-child {
+    padding-top: 70px !important;
   }
   
   /* Garantir que o primeiro elemento dentro de cada seção não adicione padding extra */
   .pdf-container > div > *:first-child {
     margin-top: 0 !important;
     padding-top: 0 !important;
-  }
-  
-  /* IMPORTANTE: Garantir que quando o conteúdo quebra para uma nova página no meio de um parágrafo,
-     ele tenha espaço suficiente. Adicionar padding-top em elementos que podem quebrar */
-  .pdf-container p,
-  .pdf-container div[style*="fontSize"],
-  .pdf-container ul,
-  .pdf-container ol {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
   }
   
   /* Garantir que títulos não sejam sobrepostos pelo logo */
@@ -1451,7 +1446,7 @@
   
   /* Títulos que aparecem no início de uma nova página precisam de espaço extra */
   .pdf-container > div h3:first-of-type {
-    margin-top: 15px !important;
+    margin-top: 10px !important;
     padding-top: 0 !important;
   }
   
@@ -1460,14 +1455,14 @@
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 - aumentar margem superior para garantir espaço para o logo */
+  /* Configurações de página A4 - margem superior para garantir espaço para o logo */
   @page {
     size: A4;
-    margin: 75px 20mm 20mm 20mm;
+    margin: 70px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 75px;
+    margin-top: 70px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
