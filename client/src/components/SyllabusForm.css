@@ -1458,6 +1458,12 @@
     margin-top: 0 !important;
   }
   
+  /* Garantir que divs com conteúdo que quebram para nova página tenham espaço */
+  .pdf-container > div > div {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
   /* Garantir que títulos não sejam sobrepostos pelo logo */
   .pdf-container h3 {
     margin-top: 15px !important;
@@ -1486,11 +1492,11 @@
   /* Configurações de página A4 - aumentar margem superior para garantir espaço para o logo em todas as páginas */
   @page {
     size: A4;
-    margin: 75px 20mm 20mm 20mm;
+    margin: 80px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 75px;
+    margin-top: 80px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
