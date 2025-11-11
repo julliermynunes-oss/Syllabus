@@ -1415,21 +1415,16 @@
     margin-top: 0 !important;
   }
   
-  /* Adicionar padding superior na primeira seção para evitar sobreposição do logo */
+  /* Adicionar padding superior apenas na primeira seção para evitar sobreposição do logo */
   .pdf-container > div:first-child {
     padding-top: 75px !important;
     margin-top: 0 !important;
   }
   
-  /* Garantir que todas as seções tenham espaço suficiente no topo quando começam uma nova página */
-  .pdf-container > div {
-    padding-top: 75px !important;
+  /* Remover padding-top das outras seções - a margem da página garante espaço quando quebram */
+  .pdf-container > div:not(:first-child) {
+    padding-top: 0 !important;
     margin-top: 0 !important;
-  }
-  
-  /* A primeira seção já tem padding-top definido acima, então manter consistente */
-  .pdf-container > div:first-child {
-    padding-top: 75px !important;
   }
   
   /* Garantir que o primeiro elemento dentro de cada seção não adicione padding extra */
@@ -1488,19 +1483,7 @@
     padding-top: 0 !important;
   }
   
-  /* Adicionar um elemento spacer invisível no início de cada seção que cria espaço quando quebra para nova página */
-  .pdf-container > div {
-    position: relative;
-  }
-  
-  .pdf-container > div::before {
-    content: '';
-    display: block;
-    height: 75px;
-    margin-top: -75px;
-    page-break-after: avoid;
-    page-break-inside: avoid;
-  }
+  /* Remover o pseudo-elemento - vamos usar apenas a margem da página */
   
   /* Garantir que títulos não sejam sobrepostos pelo logo */
   .pdf-container h3 {
