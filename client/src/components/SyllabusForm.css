@@ -1438,6 +1438,26 @@
     padding-top: 0 !important;
   }
   
+  /* IMPORTANTE: Quando conteúdo quebra no meio de uma lista ou parágrafo para nova página,
+     garantir que o elemento no topo tenha espaço suficiente */
+  .pdf-container ul,
+  .pdf-container ol {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Quando um item de lista aparece no topo de uma nova página, garantir espaço */
+  .pdf-container li {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
+  /* Quando um parágrafo quebra para nova página, garantir espaço */
+  .pdf-container p {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  
   /* Garantir que títulos não sejam sobrepostos pelo logo */
   .pdf-container h3 {
     margin-top: 20px !important;
@@ -1450,19 +1470,27 @@
     padding-top: 0 !important;
   }
   
+  /* Adicionar espaço no topo quando conteúdo quebra para nova página usando orphans/widows */
+  .pdf-container p,
+  .pdf-container li,
+  .pdf-container div {
+    orphans: 3 !important;
+    widows: 3 !important;
+  }
+  
   .pdf-container > * {
     position: relative !important;
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 - margem superior para garantir espaço para o logo */
+  /* Configurações de página A4 - aumentar margem superior para garantir espaço para o logo em todas as páginas */
   @page {
     size: A4;
-    margin: 70px 20mm 20mm 20mm;
+    margin: 75px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 70px;
+    margin-top: 75px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
