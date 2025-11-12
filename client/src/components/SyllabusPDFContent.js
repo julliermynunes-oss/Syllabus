@@ -133,11 +133,6 @@ function SyllabusPDFContent({ formData, professoresList }) {
                 <strong>{t('disciplineLeader')}:</strong> {formData.coordenador}
               </div>
             )}
-            {formData.idioma && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('language')}:</strong> {formData.idioma}
-              </div>
-            )}
             {formData.linha && (
               <div style={{ marginBottom: '4px' }}>
                 <strong>{t('line')}:</strong> {formData.linha}
