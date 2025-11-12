@@ -1599,7 +1599,7 @@
   }
   
   /* Remover cores alternadas (zebra striping) da tabela de Informações Gerais */
-  /* Garantir que TODAS as linhas sejam brancas */
+  /* Garantir que TODAS as linhas tenham fundo transparente */
   .pdf-container > div:first-child table tr,
   .pdf-container > div:first-child table tr:nth-child(even),
   .pdf-container > div:first-child table tr:nth-child(odd),
@@ -1607,8 +1607,8 @@
   .pdf-container > div:first-child table tr:nth-child(2n+1),
   .pdf-container > div:first-child table tr:nth-child(1),
   .pdf-container > div:first-child table tr:nth-child(n) {
-    background-color: white !important;
-    background: white !important;
+    background-color: transparent !important;
+    background: transparent !important;
   }
   
   .pdf-container > div:first-child table tr td,
@@ -1618,8 +1618,8 @@
   .pdf-container > div:first-child table tr:nth-child(2n+1) td,
   .pdf-container > div:first-child table tr:nth-child(1) td,
   .pdf-container > div:first-child table tr:nth-child(n) td {
-    background-color: white !important;
-    background: white !important;
+    background-color: transparent !important;
+    background: transparent !important;
   }
   
   /* Tabelas normais mantêm bordas e cores */
