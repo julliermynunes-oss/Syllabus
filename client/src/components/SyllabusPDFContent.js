@@ -112,6 +112,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
               <div style={{ 
                 fontWeight: 'bold',
                 marginRight: '8px',
+                width: '120px',
                 flexShrink: 0,
                 padding: '0',
                 margin: '0',
@@ -633,7 +634,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     }}>
       {/* Logo apenas na primeira página */}
       {sections.length > 0 && (
-        <div className="pdf-logo-first-page" style={{ marginBottom: '20px' }}>
+        <div className="pdf-logo-first-page" style={{ marginBottom: '15px' }}>
           <img 
             src="/FGV LOGO NOVO.png" 
             alt="FGV Logo" 
@@ -641,9 +642,16 @@ function SyllabusPDFContent({ formData, professoresList }) {
               maxHeight: '55px', 
               height: '55px',
               width: 'auto',
-              display: 'block'
+              display: 'block',
+              marginBottom: '10px'
             }} 
           />
+          <div style={{
+            width: '100%',
+            height: '1px',
+            backgroundColor: '#d0d0d0',
+            margin: '0'
+          }}></div>
         </div>
       )}
       {/* Renderizar seções na ordem correta */}
