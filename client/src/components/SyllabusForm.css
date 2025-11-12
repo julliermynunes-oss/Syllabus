@@ -1529,44 +1529,9 @@
     padding: 8px !important;
   }
   
-  /* Tabela de Informações Gerais - sem bordas e sem cores (apenas esta tabela) */
-  .pdf-container > div:first-child table {
-    border: none !important;
-    background-color: transparent !important;
-    background: none !important;
-    border-collapse: collapse !important;
-  }
-  
-  .pdf-container > div:first-child table td,
-  .pdf-container > div:first-child table th,
-  .pdf-container > div:first-child table tr {
-    border: none !important;
-    background-color: transparent !important;
-    background: none !important;
-    border-color: transparent !important;
-    border-width: 0 !important;
-  }
-  
-  .pdf-container > div:first-child table td:first-child,
-  .pdf-container > div:first-child table td:last-child {
-    border-left: none !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: none !important;
-    border-width: 0 !important;
-  }
-  
-  /* Forçar remoção de todas as bordas visíveis */
-  .pdf-container > div:first-child table * {
-    border: none !important;
-    border-width: 0 !important;
-    border-style: none !important;
-    border-color: transparent !important;
-    outline: none !important;
-  }
-  
-  /* Garantir que não há bordas em nenhum elemento da tabela */
+  /* Tabela de Informações Gerais - COMPLETAMENTE SEM BORDAS E SEM CORES */
   .pdf-container > div:first-child table,
+  .pdf-container > div:first-child table *,
   .pdf-container > div:first-child table tbody,
   .pdf-container > div:first-child table thead,
   .pdf-container > div:first-child table tfoot,
@@ -1577,8 +1542,28 @@
     border-width: 0 !important;
     border-style: none !important;
     border-color: transparent !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top-width: 0 !important;
+    border-bottom-width: 0 !important;
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    border-top-style: none !important;
+    border-bottom-style: none !important;
+    border-left-style: none !important;
+    border-right-style: none !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    background-color: transparent !important;
+    background: none !important;
     outline: none !important;
     box-shadow: none !important;
+    -webkit-border-image: none !important;
+    border-image: none !important;
   }
   
   /* Garantir que células da tabela de Informações Gerais não tenham cores */
