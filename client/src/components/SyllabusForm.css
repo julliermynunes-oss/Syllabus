@@ -1422,10 +1422,14 @@
     margin-top: 0 !important;
   }
   
-  /* Garantir que títulos tenham espaçamento normal */
+  /* Garantir que títulos tenham espaçamento normal e faixa cinza */
   .pdf-container h3 {
     margin-top: 15px !important;
-    padding-top: 0 !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    background-color: #f5f5f5 !important;
   }
   
   /* Adicionar espaço no topo quando conteúdo quebra para nova página usando orphans/widows */
@@ -1462,13 +1466,13 @@
     max-width: 100% !important;
   }
   
-  /* Títulos - texto simples em negrito */
+  /* Títulos - texto simples em negrito com faixa cinza clara */
   .pdf-container h3 {
     font-size: 15px !important;
     color: #000 !important;
     font-weight: bold !important;
-    background-color: transparent !important;
-    padding: 0 !important;
+    background-color: #f5f5f5 !important;
+    padding: 8px 12px !important;
     margin-bottom: 10px !important;
     margin-top: 15px !important;
     page-break-after: avoid;

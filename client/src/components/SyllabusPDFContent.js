@@ -165,7 +165,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             id: 'professores',
             component: (
               <div key="professores" className="professores-section" style={{ marginBottom: '18px', marginTop: '0', paddingTop: '0', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+                <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
                   {t('professorsTitle')}
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '10px' }}>
@@ -267,7 +267,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'sobre',
         component: (
           <div key="sobre" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('aboutDisciplineTitle')}
             </h3>
             <div 
@@ -285,7 +285,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'compromisso_etico',
         component: (
           <div key="compromisso_etico" className="compromisso-etico-section" style={{ marginBottom: '18px' }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('ethicalCommitmentTitle')}
             </h3>
             <div 
@@ -316,7 +316,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'competencias',
         component: (
           <div key="competencias" style={{ marginBottom: '18px', pageBreakInside: 'avoid' }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('competenciesTitle')}
             </h3>
             {formData.curso && (
@@ -340,7 +340,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'ods',
         component: (
           <div key="ods" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('odsTitle')}
             </h3>
             <div 
@@ -359,7 +359,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'conteudo',
         component: (
           <div key="conteudo" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('contentTitle')}
             </h3>
             <div 
@@ -378,7 +378,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'metodologia',
         component: (
           <div key="metodologia" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('methodologyTitle')}
             </h3>
             <div 
@@ -401,7 +401,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           if (parsed && parsed.rows && parsed.rows.length > 0) {
             return (
               <div style={{ marginBottom: '18px', pageBreakInside: 'avoid' }}>
-                <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+                <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
                   {t('evaluationCriteriaTitle')}
                 </h3>
                 <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '10px', fontSize: '11px' }}>
@@ -441,7 +441,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
             <div style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-              <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+              <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
@@ -455,7 +455,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           const hasTableOrImg = hasTablesOrImages(formData.criterio_avaliacao);
           return (
             <div style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-              <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+              <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
                 {t('evaluationCriteriaTitle')}
               </h3>
               <div 
@@ -480,7 +480,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'o_que_e_esperado',
         component: (
           <div key="o_que_e_esperado" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('expectedFromStudentTitle')}
             </h3>
             <div 
@@ -499,7 +499,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'custom',
         component: (
           <div key="custom" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {formData.custom_tab_name.toUpperCase()}
             </h3>
             <div 
@@ -599,7 +599,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'referencias',
         component: (
           <div key="referencias" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('referencesTitle')}
             </h3>
             {renderReferences()}
@@ -615,7 +615,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         id: 'contatos',
         component: (
           <div key="contatos" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
-            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold', backgroundColor: 'transparent', padding: '0', marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
+            <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
               {t('contactsTitle')}
             </h3>
             <div 
