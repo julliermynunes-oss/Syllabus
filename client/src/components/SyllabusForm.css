@@ -1493,10 +1493,28 @@
     padding-top: 0 !important;
   }
   
+  /* Quando uma seção (div) aparece no início de uma nova página, adicionar espaço para o logo */
+  .pdf-container > div {
+    padding-top: 0 !important;
+  }
+  
   /* Títulos que aparecem no início de uma nova página precisam de espaço extra */
   .pdf-container > div h3:first-of-type {
     margin-top: 0 !important;
     padding-top: 110px !important;
+  }
+  
+  /* Quando uma seção começa em uma nova página (após quebra), garantir espaço */
+  .pdf-container > div:not(:first-child) {
+    page-break-inside: avoid;
+  }
+  
+  /* Adicionar espaço antes de seções que podem aparecer no topo de uma nova página */
+  .pdf-container > div::before {
+    content: '';
+    display: block;
+    height: 0;
+    margin-top: 0;
   }
   
   /* Adicionar espaço no topo quando conteúdo quebra para nova página usando orphans/widows */
