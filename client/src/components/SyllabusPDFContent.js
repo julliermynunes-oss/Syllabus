@@ -81,64 +81,57 @@ function SyllabusPDFContent({ formData, professoresList }) {
   const getOrderedSections = () => {
     const sections = [];
 
-    // 1. Informações Gerais (sempre primeiro)
+    // 1. Informações Gerais (sempre primeiro) - tabela transparente
+    const infoRows = [];
+    if (formData.curso) infoRows.push({ label: t('course'), value: formData.curso });
+    if (formData.semestre_ano) infoRows.push({ label: t('period'), value: formData.semestre_ano });
+    if (formData.linha) infoRows.push({ label: t('line'), value: formData.linha });
+    if (formData.turma) infoRows.push({ label: t('class'), value: formData.turma });
+    if (formData.departamento) infoRows.push({ label: t('department'), value: formData.departamento });
+    if (formData.num_creditos) infoRows.push({ label: t('credits'), value: formData.num_creditos });
+    if (formData.sem_curricular) infoRows.push({ label: t('semester'), value: formData.sem_curricular });
+    if (formData.coordenador) infoRows.push({ label: t('disciplineLeader'), value: formData.coordenador });
+    if (professoresList && professoresList.length > 0) {
+      infoRows.push({ label: t('professorsList'), value: professoresList.join(', ') });
+    }
+    
     sections.push({
       id: 'info_gerais',
       component: (
         <div key="info_gerais" style={{ marginBottom: '10px', marginTop: '0' }}>
-          {/* Informações do curso como texto simples */}
-          <div style={{ fontSize: '12px', lineHeight: '1.6' }}>
-            {formData.disciplina && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('discipline')}:</strong> {formData.disciplina}
-              </div>
-            )}
-            {formData.turma && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('class')}:</strong> {formData.turma}
-              </div>
-            )}
-            {formData.semestre_ano && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('period')}:</strong> {formData.semestre_ano}
-              </div>
-            )}
-            {formData.departamento && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('department')}:</strong> {formData.departamento}
-              </div>
-            )}
-            {formData.curso && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('course')}:</strong> {formData.curso}
-              </div>
-            )}
-            {formData.sem_curricular && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('semester')}:</strong> {formData.sem_curricular}
-              </div>
-            )}
-            {formData.num_creditos && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('credits')}:</strong> {formData.num_creditos}
-              </div>
-            )}
-            {professoresList && professoresList.length > 0 && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('professorsList')}:</strong> {professoresList.join(', ')}
-              </div>
-            )}
-            {formData.coordenador && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('disciplineLeader')}:</strong> {formData.coordenador}
-              </div>
-            )}
-            {formData.linha && (
-              <div style={{ marginBottom: '4px' }}>
-                <strong>{t('line')}:</strong> {formData.linha}
-              </div>
-            )}
-          </div>
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse', 
+            fontSize: '12px', 
+            lineHeight: '1.6',
+            border: 'none',
+            backgroundColor: 'transparent'
+          }}>
+            <tbody>
+              {infoRows.map((row, index) => (
+                <tr key={index} style={{ border: 'none', backgroundColor: 'transparent' }}>
+                  <td style={{ 
+                    padding: '2px 8px 2px 0', 
+                    border: 'none', 
+                    backgroundColor: 'transparent',
+                    fontWeight: 'bold',
+                    verticalAlign: 'top',
+                    width: 'auto'
+                  }}>
+                    {row.label}:
+                  </td>
+                  <td style={{ 
+                    padding: '2px 0', 
+                    border: 'none', 
+                    backgroundColor: 'transparent',
+                    verticalAlign: 'top'
+                  }}>
+                    {row.value}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )
     });
