@@ -83,6 +83,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 1. Informações Gerais (sempre primeiro) - tabela transparente
     const infoRows = [];
+    if (formData.disciplina) infoRows.push({ label: t('discipline'), value: formData.disciplina });
     if (formData.curso) infoRows.push({ label: t('course'), value: formData.curso });
     if (formData.semestre_ano) infoRows.push({ label: t('period'), value: formData.semestre_ano });
     if (formData.linha) infoRows.push({ label: t('line'), value: formData.linha });
@@ -105,15 +106,34 @@ function SyllabusPDFContent({ formData, professoresList }) {
             fontSize: '12px', 
             lineHeight: '1.6',
             border: 'none',
-            backgroundColor: 'transparent'
+            borderWidth: '0',
+            borderStyle: 'none',
+            borderColor: 'transparent',
+            backgroundColor: 'transparent',
+            background: 'none'
           }}>
             <tbody>
               {infoRows.map((row, index) => (
-                <tr key={index} style={{ border: 'none', backgroundColor: 'transparent' }}>
+                <tr key={index} style={{ 
+                  border: 'none',
+                  borderWidth: '0',
+                  borderStyle: 'none',
+                  borderColor: 'transparent',
+                  backgroundColor: 'transparent',
+                  background: 'none'
+                }}>
                   <td style={{ 
                     padding: '2px 8px 2px 0', 
-                    border: 'none', 
+                    border: 'none',
+                    borderWidth: '0',
+                    borderStyle: 'none',
+                    borderColor: 'transparent',
+                    borderTop: 'none',
+                    borderBottom: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
                     backgroundColor: 'transparent',
+                    background: 'none',
                     fontWeight: 'bold',
                     verticalAlign: 'top',
                     width: 'auto'
@@ -122,8 +142,16 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   </td>
                   <td style={{ 
                     padding: '2px 0', 
-                    border: 'none', 
+                    border: 'none',
+                    borderWidth: '0',
+                    borderStyle: 'none',
+                    borderColor: 'transparent',
+                    borderTop: 'none',
+                    borderBottom: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
                     backgroundColor: 'transparent',
+                    background: 'none',
                     verticalAlign: 'top'
                   }}>
                     {row.value}
