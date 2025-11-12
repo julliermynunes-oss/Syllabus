@@ -635,16 +635,17 @@ function SyllabusPDFContent({ formData, professoresList }) {
     }}>
       {/* Logo apenas na primeira página */}
       {sections.length > 0 && (
-        <div className="pdf-logo-first-page" style={{ marginBottom: '15px' }}>
+        <div className="pdf-logo-first-page" style={{ marginTop: '0', marginBottom: '10px' }}>
           <img 
             src="/FGV LOGO NOVO.png" 
             alt="FGV Logo" 
             style={{ 
-              maxHeight: '55px', 
-              height: '55px',
+              maxHeight: '75px', 
+              height: '75px',
               width: 'auto',
               display: 'block',
-              marginBottom: '10px'
+              marginBottom: '10px',
+              marginTop: '0'
             }} 
           />
           <div style={{
