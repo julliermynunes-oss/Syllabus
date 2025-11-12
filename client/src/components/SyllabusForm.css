@@ -1415,106 +1415,17 @@
     margin-top: 0 !important;
   }
   
-  /* Adicionar padding superior apenas na primeira seção para evitar sobreposição do logo */
-  .pdf-container > div:first-child {
-    padding-top: 110px !important;
-    margin-top: 0 !important;
-  }
-  
-  /* Remover padding-top das outras seções - espaçamento será controlado apenas por marginBottom */
-  .pdf-container > div:not(:first-child) {
+  /* NOVA ABORDAGEM: Usar apenas a margem da página para o logo, sem padding extra */
+  /* Remover todos os paddings extras - a margem da página cuidará do espaço do logo */
+  .pdf-container > div {
     padding-top: 0 !important;
     margin-top: 0 !important;
   }
   
-  /* O espaço para o logo quando quebra para nova página é garantido pela margem da página (@page) */
-  
-  /* Garantir que o primeiro elemento dentro de cada seção não adicione padding extra */
-  .pdf-container > div > *:first-child {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-  }
-  
-  /* IMPORTANTE: Quando conteúdo quebra no meio de uma lista ou parágrafo para nova página,
-     adicionar padding-top para garantir espaço para o logo */
-  .pdf-container ul,
-  .pdf-container ol {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  
-  /* Quando uma lista quebra para nova página, o primeiro elemento precisa de espaço */
-  .pdf-container ul:first-of-type,
-  .pdf-container ol:first-of-type {
-    padding-top: 0 !important;
-  }
-  
-  /* Adicionar um pseudo-elemento antes de listas que aparecem no topo de uma página */
-  .pdf-container > div ul::before,
-  .pdf-container > div ol::before {
-    content: '';
-    display: block;
-    height: 0;
-    margin-top: 0;
-  }
-  
-  /* Quando um item de lista aparece no topo de uma nova página, garantir espaço */
-  .pdf-container li {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  
-  /* Quando um parágrafo quebra para nova página, garantir espaço */
-  .pdf-container p {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  
-  /* Garantir que divs com conteúdo que quebram para nova página tenham espaço */
-  .pdf-container > div > div {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
-  }
-  
-  /* SOLUÇÃO: Adicionar padding-top em elementos que podem aparecer no topo após quebra de página */
-  /* Usar um seletor mais específico para elementos que estão no início de uma seção após quebra */
-  .pdf-container > div > ul:first-child,
-  .pdf-container > div > ol:first-child,
-  .pdf-container > div > p:first-child,
-  .pdf-container > div > div:first-child {
-    padding-top: 0 !important;
-  }
-  
-  /* Remover o pseudo-elemento - vamos usar apenas a margem da página */
-  
-  /* Garantir que títulos não sejam sobrepostos pelo logo */
+  /* Garantir que títulos tenham espaçamento normal */
   .pdf-container h3 {
     margin-top: 15px !important;
     padding-top: 0 !important;
-  }
-  
-  /* Quando uma seção (div) aparece no início de uma nova página, adicionar espaço para o logo */
-  .pdf-container > div {
-    padding-top: 0 !important;
-  }
-  
-  /* Títulos que aparecem no início de uma nova página precisam de espaço extra */
-  .pdf-container > div h3:first-of-type {
-    margin-top: 0 !important;
-    padding-top: 110px !important;
-  }
-  
-  /* Quando uma seção começa em uma nova página (após quebra), garantir espaço */
-  .pdf-container > div:not(:first-child) {
-    page-break-inside: avoid;
-  }
-  
-  /* Adicionar espaço antes de seções que podem aparecer no topo de uma nova página */
-  .pdf-container > div::before {
-    content: '';
-    display: block;
-    height: 0;
-    margin-top: 0;
   }
   
   /* Adicionar espaço no topo quando conteúdo quebra para nova página usando orphans/widows */
@@ -1530,14 +1441,14 @@
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 - margem superior maior para garantir espaço para o logo em continuações */
+  /* Configurações de página A4 - margem superior para o logo (55px) + espaço extra (15px) = 70px */
   @page {
     size: A4;
-    margin: 110px 20mm 20mm 20mm;
+    margin: 70px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 110px;
+    margin-top: 70px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
