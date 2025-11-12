@@ -1523,6 +1523,9 @@
     margin: 15px 0 !important;
   }
   
+  /* Tabela de Informações Gerais - COMPLETAMENTE SEM BORDAS E SEM CORES - DEVE VIR ANTES DAS REGRAS GERAIS */
+  /* Esta regra tem prioridade sobre as regras gerais de tabela */
+  
   .pdf-container table td,
   .pdf-container table th {
     border: 1px solid #ddd !important;
