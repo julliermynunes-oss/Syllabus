@@ -1445,14 +1445,14 @@
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 - margem superior para o logo (55px) + espaço extra (35px) = 90px */
+  /* Configurações de página A4 - margem superior para o logo (55px) + espaço extra (50px) = 105px */
   @page {
     size: A4;
-    margin: 90px 20mm 20mm 20mm;
+    margin: 105px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 90px;
+    margin-top: 105px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
