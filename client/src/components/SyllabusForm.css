@@ -1395,8 +1395,8 @@
     display: block !important;
     visibility: visible !important;
     position: fixed !important;
-    top: 20mm !important;
-    left: 20mm !important;
+    top: 0 !important;
+    left: 0 !important;
     width: auto !important;
     height: 55px !important;
     z-index: 9999 !important;
@@ -1406,6 +1406,8 @@
     page-break-inside: avoid !important;
     page-break-after: avoid !important;
     page-break-before: avoid !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   /* Garantir que o logo não interfira no conteúdo */
@@ -1445,14 +1447,14 @@
     z-index: 1 !important;
   }
   
-  /* Configurações de página A4 - margem superior para o logo (55px) + espaço extra (50px) = 105px */
+  /* Configurações de página A4 - margem superior para o logo (55px) + espaço extra (20px) = 75px */
   @page {
     size: A4;
-    margin: 105px 20mm 20mm 20mm;
+    margin: 75px 20mm 20mm 20mm;
   }
   
   @page:first {
-    margin-top: 105px;
+    margin-top: 75px;
   }
   
   /* Logo fixo em todas as páginas usando pseudo-elemento */
