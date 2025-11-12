@@ -152,7 +152,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
           sections.push({
             id: 'professores',
             component: (
-              <div key="professores" className="professores-section" style={{ marginBottom: '18px', marginTop: '0', paddingTop: '0', pageBreakInside: 'avoid' }}>
+              <div key="professores" className="professores-section" style={{ marginBottom: '18px', marginTop: '0', paddingTop: '0' }}>
                 <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
                   {t('professorsTitle')}
                 </h3>
@@ -165,14 +165,14 @@ function SyllabusPDFContent({ formData, professoresList }) {
                         borderRadius: '8px', 
                         padding: '15px',
                         background: '#fff',
-                        pageBreakInside: 'avoid',
-                        breakInside: 'avoid',
+                        pageBreakInside: 'auto',
+                        breakInside: 'auto',
                         width: '100%',
                         maxWidth: '100%',
                         boxSizing: 'border-box',
                         overflow: 'visible'
                       }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px', pageBreakInside: 'avoid' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px', pageBreakInside: 'auto' }}>
                           {profData.foto && (
                             <img 
                               src={profData.foto} 
@@ -182,11 +182,12 @@ function SyllabusPDFContent({ formData, professoresList }) {
                                 height: '80px', 
                                 borderRadius: '50%', 
                                 objectFit: 'cover',
-                                border: '2px solid #235795'
+                                border: '2px solid #235795',
+                                flexShrink: 0
                               }}
                             />
                           )}
-                          <h4 style={{ margin: 0, color: '#235795', fontSize: '17px', fontWeight: 'bold', pageBreakAfter: 'avoid' }}>{professorNome}</h4>
+                          <h4 style={{ margin: 0, color: '#235795', fontSize: '17px', fontWeight: 'bold', pageBreakAfter: 'auto' }}>{professorNome}</h4>
                         </div>
                         {profData.descricao && (
                           <div 
@@ -195,7 +196,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
                               lineHeight: '1.5', 
                               marginBottom: '10px', 
                               color: '#333',
-                              pageBreakInside: 'avoid',
+                              pageBreakInside: 'auto',
                               orphans: 3,
                               widows: 3,
                               width: '100%',
