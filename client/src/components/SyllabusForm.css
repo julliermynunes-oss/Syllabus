@@ -1532,7 +1532,12 @@
     padding: 8px !important;
   }
   
-  /* Tabela de Informações Gerais - COMPLETAMENTE SEM BORDAS E SEM CORES */
+  /* Tabela de Informações Gerais - COMPLETAMENTE SEM BORDAS, MARGENS E CORES */
+  .pdf-container > div:first-child {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
   .pdf-container > div:first-child table,
   .pdf-container > div:first-child table *,
   .pdf-container > div:first-child table tbody,
@@ -1567,6 +1572,14 @@
     box-shadow: none !important;
     -webkit-border-image: none !important;
     border-image: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .pdf-container > div:first-child table {
+    border-spacing: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   /* Garantir que células da tabela de Informações Gerais não tenham cores E NEM BORDAS */

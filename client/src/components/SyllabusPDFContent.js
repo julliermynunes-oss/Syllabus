@@ -99,7 +99,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ marginBottom: '10px', marginTop: '0' }}>
+        <div key="info_gerais" style={{ margin: '0', marginBottom: '0', marginTop: '0', padding: '0' }}>
           <table style={{ 
             width: '100%', 
             borderCollapse: 'collapse', 
@@ -110,9 +110,12 @@ function SyllabusPDFContent({ formData, professoresList }) {
             borderStyle: 'none',
             borderColor: 'transparent',
             backgroundColor: 'transparent',
-            background: 'none'
+            background: 'none',
+            margin: '0',
+            padding: '0',
+            borderSpacing: '0'
           }}>
-            <tbody>
+            <tbody style={{ margin: '0', padding: '0' }}>
               {infoRows.map((row, index) => (
                 <tr key={index} style={{ 
                   border: 'none',
@@ -120,7 +123,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   borderStyle: 'none',
                   borderColor: 'transparent',
                   backgroundColor: 'transparent',
-                  background: 'none'
+                  background: 'none',
+                  margin: '0',
+                  padding: '0'
                 }}>
                   <td style={{ 
                     padding: '2px 8px 2px 0', 
@@ -136,7 +141,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
                     background: 'none',
                     fontWeight: 'bold',
                     verticalAlign: 'top',
-                    width: 'auto'
+                    width: 'auto',
+                    margin: '0'
                   }}>
                     {row.label}:
                   </td>
@@ -152,7 +158,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
                     borderRight: 'none',
                     backgroundColor: 'transparent',
                     background: 'none',
-                    verticalAlign: 'top'
+                    verticalAlign: 'top',
+                    margin: '0'
                   }}>
                     {row.value}
                   </td>
