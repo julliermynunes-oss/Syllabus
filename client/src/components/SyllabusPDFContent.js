@@ -102,7 +102,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
         <div key="info_gerais" style={{ margin: '0', marginBottom: '0', marginTop: '0', padding: '0' }}>
           <table style={{ 
             width: '100%', 
-            borderCollapse: 'collapse', 
+            borderCollapse: 'separate', 
+            borderSpacing: '0',
             fontSize: '12px', 
             lineHeight: '1.6',
             border: 'none',
@@ -112,8 +113,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
             backgroundColor: 'transparent',
             background: 'none',
             margin: '0',
-            padding: '0',
-            borderSpacing: '0'
+            padding: '0'
           }}>
             <tbody style={{ margin: '0', padding: '0' }}>
               {infoRows.map((row, index) => (

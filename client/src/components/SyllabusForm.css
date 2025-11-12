@@ -1578,9 +1578,14 @@
   }
   
   .pdf-container > div:first-child table {
+    border-collapse: separate !important;
     border-spacing: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+    border: none !important;
+    border-width: 0 !important;
+    border-style: none !important;
+    border-color: transparent !important;
   }
   
   /* Garantir que a regra geral de margin não seja aplicada */
