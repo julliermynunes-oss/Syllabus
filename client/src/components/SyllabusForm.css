@@ -1533,6 +1533,7 @@
   }
   
   /* Tabela de Informações Gerais - COMPLETAMENTE SEM BORDAS, MARGENS E CORES */
+  /* IMPORTANTE: Estas regras DEVEM vir DEPOIS das regras gerais e ter maior especificidade */
   .pdf-container > div:first-child {
     margin: 0 !important;
     padding: 0 !important;
@@ -1580,6 +1581,15 @@
     border-spacing: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+  }
+  
+  /* Garantir que a regra geral de margin não seja aplicada */
+  .pdf-container > div:first-child table {
+    margin: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
   
   /* Garantir que células da tabela de Informações Gerais não tenham cores E NEM BORDAS */
