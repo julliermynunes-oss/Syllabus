@@ -1586,20 +1586,27 @@
   }
   
   /* Remover cores alternadas (zebra striping) da tabela de Informações Gerais */
+  /* Garantir que TODAS as linhas sejam brancas */
+  .pdf-container > div:first-child table tr,
   .pdf-container > div:first-child table tr:nth-child(even),
   .pdf-container > div:first-child table tr:nth-child(odd),
   .pdf-container > div:first-child table tr:nth-child(2n),
-  .pdf-container > div:first-child table tr:nth-child(2n+1) {
-    background-color: transparent !important;
-    background: none !important;
+  .pdf-container > div:first-child table tr:nth-child(2n+1),
+  .pdf-container > div:first-child table tr:nth-child(1),
+  .pdf-container > div:first-child table tr:nth-child(n) {
+    background-color: white !important;
+    background: white !important;
   }
   
+  .pdf-container > div:first-child table tr td,
   .pdf-container > div:first-child table tr:nth-child(even) td,
   .pdf-container > div:first-child table tr:nth-child(odd) td,
   .pdf-container > div:first-child table tr:nth-child(2n) td,
-  .pdf-container > div:first-child table tr:nth-child(2n+1) td {
-    background-color: transparent !important;
-    background: none !important;
+  .pdf-container > div:first-child table tr:nth-child(2n+1) td,
+  .pdf-container > div:first-child table tr:nth-child(1) td,
+  .pdf-container > div:first-child table tr:nth-child(n) td {
+    background-color: white !important;
+    background: white !important;
   }
   
   /* Tabelas normais mantêm bordas e cores */
