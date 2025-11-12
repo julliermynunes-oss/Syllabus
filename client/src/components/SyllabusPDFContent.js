@@ -630,36 +630,38 @@ function SyllabusPDFContent({ formData, professoresList }) {
     return sections;
   };
   
+  const sections = getOrderedSections();
+  
   return (
-    <>
-      {/* Logo fixo em todas as páginas - fora do container para funcionar melhor no print */}
-      <div className="pdf-logo-fixed">
-        <img 
-          src="/FGV LOGO NOVO.png" 
-          alt="FGV Logo" 
-          style={{ 
-            maxHeight: '55px', 
-            height: '55px',
-            width: 'auto',
-            display: 'block'
-          }} 
-        />
-      </div>
-      <div className="pdf-container" style={{ 
-        padding: '0',
-        fontFamily: 'Arial, sans-serif',
-        color: '#000',
-        backgroundColor: '#fff',
-        maxWidth: '100%',
-        width: '100%',
-        boxSizing: 'border-box',
-        position: 'relative',
-        overflow: 'visible'
-      }}>
-        {/* Renderizar seções na ordem correta */}
-        {getOrderedSections().map(section => section.component)}
-      </div>
-    </>
+    <div className="pdf-container" style={{ 
+      padding: '0',
+      fontFamily: 'Arial, sans-serif',
+      color: '#000',
+      backgroundColor: '#fff',
+      maxWidth: '100%',
+      width: '100%',
+      boxSizing: 'border-box',
+      position: 'relative',
+      overflow: 'visible'
+    }}>
+      {/* Logo apenas na primeira página */}
+      {sections.length > 0 && (
+        <div className="pdf-logo-first-page" style={{ marginBottom: '20px' }}>
+          <img 
+            src="/FGV LOGO NOVO.png" 
+            alt="FGV Logo" 
+            style={{ 
+              maxHeight: '55px', 
+              height: '55px',
+              width: 'auto',
+              display: 'block'
+            }} 
+          />
+        </div>
+      )}
+      {/* Renderizar seções na ordem correta */}
+      {sections.map(section => section.component)}
+    </div>
   );
 }
 
