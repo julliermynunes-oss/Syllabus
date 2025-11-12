@@ -99,74 +99,38 @@ function SyllabusPDFContent({ formData, professoresList }) {
     sections.push({
       id: 'info_gerais',
       component: (
-        <div key="info_gerais" style={{ margin: '0', marginBottom: '0', marginTop: '0', padding: '0' }}>
-          <table style={{ 
-            width: '100%', 
-            borderCollapse: 'separate', 
-            borderSpacing: '0',
-            fontSize: '12px', 
-            lineHeight: '1.6',
-            border: 'none',
-            borderWidth: '0',
-            borderStyle: 'none',
-            borderColor: 'transparent',
-            backgroundColor: 'transparent',
-            background: 'none',
-            margin: '0',
-            padding: '0'
-          }}>
-            <tbody style={{ margin: '0', padding: '0' }}>
-              {infoRows.map((row, index) => (
-                <tr key={index} style={{ 
-                  border: 'none',
-                  borderWidth: '0',
-                  borderStyle: 'none',
-                  borderColor: 'transparent',
-                  backgroundColor: 'transparent',
-                  background: 'none',
-                  margin: '0',
-                  padding: '0'
-                }}>
-                  <td style={{ 
-                    padding: '2px 8px 2px 0', 
-                    border: 'none',
-                    borderWidth: '0',
-                    borderStyle: 'none',
-                    borderColor: 'transparent',
-                    borderTop: 'none',
-                    borderBottom: 'none',
-                    borderLeft: 'none',
-                    borderRight: 'none',
-                    backgroundColor: 'transparent',
-                    background: 'none',
-                    fontWeight: 'bold',
-                    verticalAlign: 'top',
-                    width: 'auto',
-                    margin: '0'
-                  }}>
-                    {row.label}:
-                  </td>
-                  <td style={{ 
-                    padding: '2px 0', 
-                    border: 'none',
-                    borderWidth: '0',
-                    borderStyle: 'none',
-                    borderColor: 'transparent',
-                    borderTop: 'none',
-                    borderBottom: 'none',
-                    borderLeft: 'none',
-                    borderRight: 'none',
-                    backgroundColor: 'transparent',
-                    background: 'none',
-                    verticalAlign: 'top',
-                    margin: '0'
-                  }}>
-                    {row.value}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div key="info_gerais" style={{ margin: '0', marginBottom: '0', marginTop: '0', padding: '0', fontSize: '12px', lineHeight: '1.6' }}>
+          {infoRows.map((row, index) => (
+            <div key={index} style={{ 
+              display: 'flex',
+              marginBottom: '4px',
+              margin: '0',
+              padding: '0',
+              border: 'none',
+              backgroundColor: 'transparent'
+            }}>
+              <div style={{ 
+                fontWeight: 'bold',
+                marginRight: '8px',
+                flexShrink: 0,
+                padding: '0',
+                margin: '0',
+                border: 'none',
+                backgroundColor: 'transparent'
+              }}>
+                {row.label}:
+              </div>
+              <div style={{ 
+                flex: 1,
+                padding: '0',
+                margin: '0',
+                border: 'none',
+                backgroundColor: 'transparent'
+              }}>
+                {row.value}
+              </div>
+            </div>
+          ))}
         </div>
       )
     });
