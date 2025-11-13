@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
+import axios from 'axios';
+import { API_URL } from '../config';
 
 // Componente para a tabela de competências no PDF
 const CompetenciesTablePDF = ({ data, curso }) => {
@@ -351,7 +353,26 @@ function SyllabusPDFContent({ formData, professoresList }) {
             {formData.curso && (
               <div style={{ marginTop: '10px', padding: '8px 12px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
                 <p style={{ margin: 0, fontSize: '11px', color: '#000', lineHeight: '1.3' }}>
-                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas aqui.
+                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas
+                  {linkInfo ? (
+                    <>
+                      {' '}
+                      <a 
+                        href={linkInfo} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ 
+                          color: '#235795', 
+                          textDecoration: 'underline',
+                          fontWeight: '500'
+                        }}
+                      >
+                        aqui
+                      </a>.
+                    </>
+                  ) : (
+                    ' aqui.'
+                  )}
                 </p>
               </div>
             )}

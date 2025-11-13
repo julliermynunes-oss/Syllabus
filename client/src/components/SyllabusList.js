@@ -527,6 +527,28 @@ const SyllabusList = () => {
 // Componente para renderizar o preview do syllabus
 const SyllabusPreviewContent = ({ formData, professoresList }) => {
   const { t } = useTranslation();
+  const [linkInfo, setLinkInfo] = useState(null);
+  
+  // Carregar linkInfo quando o curso mudar
+  useEffect(() => {
+    const loadLinkInfo = async () => {
+      if (formData.curso) {
+        try {
+          const response = await axios.get(`${API_URL}/api/competencias/limit`, {
+            params: { curso: formData.curso }
+          });
+          setLinkInfo(response.data.linkInfo || null);
+        } catch (error) {
+          console.error('Erro ao carregar linkInfo:', error);
+          setLinkInfo(null);
+        }
+      } else {
+        setLinkInfo(null);
+      }
+    };
+    
+    loadLinkInfo();
+  }, [formData.curso]);
   
   // Função auxiliar para verificar se o curso é restrito
   const isRestrictedCourse = (curso) => {
@@ -744,7 +766,26 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             {formData.curso && (
               <div style={{ marginTop: '15px', padding: '10px 15px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
                 <p style={{ margin: 0, fontSize: '14px', color: '#4a5568', lineHeight: '1.6' }}>
-                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas aqui.
+                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas
+                  {linkInfo ? (
+                    <>
+                      {' '}
+                      <a 
+                        href={linkInfo} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ 
+                          color: '#235795', 
+                          textDecoration: 'underline',
+                          fontWeight: '500'
+                        }}
+                      >
+                        aqui
+                      </a>.
+                    </>
+                  ) : (
+                    ' aqui.'
+                  )}
                 </p>
               </div>
             )}
