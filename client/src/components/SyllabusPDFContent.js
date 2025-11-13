@@ -83,6 +83,28 @@ const CompetenciesTablePDF = ({ data, curso }) => {
 // Componente separado para a visualização do PDF
 function SyllabusPDFContent({ formData, professoresList }) {
   const { t } = useTranslation();
+  const [linkInfo, setLinkInfo] = useState(null);
+  
+  // Carregar linkInfo quando o curso mudar
+  useEffect(() => {
+    const loadLinkInfo = async () => {
+      if (formData.curso) {
+        try {
+          const response = await axios.get(`${API_URL}/api/competencias/limit`, {
+            params: { curso: formData.curso }
+          });
+          setLinkInfo(response.data.linkInfo || null);
+        } catch (error) {
+          console.error('Erro ao carregar linkInfo:', error);
+          setLinkInfo(null);
+        }
+      } else {
+        setLinkInfo(null);
+      }
+    };
+    
+    loadLinkInfo();
+  }, [formData.curso]);
   
   // Função auxiliar para verificar se o HTML contém tabelas ou imagens
   const hasTablesOrImages = (html) => {
