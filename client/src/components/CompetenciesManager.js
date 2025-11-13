@@ -15,6 +15,8 @@ const CompetenciesManager = () => {
   const [loading, setLoading] = useState(true);
   const [limiteContribuicoes, setLimiteContribuicoes] = useState(0);
   const [limitesPorCurso, setLimitesPorCurso] = useState({});
+  const [linkInfo, setLinkInfo] = useState('');
+  const [linksPorCurso, setLinksPorCurso] = useState({});
 
   useEffect(() => {
     loadCompetenciasData();
@@ -28,10 +30,13 @@ const CompetenciesManager = () => {
       });
       
       const limitesMap = {};
+      const linksMap = {};
       response.data.forEach(item => {
         limitesMap[item.curso] = item.limite_contribuicoes;
+        linksMap[item.curso] = item.link_info || '';
       });
       setLimitesPorCurso(limitesMap);
+      setLinksPorCurso(linksMap);
     } catch (error) {
       console.error('Erro ao carregar limites:', error);
     }
@@ -89,11 +94,13 @@ const CompetenciesManager = () => {
           descricao: item.descricao || ''
         }))
       );
-      // Carregar limite do curso selecionado
+      // Carregar limite e link do curso selecionado
       setLimiteContribuicoes(limitesPorCurso[curso] || 0);
+      setLinkInfo(linksPorCurso[curso] || '');
     } else {
       setCompetenciaRows([]);
       setLimiteContribuicoes(0);
+      setLinkInfo('');
     }
   };
 
@@ -121,29 +128,34 @@ const CompetenciesManager = () => {
       return;
     }
 
-    // Salvar limite de contribuições
+    // Salvar limite de contribuições e link
     try {
       await axios.post(
         `${API_URL}/api/competencias/limit`,
         {
           curso: selectedCurso,
-          limite: limiteContribuicoes
+          limite: limiteContribuicoes,
+          linkInfo: linkInfo
         },
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
       
-      // Atualizar mapa de limites
+      // Atualizar mapas de limites e links
       setLimitesPorCurso(prev => ({
         ...prev,
         [selectedCurso]: limiteContribuicoes
       }));
+      setLinksPorCurso(prev => ({
+        ...prev,
+        [selectedCurso]: linkInfo
+      }));
       
-      alert('Limite de contribuições salvo com sucesso!');
+      alert('Configurações salvas com sucesso!');
     } catch (error) {
-      console.error('Erro ao salvar limite:', error);
-      alert('Erro ao salvar limite de contribuições');
+      console.error('Erro ao salvar configurações:', error);
+      alert('Erro ao salvar configurações');
       return;
     }
 
@@ -219,6 +231,32 @@ const CompetenciesManager = () => {
                 <span style={{ color: '#666', fontSize: '14px' }}>
                   bolinhas disponíveis para distribuir entre todas as competências
                 </span>
+              </div>
+            </div>
+
+            <div className="limite-config-section" style={{ marginTop: '20px' }}>
+              <label htmlFor="link-input">
+                <strong>Link de Informações sobre Competências para {selectedCurso}:</strong>
+              </label>
+              <div style={{ marginTop: '10px' }}>
+                <input
+                  id="link-input"
+                  type="url"
+                  value={linkInfo}
+                  onChange={(e) => setLinkInfo(e.target.value)}
+                  placeholder="https://exemplo.com/competencias"
+                  style={{
+                    padding: '8px 12px',
+                    border: '2px solid #235795',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    width: '100%',
+                    maxWidth: '600px'
+                  }}
+                />
+                <p style={{ color: '#666', fontSize: '12px', marginTop: '5px', marginBottom: 0 }}>
+                  Este link aparecerá no final da tabela de competências com o texto: "Mais informações sobre as competências esperadas para os egressos do {selectedCurso} podem ser encontradas aqui."
+                </p>
               </div>
             </div>
 

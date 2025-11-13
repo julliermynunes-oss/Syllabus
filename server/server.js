@@ -216,9 +216,15 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         curso TEXT UNIQUE NOT NULL,
         limite_contribuicoes INTEGER NOT NULL DEFAULT 0,
+        link_info TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
+      
+      // Adicionar coluna link_info se não existir (migração)
+      db.run(`ALTER TABLE competencia_limits ADD COLUMN link_info TEXT`, (err) => {
+        // Ignorar erro se coluna já existir
+      });
 
       // Normalização retroativa de valores de semestre (idempotente)
       const normalizeSemesters = () => {
@@ -700,7 +706,7 @@ app.get('/api/competencias/limit', (req, res) => {
   }
 
   db.get(
-    'SELECT limite_contribuicoes FROM competencia_limits WHERE curso = ?',
+    'SELECT limite_contribuicoes, link_info FROM competencia_limits WHERE curso = ?',
     [cursoCode],
     (err, row) => {
       if (err) {
@@ -709,7 +715,11 @@ app.get('/api/competencias/limit', (req, res) => {
       }
       
       // Se não houver limite configurado, retornar null (sem limite)
-      res.json({ curso: cursoCode, limite: row ? row.limite_contribuicoes : null });
+      res.json({ 
+        curso: cursoCode, 
+        limite: row ? row.limite_contribuicoes : null,
+        linkInfo: row ? row.link_info : null
+      });
     }
   );
 });
@@ -732,11 +742,13 @@ app.post('/api/competencias/limit', authenticateToken, (req, res) => {
     return res.status(400).json({ error: 'Curso não encontrado' });
   }
 
+  const { linkInfo } = req.body;
+  
   // Usar INSERT OR REPLACE para atualizar se já existir
   db.run(
-    `INSERT OR REPLACE INTO competencia_limits (curso, limite_contribuicoes, updated_at)
-     VALUES (?, ?, CURRENT_TIMESTAMP)`,
-    [cursoCode, limite],
+    `INSERT OR REPLACE INTO competencia_limits (curso, limite_contribuicoes, link_info, updated_at)
+     VALUES (?, ?, ?, CURRENT_TIMESTAMP)`,
+    [cursoCode, limite, linkInfo || null],
     function(err) {
       if (err) {
         console.error('Erro ao salvar limite:', err);
@@ -746,7 +758,8 @@ app.post('/api/competencias/limit', authenticateToken, (req, res) => {
       res.json({ 
         message: 'Limite salvo com sucesso',
         curso: cursoCode,
-        limite: limite
+        limite: limite,
+        linkInfo: linkInfo || null
       });
     }
   );
@@ -755,7 +768,7 @@ app.post('/api/competencias/limit', authenticateToken, (req, res) => {
 // Endpoint para obter todos os limites (para a tela de gerenciamento)
 app.get('/api/competencias/limits', authenticateToken, (req, res) => {
   db.all(
-    'SELECT curso, limite_contribuicoes FROM competencia_limits ORDER BY curso',
+    'SELECT curso, limite_contribuicoes, link_info FROM competencia_limits ORDER BY curso',
     [],
     (err, rows) => {
       if (err) {

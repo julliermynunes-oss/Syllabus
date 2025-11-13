@@ -8,6 +8,8 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
   const initializedRef = useRef(false);
   const loadedCursoRef = useRef(null);
   const [limiteContribuicoes, setLimiteContribuicoes] = useState(null);
+  const [linkInfo, setLinkInfo] = useState(null);
+  const [outrosObjetivos, setOutrosObjetivos] = useState('');
 
   // Carregar dados salvos primeiro (se houver)
   useEffect(() => {
@@ -27,6 +29,10 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
             initializedRef.current = true;
             console.log('Competências carregadas do banco:', sortedRows.length, 'linhas');
           }
+        }
+        // Carregar outrosObjetivos se existir
+        if (parsed.outrosObjetivos !== undefined) {
+          setOutrosObjetivos(parsed.outrosObjetivos || '');
         }
       } catch (e) {
         console.error('Erro ao parsear competências salvas:', e);
@@ -48,7 +54,7 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [curso]);
 
-  // Carregar limite de contribuições do curso
+  // Carregar limite de contribuições e link do curso
   const loadLimite = async (cursoNome) => {
     if (!cursoNome) return;
     
@@ -57,9 +63,11 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
         params: { curso: cursoNome }
       });
       setLimiteContribuicoes(response.data.limite);
+      setLinkInfo(response.data.linkInfo || null);
     } catch (error) {
       console.error('Erro ao carregar limite:', error);
       setLimiteContribuicoes(null); // Sem limite se houver erro
+      setLinkInfo(null);
     }
   };
 
@@ -166,12 +174,12 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
 
   // Salvar dados automaticamente quando mudarem (mas não na primeira renderização)
   useEffect(() => {
-    if (initializedRef.current && rows.length > 0) {
-      const dataObj = { rows };
+    if (initializedRef.current) {
+      const dataObj = { rows, outrosObjetivos };
       onChange(JSON.stringify(dataObj));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows]);
+  }, [rows, outrosObjetivos]);
 
   const updateRow = (index, field, value) => {
     // Não permitir editar competência
@@ -252,8 +260,8 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
       {curso && rows.length > 0 && (
         <div className="competencies-intro">
           <p>
-            Na tabela abaixo, são apresentados os objetivos de aprendizagem da disciplina e como 
-            estes contribuem para o desenvolvimento das competências do {getCursoSigla(curso)}.
+            Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
+            demonstrando como contribuem para a aquisição das competências esperadas para os egressos do {getCursoSigla(curso)}.
           </p>
           {limiteContribuicoes !== null && (
             <div style={{
@@ -293,12 +301,17 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 && (
+            {rows.length === 0 && !curso && (
               <tr className="empty-row">
                 <td colSpan="3" className="empty-message">
-                  {curso 
-                    ? 'Nenhuma competência encontrada para este curso.' 
-                    : 'Selecione um curso e disciplina para carregar as competências automaticamente.'}
+                  Selecione um curso e disciplina para carregar as competências automaticamente.
+                </td>
+              </tr>
+            )}
+            {rows.length === 0 && curso && (
+              <tr className="empty-row">
+                <td colSpan="3" className="empty-message">
+                  Nenhuma competência encontrada para este curso.
                 </td>
               </tr>
             )}
@@ -338,9 +351,60 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
                 </td>
               </tr>
             ))}
+            {/* Campo Outros Objetivos da Disciplina */}
+            {curso && (
+              <tr>
+                <td className="col-competencia">
+                  <input
+                    type="text"
+                    value="Outros Objetivos da Disciplina"
+                    readOnly
+                    className="table-input readonly"
+                    style={{ fontWeight: 'bold' }}
+                  />
+                </td>
+                <td className="col-descricao">
+                  <textarea
+                    value={outrosObjetivos}
+                    onChange={(e) => setOutrosObjetivos(e.target.value)}
+                    placeholder="Descreva outros objetivos da disciplina"
+                    className="table-textarea"
+                    rows="2"
+                  />
+                </td>
+                <td className="col-contribuicao" style={{ textAlign: 'center', color: '#999' }}>
+                  -
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+      
+      {/* Texto com link no final */}
+      {curso && linkInfo && (
+        <div style={{ 
+          marginTop: '20px', 
+          padding: '12px', 
+          fontSize: '14px', 
+          color: '#4a5568',
+          lineHeight: '1.6'
+        }}>
+          Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(curso)} podem ser encontradas{' '}
+          <a 
+            href={linkInfo} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            style={{ 
+              color: '#235795', 
+              textDecoration: 'underline',
+              fontWeight: '500'
+            }}
+          >
+            aqui
+          </a>.
+        </div>
+      )}
     </div>
   );
 });
