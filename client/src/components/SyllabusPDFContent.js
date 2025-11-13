@@ -2,8 +2,26 @@ import React from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 
 // Componente para a tabela de competências no PDF
-const CompetenciesTablePDF = ({ data }) => {
+const CompetenciesTablePDF = ({ data, curso }) => {
   const { t } = useTranslation();
+  
+  const getCursoSigla = (cursoNome) => {
+    if (!cursoNome) return '';
+    const cursoUpper = cursoNome.toUpperCase();
+    if (cursoUpper.includes('CGA') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO')) {
+      return 'CGA';
+    } else if (cursoUpper.includes('CGAP') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA')) {
+      return 'CGAP';
+    } else if (cursoUpper.includes('AFA') || cursoUpper.includes('2ª GRADUAÇÃO')) {
+      return 'AFA';
+    }
+    // Extrair sigla do padrão: "CGA - Curso de Graduação em Administração" -> "CGA"
+    const match = cursoNome.match(/^([A-Z]+(?:\s+[A-Z]+)?)/);
+    if (match) {
+      return match[1].replace(/\s+/g, '');
+    }
+    return cursoNome.trim();
+  };
   
   if (!data || data === '' || data === '[]') {
     return <div style={{ fontSize: '15px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
@@ -12,34 +30,47 @@ const CompetenciesTablePDF = ({ data }) => {
   try {
     const parsed = JSON.parse(data);
     
-    // O formato é { rows: [...] }
+    // O formato é { rows: [...], outrosObjetivos: '...' }
     const rows = parsed.rows || parsed;
+    const outrosObjetivos = parsed.outrosObjetivos || '';
     
     if (!rows || rows.length === 0) {
       return <div style={{ fontSize: '15px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
     }
     
     return (
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', fontSize: '11px' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
-            <th style={{ padding: '4px 6px', textAlign: 'left', border: '1px solid #235795', fontSize: '11px' }}>{t('competence')}</th>
-            <th style={{ padding: '4px 6px', textAlign: 'left', border: '1px solid #235795', fontSize: '11px' }}>{t('descriptionField')}</th>
-            <th style={{ padding: '4px 6px', textAlign: 'center', border: '1px solid #235795', fontSize: '11px', width: '130px' }}>{t('contributionDegree')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, index) => (
-            <tr key={index}>
-              <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{row.competencia || '-'}</td>
-              <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{row.descricao || '-'}</td>
-              <td style={{ padding: '3px 6px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px' }}>
-                {'●'.repeat(row.grau || 0)}{'○'.repeat(3 - (row.grau || 0))}
-              </td>
+      <>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', fontSize: '11px' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
+              <th style={{ padding: '4px 6px', textAlign: 'left', border: '1px solid #235795', fontSize: '11px' }}>
+                {curso ? `Competências ${getCursoSigla(curso)}` : 'Competências'}
+              </th>
+              <th style={{ padding: '4px 6px', textAlign: 'left', border: '1px solid #235795', fontSize: '11px' }}>Objetivos da Disciplina</th>
+              <th style={{ padding: '4px 6px', textAlign: 'center', border: '1px solid #235795', fontSize: '11px', width: '130px' }}>Grau de Contribuição</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={index}>
+                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{row.competencia || '-'}</td>
+                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{row.descricao || '-'}</td>
+                <td style={{ padding: '3px 6px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px' }}>
+                  {'●'.repeat(row.grau || 0)}{'○'.repeat(3 - (row.grau || 0))}
+                </td>
+              </tr>
+            ))}
+            {/* Campo Outros Objetivos da Disciplina */}
+            {curso && (
+              <tr>
+                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px', fontWeight: 'bold' }}>Outros Objetivos da Disciplina</td>
+                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{outrosObjetivos || '-'}</td>
+                <td style={{ padding: '3px 6px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px', color: '#999' }}>-</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </>
     );
   } catch (e) {
     console.error('Erro ao renderizar competências:', e, 'Data:', data);
@@ -309,14 +340,21 @@ function SyllabusPDFContent({ formData, professoresList }) {
               {t('competenciesTitle')}
             </h3>
             {formData.curso && (
-              <div style={{ marginBottom: '10px', padding: '8px 12px', background: 'transparent', borderLeft: 'none', borderRadius: '0' }}>
+              <div style={{ marginBottom: '10px', padding: '8px 12px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
                 <p style={{ margin: 0, fontSize: '11px', color: '#000', lineHeight: '1.3' }}>
                   Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
-                  demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(formData.curso)}.
+                  demonstrando como contribuem para a aquisição das competências esperadas para os egressos do {getCursoSigla(formData.curso)}.
                 </p>
               </div>
             )}
-            <CompetenciesTablePDF data={formData.competencias} />
+            <CompetenciesTablePDF data={formData.competencias} curso={formData.curso} />
+            {formData.curso && (
+              <div style={{ marginTop: '10px', padding: '8px 12px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
+                <p style={{ margin: 0, fontSize: '11px', color: '#000', lineHeight: '1.3' }}>
+                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas aqui.
+                </p>
+              </div>
+            )}
           </div>
         )
       });

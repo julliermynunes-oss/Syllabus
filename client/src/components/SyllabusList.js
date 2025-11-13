@@ -736,11 +736,37 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
               <div style={{ marginBottom: '15px', padding: '10px 15px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
                 <p style={{ margin: 0, fontSize: '14px', color: '#4a5568', lineHeight: '1.6' }}>
                   Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
-                  demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(formData.curso)}.
+                  demonstrando como contribuem para a aquisição das competências esperadas para os egressos do {getCursoSigla(formData.curso)}.
                 </p>
               </div>
             )}
-            <CompetenciesTablePDF data={formData.competencias} />
+            <CompetenciesTablePDF data={formData.competencias} curso={formData.curso} />
+            {formData.curso && (
+              <div style={{ marginTop: '15px', padding: '10px 15px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
+                <p style={{ margin: 0, fontSize: '14px', color: '#4a5568', lineHeight: '1.6' }}>
+                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas
+                  {linkInfo ? (
+                    <>
+                      {' '}
+                      <a 
+                        href={linkInfo} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        style={{ 
+                          color: '#235795', 
+                          textDecoration: 'underline',
+                          fontWeight: '500'
+                        }}
+                      >
+                        aqui
+                      </a>.
+                    </>
+                  ) : (
+                    ' aqui.'
+                  )}
+                </p>
+              </div>
+            )}
           </div>
         );
       })()}
@@ -985,8 +1011,26 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
 };
 
 // Componente para a tabela de competências no preview
-const CompetenciesTablePDF = ({ data }) => {
+const CompetenciesTablePDF = ({ data, curso, linkInfo }) => {
   const { t } = useTranslation();
+  
+  const getCursoSigla = (cursoNome) => {
+    if (!cursoNome) return '';
+    const cursoUpper = cursoNome.toUpperCase();
+    if (cursoUpper.includes('CGA') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO')) {
+      return 'CGA';
+    } else if (cursoUpper.includes('CGAP') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA')) {
+      return 'CGAP';
+    } else if (cursoUpper.includes('AFA') || cursoUpper.includes('2ª GRADUAÇÃO')) {
+      return 'AFA';
+    }
+    // Extrair sigla do padrão: "CGA - Curso de Graduação em Administração" -> "CGA"
+    const match = cursoNome.match(/^([A-Z]+(?:\s+[A-Z]+)?)/);
+    if (match) {
+      return match[1].replace(/\s+/g, '');
+    }
+    return cursoNome.trim();
+  };
   
   if (!data || data === '' || data === '[]') {
     return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
@@ -995,34 +1039,47 @@ const CompetenciesTablePDF = ({ data }) => {
   try {
     const parsed = JSON.parse(data);
     
-    // O formato é { rows: [...] }
+    // O formato é { rows: [...], outrosObjetivos: '...' }
     const rows = parsed.rows || parsed;
+    const outrosObjetivos = parsed.outrosObjetivos || '';
     
     if (!rows || rows.length === 0) {
       return <div style={{ fontSize: '14px', color: '#666', fontStyle: 'italic' }}>{t('noCompetencies')}</div>;
     }
     
     return (
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '12px' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>{t('competence')}</th>
-            <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>{t('descriptionField')}</th>
-            <th style={{ padding: '10px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '12px', width: '100px' }}>{t('contributionDegree')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, index) => (
-            <tr key={index}>
-              <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.competencia || '-'}</td>
-              <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.descricao || '-'}</td>
-              <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px' }}>
-                {'●'.repeat(row.grau || 0)}{'○'.repeat(3 - (row.grau || 0))}
-              </td>
+      <>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', fontSize: '12px' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
+              <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>
+                {curso ? `Competências ${getCursoSigla(curso)}` : 'Competências'}
+              </th>
+              <th style={{ padding: '10px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>Objetivos da Disciplina</th>
+              <th style={{ padding: '10px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '12px', width: '100px' }}>Grau de Contribuição</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row, index) => (
+              <tr key={index}>
+                <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.competencia || '-'}</td>
+                <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{row.descricao || '-'}</td>
+                <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px' }}>
+                  {'●'.repeat(row.grau || 0)}{'○'.repeat(3 - (row.grau || 0))}
+                </td>
+              </tr>
+            ))}
+            {/* Campo Outros Objetivos da Disciplina */}
+            {curso && (
+              <tr>
+                <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px', fontWeight: 'bold' }}>Outros Objetivos da Disciplina</td>
+                <td style={{ padding: '8px', border: '1px solid #ddd', fontSize: '11px' }}>{outrosObjetivos || '-'}</td>
+                <td style={{ padding: '8px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px', color: '#999' }}>-</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </>
     );
   } catch (e) {
     console.error('Erro ao renderizar competências:', e, 'Data:', data);
