@@ -252,8 +252,8 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
       {curso && rows.length > 0 && (
         <div className="competencies-intro">
           <p>
-            Os objetivos de aprendizagem da disciplina estão apresentados na tabela abaixo, 
-            demonstrando como os mesmos contribuem para os objetivos do {getCursoSigla(curso)}.
+            Na tabela abaixo, são apresentados os objetivos de aprendizagem da disciplina e como 
+            estes contribuem para o desenvolvimento das competências do {getCursoSigla(curso)}.
           </p>
           {limiteContribuicoes !== null && (
             <div style={{
@@ -285,8 +285,10 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
         <table className="competencies-table">
           <thead>
             <tr>
-              <th className="col-competencia">Competência</th>
-              <th className="col-descricao">Descrição</th>
+              <th className="col-competencia">
+                {curso ? `Competências ${getCursoSigla(curso)}` : 'Competências'}
+              </th>
+              <th className="col-descricao">Objetivos da Disciplina</th>
               <th className="col-contribuicao">Grau de Contribuição</th>
             </tr>
           </thead>
