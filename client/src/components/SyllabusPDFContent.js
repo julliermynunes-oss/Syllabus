@@ -40,22 +40,22 @@ const CompetenciesTablePDF = ({ data, curso }) => {
     
     return (
       <>
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', fontSize: '11px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '8px', fontSize: '12px' }}>
           <thead>
             <tr style={{ backgroundColor: '#235795', color: '#fff' }}>
-              <th style={{ padding: '4px 6px', textAlign: 'left', border: '1px solid #235795', fontSize: '11px' }}>
+              <th style={{ padding: '6px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>
                 {curso ? `Competências ${getCursoSigla(curso)}` : 'Competências'}
               </th>
-              <th style={{ padding: '4px 6px', textAlign: 'left', border: '1px solid #235795', fontSize: '11px' }}>Objetivos da Disciplina</th>
-              <th style={{ padding: '4px 6px', textAlign: 'center', border: '1px solid #235795', fontSize: '11px', width: '130px' }}>Grau de Contribuição</th>
+              <th style={{ padding: '6px 8px', textAlign: 'left', border: '1px solid #235795', fontSize: '12px' }}>Objetivos da Disciplina</th>
+              <th style={{ padding: '6px 8px', textAlign: 'center', border: '1px solid #235795', fontSize: '12px', width: '130px' }}>Grau de Contribuição</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, index) => (
               <tr key={index}>
-                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{row.competencia || '-'}</td>
-                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{row.descricao || '-'}</td>
-                <td style={{ padding: '3px 6px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px' }}>
+                <td style={{ padding: '5px 8px', border: '1px solid #ddd', fontSize: '12px' }}>{row.competencia || '-'}</td>
+                <td style={{ padding: '5px 8px', border: '1px solid #ddd', fontSize: '12px' }}>{row.descricao || '-'}</td>
+                <td style={{ padding: '5px 8px', border: '1px solid #ddd', textAlign: 'center', fontSize: '12px' }}>
                   {'●'.repeat(row.grau || 0)}{'○'.repeat(3 - (row.grau || 0))}
                 </td>
               </tr>
@@ -63,9 +63,9 @@ const CompetenciesTablePDF = ({ data, curso }) => {
             {/* Campo Outros Objetivos da Disciplina */}
             {curso && (
               <tr>
-                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px', fontWeight: 'bold' }}>Outros Objetivos da Disciplina</td>
-                <td style={{ padding: '3px 6px', border: '1px solid #ddd', fontSize: '11px' }}>{outrosObjetivos || '-'}</td>
-                <td style={{ padding: '3px 6px', border: '1px solid #ddd', textAlign: 'center', fontSize: '11px', color: '#999' }}>-</td>
+                <td style={{ padding: '5px 8px', border: '1px solid #ddd', fontSize: '12px', fontWeight: 'bold' }}>Outros Objetivos da Disciplina</td>
+                <td style={{ padding: '5px 8px', border: '1px solid #ddd', fontSize: '12px' }}>{outrosObjetivos || '-'}</td>
+                <td style={{ padding: '5px 8px', border: '1px solid #ddd', textAlign: 'center', fontSize: '12px', color: '#999' }}>-</td>
               </tr>
             )}
           </tbody>
