@@ -382,27 +382,30 @@ const CompetenciesTable = forwardRef(({ data, onChange, curso }, ref) => {
       </div>
       
       {/* Texto com link no final */}
-      {curso && linkInfo && (
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '12px', 
-          fontSize: '14px', 
-          color: '#4a5568',
-          lineHeight: '1.6'
-        }}>
-          Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(curso)} podem ser encontradas{' '}
-          <a 
-            href={linkInfo} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ 
-              color: '#235795', 
-              textDecoration: 'underline',
-              fontWeight: '500'
-            }}
-          >
-            aqui
-          </a>.
+      {curso && (
+        <div className="competencies-intro" style={{ marginTop: '20px' }}>
+          <p>
+            Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(curso)} podem ser encontradas
+            {linkInfo ? (
+              <>
+                {' '}
+                <a 
+                  href={linkInfo} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    color: '#235795', 
+                    textDecoration: 'underline',
+                    fontWeight: '500'
+                  }}
+                >
+                  aqui
+                </a>.
+              </>
+            ) : (
+              ' aqui.'
+            )}
+          </p>
         </div>
       )}
     </div>
