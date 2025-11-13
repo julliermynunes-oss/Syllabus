@@ -744,26 +744,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             {formData.curso && (
               <div style={{ marginTop: '15px', padding: '10px 15px', background: '#f8f9fa', borderLeft: '4px solid #235795', borderRadius: '4px' }}>
                 <p style={{ margin: 0, fontSize: '14px', color: '#4a5568', lineHeight: '1.6' }}>
-                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas
-                  {linkInfo ? (
-                    <>
-                      {' '}
-                      <a 
-                        href={linkInfo} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        style={{ 
-                          color: '#235795', 
-                          textDecoration: 'underline',
-                          fontWeight: '500'
-                        }}
-                      >
-                        aqui
-                      </a>.
-                    </>
-                  ) : (
-                    ' aqui.'
-                  )}
+                  Mais informações sobre as competências esperadas para os egressos do {getCursoSigla(formData.curso)} podem ser encontradas aqui.
                 </p>
               </div>
             )}
