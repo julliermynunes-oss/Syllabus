@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaChevronUp, FaChevronDown, FaPlus } from 'react-icons/fa';
 import axios from 'axios';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../hooks/useTranslation';
 import { API_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 import CompetenciesManager from './CompetenciesManager';

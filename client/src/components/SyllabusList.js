@@ -273,25 +273,6 @@ const SyllabusList = () => {
           <h1 className="main-title">{t('syllabus')}</h1>
         </div>
         <div className="header-actions">
-          <select
-            value={language}
-            onChange={(e) => changeLanguage(e.target.value)}
-            style={{
-              padding: '0.5rem 1rem',
-              border: '2px solid #235795',
-              borderRadius: '8px',
-              background: 'white',
-              color: '#235795',
-              fontWeight: '600',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-              marginRight: '1rem'
-            }}
-          >
-            <option value="pt">BR - Português</option>
-            <option value="en">US - English</option>
-            <option value="es">ES - Español</option>
-          </select>
           <div className="user-badge" title={user?.email}>{t('professor')}: {user?.nome_completo || '—'}</div>
           {canAccessConfigurations && (
             <button className="icon-btn" onClick={() => navigate('/configuracoes')} style={{ backgroundColor: '#28a745', color: 'white' }}>
