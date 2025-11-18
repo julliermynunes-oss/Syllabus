@@ -66,25 +66,51 @@
 .config-tab {
   border: none;
   background: transparent;
-  padding: 10px 16px;
-  font-size: 14px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #666;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   cursor: pointer;
+  border-radius: 12px 12px 0 0;
   border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  white-space: nowrap;
+  text-align: center;
+  flex-shrink: 0;
+  justify-content: center;
 }
 
 .config-tab svg {
-  font-size: 16px;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.config-tab:hover {
+  background: #f8f9fa;
+  color: #235795;
+}
+
+.config-tab:hover svg {
+  transform: scale(1.1);
 }
 
 .config-tab.active {
   color: #235795;
   border-bottom-color: #235795;
+  background: white;
+  z-index: 1;
+}
+
+.config-tab.active svg {
+  transform: scale(1.15);
+}
+
+.config-tab.active:hover {
+  background: white;
 }
 
 .config-tab-panel {
