@@ -304,17 +304,26 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                         min={weightLimits.min}
                         max={weightLimits.max}
                         step="0.1"
-                        value={row.peso ? (parseFloat(row.peso) || '') : ''}
+                        value={row.peso ? (parseFloat(row.peso.toString().replace('%', '')) || '') : ''}
                         onChange={(e) => {
                           const val = e.target.value;
-                          if (val === '' || (!isNaN(parseFloat(val)) && parseFloat(val) >= weightLimits.min && parseFloat(val) <= weightLimits.max)) {
-                            updateRow(index, 'peso', val ? `${val}%` : '');
-                          }
+                          // Permitir digitar qualquer valor (para poder corrigir)
+                          // A validação será feita pelo updateRow
+                          updateRow(index, 'peso', val ? `${val}%` : '');
                         }}
                         onBlur={(e) => {
                           const val = parseFloat(e.target.value);
-                          if (!isNaN(val) && val >= weightLimits.min && val <= weightLimits.max) {
-                            updateRow(index, 'peso', `${val}%`);
+                          if (!isNaN(val)) {
+                            // Garantir que está dentro dos limites
+                            if (val < weightLimits.min) {
+                              updateRow(index, 'peso', `${weightLimits.min}%`);
+                            } else if (val > weightLimits.max) {
+                              updateRow(index, 'peso', `${weightLimits.max}%`);
+                            } else {
+                              updateRow(index, 'peso', `${val}%`);
+                            }
+                          } else if (e.target.value === '') {
+                            updateRow(index, 'peso', '');
                           }
                         }}
                         placeholder={`${weightLimits.min}% - ${weightLimits.max}%`}
