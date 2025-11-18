@@ -77,13 +77,31 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const highlightText = (text, searchTerm) => {
     if (!text || !searchTerm) return text;
     
-    const words = searchTerm.trim().split(/\s+/).filter(w => w.length > 0);
+    const words = searchTerm.trim().split(/\s+/).filter(w => w.length > 2); // Ignorar palavras muito curtas
     if (words.length === 0) return text;
     
     let highlightedText = String(text);
+    
+    // Criar um padrão único para cada palavra e substituir todas de uma vez
+    // Isso evita problemas com substituições múltiplas que podem quebrar tags HTML
+    const placeholders = {};
+    const placeholderPrefix = '___HL_PLACEHOLDER_';
+    let placeholderIndex = 0;
+    
+    // Primeiro, substituir todas as ocorrências por placeholders únicos
     words.forEach(word => {
-      const regex = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-      highlightedText = highlightedText.replace(regex, '<strong>$1</strong>');
+      const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
+      highlightedText = highlightedText.replace(regex, (match) => {
+        const placeholder = `${placeholderPrefix}${placeholderIndex++}`;
+        placeholders[placeholder] = match;
+        return placeholder;
+      });
+    });
+    
+    // Depois, substituir os placeholders por tags strong
+    Object.keys(placeholders).forEach(placeholder => {
+      highlightedText = highlightedText.replace(placeholder, `<strong>${placeholders[placeholder]}</strong>`);
     });
     
     return highlightedText;
