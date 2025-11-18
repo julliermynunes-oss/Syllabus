@@ -57,24 +57,58 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows, observacoes]);
 
+  // Função para extrair a sigla do curso do nome completo
+  const getCursoSigla = (cursoNome) => {
+    if (!cursoNome) return '';
+    
+    const cursoUpper = cursoNome.toUpperCase();
+    
+    // Casos específicos conhecidos
+    if (cursoUpper.includes('CGA') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO')) {
+      return 'CGA';
+    } else if (cursoUpper.includes('CGAP') || cursoUpper.includes('CURSO DE GRADUAÇÃO EM ADMINISTRAÇÃO PÚBLICA')) {
+      return 'CGAP';
+    } else if (cursoUpper.includes('AFA') || cursoUpper.includes('2ª GRADUAÇÃO')) {
+      return 'AFA';
+    }
+    
+    // Extrair sigla do padrão: "CGA - Curso de Graduação em Administração" -> "CGA"
+    const match = cursoNome.match(/^([A-Z]+(?:\s+[A-Z]+)?)/);
+    if (match) {
+      return match[1].replace(/\s+/g, '');
+    }
+    
+    // Se já for uma sigla curta (até 10 caracteres e apenas letras)
+    if (cursoNome.length <= 10 && /^[A-Z]+$/i.test(cursoNome.trim())) {
+      return cursoNome.trim().toUpperCase();
+    }
+    
+    return cursoNome;
+  };
+
   // Carregar limites de peso quando o curso mudar
   useEffect(() => {
     if (curso && token) {
+      // Normalizar o curso para buscar apenas a sigla
+      const cursoSigla = getCursoSigla(curso);
+      
       axios.get(`${API_URL}/api/general-settings/weight-limits`, {
-        params: { curso },
+        params: { curso: cursoSigla },
         headers: { Authorization: `Bearer ${token}` }
       }).then(response => {
-        if (response.data) {
+        if (response.data && response.data.min_weight !== undefined && response.data.max_weight !== undefined) {
           const limits = {
-            min: response.data.min_weight || null,
-            max: response.data.max_weight || null
+            min: response.data.min_weight,
+            max: response.data.max_weight
           };
+          console.log('Limites carregados:', limits, 'para curso:', cursoSigla);
           setWeightLimits(limits);
           // Validar todos os pesos existentes quando os limites são carregados
-          if (limits.min !== null && limits.max !== null && rows.length > 0) {
+          if (rows.length > 0) {
             validateAllWeights(rows, limits);
           }
         } else {
+          console.log('Nenhum limite configurado para curso:', cursoSigla);
           setWeightLimits({ min: null, max: null });
           setWeightErrors({});
         }
@@ -374,7 +408,9 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                             }
                           }
                         }}
-                        placeholder={`${weightLimits.min}% a ${weightLimits.max}%`}
+                        placeholder={weightLimits.min !== null && weightLimits.max !== null 
+                          ? `${weightLimits.min}% a ${weightLimits.max}%`
+                          : 'Ex: 40%'}
                         className={`table-input ${weightErrors[index] ? 'error-input' : ''}`}
                         title={`Peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`}
                         style={{ width: '100%' }}
