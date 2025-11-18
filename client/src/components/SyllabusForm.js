@@ -888,7 +888,7 @@ function SyllabusForm() {
                 name="curso"
                 value={formData.curso}
                 onChange={handleInputChange}
-                placeholder={`${t('course')} ...`}
+                placeholder="Digite um Curso..."
                 onBlur={() => setTimeout(() => setShowProgramDropdown(false), 200)}
               />
               {showProgramDropdown && filteredPrograms.length > 0 && (
@@ -915,7 +915,7 @@ function SyllabusForm() {
                 name="disciplina"
                 value={formData.disciplina}
                 onChange={handleInputChange}
-                placeholder={`${t('discipline')} ...`}
+                placeholder="Digite uma Disciplina..."
                 onBlur={() => setTimeout(() => setShowDisciplineDropdown(false), 200)}
                 disabled={!formData.curso}
               />
@@ -945,7 +945,7 @@ function SyllabusForm() {
               name="linha"
               value={formData.linha}
               onChange={handleInputChange}
-              placeholder={`${t('line')} ...`}
+              placeholder="Digite uma Linha..."
             />
           </div>
           <div className="form-field">
@@ -973,7 +973,7 @@ function SyllabusForm() {
               name="turma"
               value={formData.turma}
               onChange={handleInputChange}
-              placeholder={`${t('class')} ...`}
+              placeholder="Digite uma Turma..."
             />
           </div>
           <div className="form-field">
@@ -999,7 +999,7 @@ function SyllabusForm() {
               name="num_creditos"
               value={formData.num_creditos}
               onChange={handleInputChange}
-              placeholder={`${t('credits')} ...`}
+              placeholder="Digite o número de créditos..."
             />
           </div>
           <div className="form-field">
@@ -1041,7 +1041,7 @@ function SyllabusForm() {
                 onChange={handleLiderInputChange}
                 onFocus={() => formData.coordenador && setShowLiderDropdown(true)}
                 onBlur={() => setTimeout(() => setShowLiderDropdown(false), 200)}
-                placeholder={`${t('disciplineLeader')} ...`}
+                placeholder="Digite um Líder..."
                 className="form-input"
               />
               {showLiderDropdown && filteredLiderDisciplina.length > 0 && (
