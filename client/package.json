@@ -14,10 +14,12 @@
     "@tiptap/react": "^3.8.0",
     "@tiptap/starter-kit": "^3.8.0",
     "axios": "^1.5.0",
+    "i18next": "^23.11.2",
     "html2pdf.js": "^0.12.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
+    "react-i18next": "^13.5.0",
     "react-router-dom": "^6.15.0",
     "react-to-print": "^3.2.0"
   },
