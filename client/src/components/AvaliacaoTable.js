@@ -304,26 +304,67 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                         min={weightLimits.min}
                         max={weightLimits.max}
                         step="0.1"
-                        value={row.peso ? (parseFloat(row.peso.toString().replace('%', '')) || '') : ''}
+                        value={(() => {
+                          if (!row.peso) return '';
+                          const num = parseFloat(row.peso.toString().replace('%', ''));
+                          if (isNaN(num)) return '';
+                          // Garantir que o valor exibido está dentro dos limites
+                          if (num < weightLimits.min) return weightLimits.min;
+                          if (num > weightLimits.max) return weightLimits.max;
+                          return num;
+                        })()}
                         onChange={(e) => {
                           const val = e.target.value;
-                          // Permitir digitar qualquer valor (para poder corrigir)
-                          // A validação será feita pelo updateRow
-                          updateRow(index, 'peso', val ? `${val}%` : '');
+                          if (val === '') {
+                            updateRow(index, 'peso', '');
+                            return;
+                          }
+                          
+                          const numVal = parseFloat(val);
+                          if (isNaN(numVal)) {
+                            return; // Não atualizar se não for número
+                          }
+                          
+                          // Bloquear valores fora dos limites durante a digitação
+                          if (numVal < weightLimits.min) {
+                            // Permitir digitar valores menores temporariamente (para poder apagar e corrigir)
+                            updateRow(index, 'peso', `${numVal}%`);
+                          } else if (numVal > weightLimits.max) {
+                            // Bloquear valores maiores que o máximo
+                            // Não atualizar o valor, mantendo o anterior
+                            return;
+                          } else {
+                            // Valor válido, atualizar
+                            updateRow(index, 'peso', `${numVal}%`);
+                          }
                         }}
                         onBlur={(e) => {
                           const val = parseFloat(e.target.value);
-                          if (!isNaN(val)) {
-                            // Garantir que está dentro dos limites
-                            if (val < weightLimits.min) {
-                              updateRow(index, 'peso', `${weightLimits.min}%`);
-                            } else if (val > weightLimits.max) {
-                              updateRow(index, 'peso', `${weightLimits.max}%`);
-                            } else {
-                              updateRow(index, 'peso', `${val}%`);
+                          if (isNaN(val)) {
+                            if (e.target.value === '') {
+                              updateRow(index, 'peso', '');
                             }
-                          } else if (e.target.value === '') {
-                            updateRow(index, 'peso', '');
+                            return;
+                          }
+                          
+                          // Forçar ajuste aos limites ao sair do campo
+                          let finalVal = val;
+                          if (val < weightLimits.min) {
+                            finalVal = weightLimits.min;
+                          } else if (val > weightLimits.max) {
+                            finalVal = weightLimits.max;
+                          }
+                          
+                          updateRow(index, 'peso', `${finalVal}%`);
+                        }}
+                        onKeyDown={(e) => {
+                          // Bloquear Enter se o valor estiver fora dos limites
+                          if (e.key === 'Enter') {
+                            const val = parseFloat(e.target.value);
+                            if (!isNaN(val) && (val < weightLimits.min || val > weightLimits.max)) {
+                              e.preventDefault();
+                              e.target.blur(); // Força o onBlur que vai ajustar o valor
+                            }
                           }
                         }}
                         placeholder={`${weightLimits.min}% - ${weightLimits.max}%`}
