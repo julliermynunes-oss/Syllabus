@@ -182,6 +182,189 @@ const CompetenciesManager = ({ isEmbedded = false }) => {
     );
   }
 
+  if (isEmbedded) {
+    // Layout quando está embedded na página de configurações
+    return (
+      <div className="models-tab">
+        <div className="models-controls">
+          <div className="models-course-select">
+            <label htmlFor="competencies-course">Selecione o Curso:</label>
+            <div className="course-select-row">
+              <select 
+                id="competencies-course" 
+                value={selectedCurso} 
+                onChange={handleCursoChange}
+              >
+                <option value="">-- Selecione um curso --</option>
+                {cursos.map(curso => (
+                  <option key={curso} value={curso}>{curso}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {!selectedCurso ? (
+          <div className="empty-state-card">
+            <h3>Nenhum curso selecionado</h3>
+            <p>Selecione um curso para configurar as competências.</p>
+          </div>
+        ) : (
+          <div className="card">
+            <div className="card-header">
+              <h3>Configurações de Competências para {selectedCurso}</h3>
+            </div>
+            
+            <div className="form-field" style={{ marginBottom: '1.5rem' }}>
+              <label htmlFor="limite-input">
+                Limite de Contribuições:
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '0.5rem' }}>
+                <input
+                  id="limite-input"
+                  type="number"
+                  min="0"
+                  value={limiteContribuicoes}
+                  onChange={(e) => setLimiteContribuicoes(parseInt(e.target.value) || 0)}
+                  style={{
+                    width: '120px',
+                    padding: '1.25rem 1.5rem',
+                    border: '2px solid #a4a4a4',
+                    borderRadius: '10px',
+                    fontSize: '1.05rem',
+                    background: '#fafafa',
+                    color: '#235795'
+                  }}
+                />
+                <span style={{ color: '#666', fontSize: '0.9rem' }}>
+                  bolinhas disponíveis para distribuir entre todas as competências
+                </span>
+              </div>
+            </div>
+
+            <div className="form-field" style={{ marginBottom: '1.5rem' }}>
+              <label htmlFor="link-input">
+                Link de Informações sobre Competências:
+              </label>
+              <input
+                id="link-input"
+                type="url"
+                value={linkInfo}
+                onChange={(e) => setLinkInfo(e.target.value)}
+                placeholder="https://exemplo.com/competencias"
+                style={{ marginTop: '0.5rem' }}
+              />
+              <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+                Este link aparecerá no final da tabela de competências com o texto: "Mais informações sobre as competências esperadas para os egressos do {selectedCurso} podem ser encontradas aqui."
+              </p>
+            </div>
+
+            <div style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h4 style={{ margin: 0, color: '#235795' }}>Competências</h4>
+                <button type="button" onClick={addRow} className="primary-btn" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
+                  <FaPlus /> Adicionar Competência
+                </button>
+              </div>
+
+              <div className="competencies-table-wrapper" style={{ border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
+                <table className="competencies-table" style={{ width: '100%', borderCollapse: 'collapse', background: 'white' }}>
+                  <thead>
+                    <tr>
+                      <th style={{ background: '#235795', color: 'white', padding: '12px', textAlign: 'left', fontWeight: '600' }}>Competência</th>
+                      <th style={{ background: '#235795', color: 'white', padding: '12px', textAlign: 'left', fontWeight: '600' }}>Descrição</th>
+                      <th style={{ background: '#235795', color: 'white', padding: '12px', textAlign: 'center', fontWeight: '600', width: '10%' }}>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {competenciaRows.length === 0 && (
+                      <tr>
+                        <td colSpan="3" style={{ textAlign: 'center', padding: '2rem', color: '#666', fontStyle: 'italic' }}>
+                          Nenhuma competência adicionada.
+                        </td>
+                      </tr>
+                    )}
+                    {competenciaRows.map((row, index) => (
+                      <tr key={index} style={{ borderBottom: '1px solid #e0e0e0' }}>
+                        <td style={{ padding: '12px' }}>
+                          <input
+                            type="text"
+                            value={row.competencia || ''}
+                            onChange={(e) => updateRow(index, 'competencia', e.target.value)}
+                            placeholder="Nome da competência"
+                            style={{
+                              width: '100%',
+                              padding: '0.75rem',
+                              border: '1px solid #ddd',
+                              borderRadius: '6px',
+                              fontSize: '0.95rem',
+                              boxSizing: 'border-box'
+                            }}
+                          />
+                        </td>
+                        <td style={{ padding: '12px' }}>
+                          <textarea
+                            value={row.descricao || ''}
+                            onChange={(e) => updateRow(index, 'descricao', e.target.value)}
+                            placeholder="Descrição detalhada"
+                            rows="2"
+                            style={{
+                              width: '100%',
+                              padding: '0.75rem',
+                              border: '1px solid #ddd',
+                              borderRadius: '6px',
+                              fontSize: '0.95rem',
+                              fontFamily: 'inherit',
+                              resize: 'vertical',
+                              minHeight: '60px',
+                              boxSizing: 'border-box'
+                            }}
+                          />
+                        </td>
+                        <td style={{ padding: '12px', textAlign: 'center' }}>
+                          <button
+                            type="button"
+                            onClick={() => deleteRow(index)}
+                            style={{
+                              background: '#dc3545',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '0.5rem 0.75rem',
+                              cursor: 'pointer',
+                              transition: 'background 0.3s ease'
+                            }}
+                            onMouseOver={(e) => e.target.style.background = '#c82333'}
+                            onMouseOut={(e) => e.target.style.background = '#dc3545'}
+                            title="Remover linha"
+                          >
+                            <FaTrash />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="form-actions" style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '2px solid #e0e0e0' }}>
+                <button 
+                  type="button" 
+                  onClick={handleSave} 
+                  className="primary-btn"
+                  disabled={!selectedCurso}
+                >
+                  <FaSave /> Salvar Alterações
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Layout original quando não está embedded
   return (
     <div className={`competencies-manager-container${isEmbedded ? ' embedded' : ''}`}>
       <div className="manager-header">
