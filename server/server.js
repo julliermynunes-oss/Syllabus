@@ -1084,6 +1084,46 @@ app.post(
   }
 );
 
+app.delete(
+  '/api/syllabus-config/models/:id',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { id } = req.params;
+
+    db.get(
+      'SELECT * FROM syllabus_layout_models WHERE id = ?',
+      [id],
+      (err, model) => {
+        if (err) {
+          console.error('Erro ao buscar modelo:', err);
+          return res.status(500).json({ error: 'Erro ao buscar modelo' });
+        }
+        if (!model) {
+          return res.status(404).json({ error: 'Modelo não encontrado' });
+        }
+
+        // Não permitir deletar modelo ativo
+        if (model.is_active === 1) {
+          return res.status(400).json({ error: 'Não é possível deletar um modelo ativo. Desative-o primeiro.' });
+        }
+
+        db.run(
+          'DELETE FROM syllabus_layout_models WHERE id = ?',
+          [id],
+          function(deleteErr) {
+            if (deleteErr) {
+              console.error('Erro ao deletar modelo:', deleteErr);
+              return res.status(500).json({ error: 'Erro ao deletar modelo' });
+            }
+            res.json({ success: true, message: 'Modelo deletado com sucesso' });
+          }
+        );
+      }
+    );
+  }
+);
+
 app.post(
   '/api/syllabus-config/models/:id/activate',
   authenticateToken,
@@ -1375,6 +1415,68 @@ app.put(
         if (err) {
           console.error('Erro ao atualizar role:', err);
           return res.status(500).json({ error: 'Erro ao atualizar role' });
+        }
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+        res.json({ success: true });
+      }
+    );
+  }
+);
+
+app.post(
+  '/api/aolsyllabus/users',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  async (req, res) => {
+    const { nome_completo, email, senha, role } = req.body;
+
+    if (!nome_completo || !email || !senha) {
+      return res.status(400).json({ error: 'Nome, email e senha são obrigatórios' });
+    }
+
+    const userRole = role || 'professor';
+    if (!['professor', 'coordenador', 'admin'].includes(userRole)) {
+      return res.status(400).json({ error: 'Role inválido' });
+    }
+
+    const hashedPassword = await bcrypt.hash(senha, 10);
+
+    db.run(
+      'INSERT INTO users (nome_completo, email, senha, role) VALUES (?, ?, ?, ?)',
+      [nome_completo, email, hashedPassword, userRole],
+      function(err) {
+        if (err) {
+          if (err.message.includes('UNIQUE')) {
+            return res.status(400).json({ error: 'Email já cadastrado' });
+          }
+          console.error('Erro ao criar usuário:', err);
+          return res.status(500).json({ error: 'Erro ao criar usuário' });
+        }
+        res.json({ 
+          success: true, 
+          user: { id: this.lastID, nome_completo, email, role: userRole } 
+        });
+      }
+    );
+  }
+);
+
+app.delete(
+  '/api/aolsyllabus/users/:id',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { id } = req.params;
+
+    db.run(
+      'DELETE FROM users WHERE id = ?',
+      [id],
+      function(err) {
+        if (err) {
+          console.error('Erro ao deletar usuário:', err);
+          return res.status(500).json({ error: 'Erro ao deletar usuário' });
         }
         if (this.changes === 0) {
           return res.status(404).json({ error: 'Usuário não encontrado' });

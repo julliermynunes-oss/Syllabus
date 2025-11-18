@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaPlus, FaArrowLeft, FaGripVertical, FaUsersCog, FaCog } from 'react-icons/fa';
+import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaPlus, FaArrowLeft, FaGripVertical, FaUsersCog, FaCog, FaTrash } from 'react-icons/fa';
 import {
   DndContext,
   closestCenter,
@@ -437,6 +437,24 @@ const LayoutModelsTab = () => {
     }
   };
 
+  const handleDeleteModel = async (modelId, modelName) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o modelo "${modelName}"? Esta ação não pode ser desfeita.`)) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_URL}/api/syllabus-config/models/${modelId}`, { headers: authHeaders });
+      alert('Modelo excluído com sucesso!');
+      await loadModels(selectedCourse);
+      await loadHistory(selectedCourse);
+      setFormState(getInitialFormState());
+    } catch (error) {
+      console.error('Erro ao deletar modelo', error);
+      const errorMsg = error.response?.data?.error || 'Erro ao deletar modelo.';
+      alert(errorMsg);
+    }
+  };
+
   const formatDate = (value) => {
     if (!value) return '-';
     return new Date(value).toLocaleString();
@@ -529,6 +547,17 @@ const LayoutModelsTab = () => {
                         {!model.isActive && (
                           <button type="button" className="primary-outline-btn" onClick={() => handleActivate(model.id)}>
                             {t('configActivate')}
+                          </button>
+                        )}
+                        {!model.isActive && (
+                          <button 
+                            type="button" 
+                            className="ghost-btn" 
+                            onClick={() => handleDeleteModel(model.id, model.nome)}
+                            title="Excluir modelo"
+                            style={{ color: '#ff4444' }}
+                          >
+                            <FaTrash />
                           </button>
                         )}
                       </div>
@@ -871,6 +900,8 @@ const AoLSyllabusTab = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newUser, setNewUser] = useState({ nome_completo: '', email: '', senha: '', role: 'professor' });
 
   const authHeaders = useMemo(() => {
     if (!token) return {};
@@ -934,6 +965,52 @@ const AoLSyllabusTab = () => {
     }
   };
 
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+    if (!newUser.nome_completo || !newUser.email || !newUser.senha) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await axios.post(`${API_URL}/api/aolsyllabus/users`, newUser, {
+        headers: authHeaders
+      });
+      alert('Usuário criado com sucesso!');
+      setShowAddUserModal(false);
+      setNewUser({ nome_completo: '', email: '', senha: '', role: 'professor' });
+      loadUsers();
+    } catch (error) {
+      console.error('Erro ao criar usuário', error);
+      const errorMsg = error.response?.data?.error || 'Erro ao criar usuário.';
+      alert(errorMsg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o usuário "${userName}"? Esta ação não pode ser desfeita.`)) {
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await axios.delete(`${API_URL}/api/aolsyllabus/users/${userId}`, {
+        headers: authHeaders
+      });
+      alert('Usuário excluído com sucesso!');
+      loadUsers();
+    } catch (error) {
+      console.error('Erro ao deletar usuário', error);
+      const errorMsg = error.response?.data?.error || 'Erro ao deletar usuário.';
+      alert(errorMsg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="card">
@@ -967,15 +1044,24 @@ const AoLSyllabusTab = () => {
       <div className="card">
         <div className="card-header">
           <h3>Gerenciamento de Usuários</h3>
-          <button 
-            className="ghost-btn" 
-            onClick={() => {
-              setIsAuthenticated(false);
-              setPassword('');
-            }}
-          >
-            Sair
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button 
+              className="primary-btn" 
+              onClick={() => setShowAddUserModal(true)}
+              disabled={saving}
+            >
+              <FaPlus /> Adicionar Usuário
+            </button>
+            <button 
+              className="ghost-btn" 
+              onClick={() => {
+                setIsAuthenticated(false);
+                setPassword('');
+              }}
+            >
+              Sair
+            </button>
+          </div>
         </div>
         {loading ? (
           <p>{t('loading')}...</p>
@@ -1014,6 +1100,74 @@ const AoLSyllabusTab = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de Adicionar Usuário */}
+      {showAddUserModal && (
+        <div className="modal-overlay" onClick={() => setShowAddUserModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2>Adicionar Novo Usuário</h2>
+            <form onSubmit={handleAddUser}>
+              <div className="form-field">
+                <label>Nome Completo:</label>
+                <input
+                  type="text"
+                  value={newUser.nome_completo}
+                  onChange={(e) => setNewUser(prev => ({ ...prev, nome_completo: e.target.value }))}
+                  required
+                  style={{ marginTop: '0.5rem' }}
+                />
+              </div>
+              <div className="form-field">
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                  style={{ marginTop: '0.5rem' }}
+                />
+              </div>
+              <div className="form-field">
+                <label>Senha:</label>
+                <input
+                  type="password"
+                  value={newUser.senha}
+                  onChange={(e) => setNewUser(prev => ({ ...prev, senha: e.target.value }))}
+                  required
+                  style={{ marginTop: '0.5rem' }}
+                />
+              </div>
+              <div className="form-field">
+                <label>Role:</label>
+                <select
+                  value={newUser.role}
+                  onChange={(e) => setNewUser(prev => ({ ...prev, role: e.target.value }))}
+                  style={{ marginTop: '0.5rem' }}
+                >
+                  <option value="professor">Professor</option>
+                  <option value="coordenador">Coordenador</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="primary-btn" disabled={saving}>
+                  {saving ? 'Salvando...' : 'Criar Usuário'}
+                </button>
+                <button 
+                  type="button" 
+                  className="modal-btn-cancel"
+                  onClick={() => {
+                    setShowAddUserModal(false);
+                    setNewUser({ nome_completo: '', email: '', senha: '', role: 'professor' });
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
