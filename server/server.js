@@ -1935,6 +1935,40 @@ if (isProduction && buildExists) {
 }
 
 
+// Endpoint temporário para atualizar roles de administradores
+// TODO: Remover após atualizar os roles no Railway
+app.post('/api/admin/update-roles', (req, res) => {
+  const adminUsers = [
+    'Julliermy Nunes das Chagas',
+    'Ana Aureliano',
+    'Alexandre Pignanelli'
+  ];
+  
+  const placeholders = adminUsers.map(() => '?').join(',');
+  const updateQuery = `UPDATE users SET role = 'admin' WHERE nome_completo IN (${placeholders})`;
+  
+  db.run(updateQuery, adminUsers, function(err) {
+    if (err) {
+      console.error('Erro ao atualizar roles:', err);
+      return res.status(500).json({ error: 'Erro ao atualizar roles', details: err.message });
+    }
+    
+    // Verificar os resultados
+    const selectQuery = `SELECT id, nome_completo, email, role FROM users WHERE nome_completo IN (${placeholders})`;
+    db.all(selectQuery, adminUsers, (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Erro ao verificar resultados', details: err.message });
+      }
+      
+      res.json({
+        success: true,
+        updated: this.changes,
+        users: rows
+      });
+    });
+  });
+});
+
 // Iniciar servidor (independente do carregamento de CSV)
 app.listen(PORT, () => {
   console.log(`✓ Server running on port ${PORT}`);
