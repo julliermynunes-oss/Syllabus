@@ -1220,6 +1220,171 @@ app.get(
   }
 );
 
+// ===== Configurações Gerais (pesos de avaliação) =====
+db.run(`CREATE TABLE IF NOT EXISTS general_settings (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  curso TEXT NOT NULL,
+  setting_key TEXT NOT NULL,
+  setting_value TEXT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE(curso, setting_key)
+)`);
+
+app.get(
+  '/api/general-settings/weight-limits',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { curso } = req.query;
+    if (!curso) {
+      return res.status(400).json({ error: 'Curso é obrigatório' });
+    }
+
+    db.get(
+      `SELECT setting_value FROM general_settings WHERE curso = ? AND setting_key = 'weight_limits'`,
+      [curso],
+      (err, row) => {
+        if (err) {
+          console.error('Erro ao buscar limites de peso:', err);
+          return res.status(500).json({ error: 'Erro ao buscar configurações' });
+        }
+
+        if (row) {
+          try {
+            const limits = JSON.parse(row.setting_value);
+            res.json(limits);
+          } catch (e) {
+            res.json(null);
+          }
+        } else {
+          res.json(null);
+        }
+      }
+    );
+  }
+);
+
+app.post(
+  '/api/general-settings/weight-limits',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { curso, min_weight, max_weight } = req.body;
+    if (!curso || min_weight === undefined || max_weight === undefined) {
+      return res.status(400).json({ error: 'Curso, min_weight e max_weight são obrigatórios' });
+    }
+
+    const limits = { min_weight, max_weight };
+    const limitsJson = JSON.stringify(limits);
+
+    // Verificar se já existe
+    db.get(
+      'SELECT id FROM general_settings WHERE curso = ? AND setting_key = ?',
+      [curso, 'weight_limits'],
+      (err, existing) => {
+        if (err) {
+          console.error('Erro ao verificar configuração existente:', err);
+          return res.status(500).json({ error: 'Erro ao salvar configurações' });
+        }
+
+        if (existing) {
+          // Atualizar
+          db.run(
+            'UPDATE general_settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+            [limitsJson, existing.id],
+            function(updateErr) {
+              if (updateErr) {
+                console.error('Erro ao atualizar limites de peso:', updateErr);
+                return res.status(500).json({ error: 'Erro ao salvar configurações' });
+              }
+              res.json({ success: true, limits });
+            }
+          );
+        } else {
+          // Inserir
+          db.run(
+            'INSERT INTO general_settings (curso, setting_key, setting_value) VALUES (?, ?, ?)',
+            [curso, 'weight_limits', limitsJson],
+            function(insertErr) {
+              if (insertErr) {
+                console.error('Erro ao inserir limites de peso:', insertErr);
+                return res.status(500).json({ error: 'Erro ao salvar configurações' });
+              }
+              res.json({ success: true, limits });
+            }
+          );
+        }
+      }
+    );
+  }
+);
+
+// ===== AoLSyllabus (gerenciamento de usuários) =====
+const AOLSYLLABUS_PASSWORD = process.env.AOLSYLLABUS_PASSWORD || 'AoL2025!Syllabus';
+
+app.post(
+  '/api/aolsyllabus/authenticate',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { password } = req.body;
+    if (password === AOLSYLLABUS_PASSWORD) {
+      res.json({ success: true });
+    } else {
+      res.status(401).json({ success: false, error: 'Senha incorreta' });
+    }
+  }
+);
+
+app.get(
+  '/api/aolsyllabus/users',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    db.all(
+      'SELECT id, nome_completo, email, role FROM users ORDER BY nome_completo',
+      [],
+      (err, rows) => {
+        if (err) {
+          console.error('Erro ao buscar usuários:', err);
+          return res.status(500).json({ error: 'Erro ao buscar usuários' });
+        }
+        res.json(rows || []);
+      }
+    );
+  }
+);
+
+app.put(
+  '/api/aolsyllabus/users/:id/role',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { id } = req.params;
+    const { role } = req.body;
+    
+    if (!['professor', 'coordenador', 'admin'].includes(role)) {
+      return res.status(400).json({ error: 'Role inválido' });
+    }
+
+    db.run(
+      'UPDATE users SET role = ? WHERE id = ?',
+      [role, id],
+      function(err) {
+        if (err) {
+          console.error('Erro ao atualizar role:', err);
+          return res.status(500).json({ error: 'Erro ao atualizar role' });
+        }
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+        res.json({ success: true });
+      }
+    );
+  }
+);
+
 // Google Scholar endpoint (via backend para usar API key do servidor)
 app.get('/api/search-scholar', async (req, res) => {
   const { q } = req.query;

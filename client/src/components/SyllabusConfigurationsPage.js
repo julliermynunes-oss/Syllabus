@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaPlus, FaArrowLeft, FaGripVertical } from 'react-icons/fa';
+import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaPlus, FaArrowLeft, FaGripVertical, FaUsersCog, FaCog } from 'react-icons/fa';
 import {
   DndContext,
   closestCenter,
@@ -23,10 +23,13 @@ import { API_URL } from '../config';
 import { useAuth } from '../context/AuthContext';
 import CompetenciesManager from './CompetenciesManager';
 import './SyllabusConfigurationsPage.css';
+import '../components/SyllabusForm.css';
 
 const tabs = [
   { id: 'models', icon: FaLayerGroup },
-  { id: 'competencies', icon: FaSlidersH }
+  { id: 'competencies', icon: FaSlidersH },
+  { id: 'general', icon: FaCog },
+  { id: 'aolsyllabus', icon: FaUsersCog }
 ];
 
 const getInitialFormState = () => ({
@@ -47,24 +50,10 @@ const SyllabusConfigurationsPage = () => {
       <div className="config-header">
         <div>
           <button 
-            className="back-button" 
+            className="back-btn" 
             onClick={() => navigate('/syllabi')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              marginBottom: '1rem',
-              padding: '0.5rem 1rem',
-              backgroundColor: 'transparent',
-              border: '2px solid #235795',
-              borderRadius: '8px',
-              color: '#235795',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-              fontWeight: '600'
-            }}
           >
-            <FaArrowLeft /> Voltar
+            <FaArrowLeft /> {t('back') || 'Voltar'}
           </button>
           <p className="configEyebrow">{t('syllabusConfigurations')}</p>
           <h1>{t('syllabusConfigurationsTitle')}</h1>
@@ -94,7 +83,10 @@ const SyllabusConfigurationsPage = () => {
       </div>
 
       <div className="config-tab-panel">
-        {activeTab === 'models' ? <LayoutModelsTab /> : <CompetenciesManager isEmbedded />}
+        {activeTab === 'models' && <LayoutModelsTab />}
+        {activeTab === 'competencies' && <CompetenciesManager isEmbedded />}
+        {activeTab === 'general' && <GeneralSettingsTab />}
+        {activeTab === 'aolsyllabus' && <AoLSyllabusTab />}
       </div>
     </div>
   );
@@ -676,6 +668,352 @@ const LayoutModelsTab = () => {
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+// Aba de Configurações Gerais (pesos de avaliação)
+const GeneralSettingsTab = () => {
+  const { t } = useTranslation();
+  const { token } = useAuth();
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [weightSettings, setWeightSettings] = useState({ min: '', max: '' });
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const authHeaders = useMemo(() => {
+    if (!token) return {};
+    return { Authorization: `Bearer ${token}` };
+  }, [token]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/competencias/cursos`);
+        setCourses(response.data || []);
+      } catch (error) {
+        console.error('Erro ao carregar cursos', error);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCourse) {
+      loadWeightSettings(selectedCourse);
+    } else {
+      setWeightSettings({ min: '', max: '' });
+    }
+  }, [selectedCourse]);
+
+  const loadWeightSettings = async (curso) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API_URL}/api/general-settings/weight-limits`, {
+        params: { curso },
+        headers: authHeaders
+      });
+      if (response.data) {
+        setWeightSettings({
+          min: response.data.min_weight || '',
+          max: response.data.max_weight || ''
+        });
+      } else {
+        setWeightSettings({ min: '', max: '' });
+      }
+    } catch (error) {
+      console.error('Erro ao carregar configurações de peso', error);
+      setWeightSettings({ min: '', max: '' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!selectedCourse) {
+      alert(t('configSelectCourseFirst'));
+      return;
+    }
+    
+    const min = parseFloat(weightSettings.min);
+    const max = parseFloat(weightSettings.max);
+    
+    if (isNaN(min) || isNaN(max)) {
+      alert('Por favor, informe valores numéricos válidos.');
+      return;
+    }
+    
+    if (min < 0 || max < 0) {
+      alert('Os valores devem ser positivos.');
+      return;
+    }
+    
+    if (min > max) {
+      alert('O peso mínimo não pode ser maior que o peso máximo.');
+      return;
+    }
+    
+    if (min > 100 || max > 100) {
+      alert('Os valores não podem ser maiores que 100%.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await axios.post(`${API_URL}/api/general-settings/weight-limits`, {
+        curso: selectedCourse,
+        min_weight: min,
+        max_weight: max
+      }, {
+        headers: authHeaders
+      });
+      alert(t('configModelSaved') || 'Configurações salvas com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar configurações', error);
+      alert('Erro ao salvar configurações.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="models-tab">
+      <div className="models-controls">
+        <div className="models-course-select">
+          <label htmlFor="general-course">{t('configSelectCourseLabel')}</label>
+          <div className="course-select-row">
+            <select 
+              id="general-course" 
+              value={selectedCourse} 
+              onChange={(e) => setSelectedCourse(e.target.value)}
+            >
+              <option value="">{t('configSelectCoursePlaceholder')}</option>
+              {courses.map(course => (
+                <option key={course} value={course}>{course}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {!selectedCourse ? (
+        <div className="empty-state-card">
+          <h3>{t('configNoCourseSelectedTitle')}</h3>
+          <p>{t('configNoCourseSelectedDescription')}</p>
+        </div>
+      ) : (
+        <div className="card">
+          <div className="card-header">
+            <h3>Configurações de Peso de Avaliação</h3>
+          </div>
+          {loading ? (
+            <p>{t('loading')}...</p>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+              <div className="form-field" style={{ marginBottom: '1.5rem' }}>
+                <label>Peso Mínimo (%)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={weightSettings.min}
+                  onChange={(e) => setWeightSettings(prev => ({ ...prev, min: e.target.value }))}
+                  placeholder="Ex: 5"
+                  style={{ marginTop: '0.5rem' }}
+                />
+                <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+                  Peso mínimo permitido para cada item de avaliação (em porcentagem)
+                </p>
+              </div>
+
+              <div className="form-field" style={{ marginBottom: '1.5rem' }}>
+                <label>Peso Máximo (%)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value={weightSettings.max}
+                  onChange={(e) => setWeightSettings(prev => ({ ...prev, max: e.target.value }))}
+                  placeholder="Ex: 50"
+                  style={{ marginTop: '0.5rem' }}
+                />
+                <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem' }}>
+                  Peso máximo permitido para cada item de avaliação (em porcentagem)
+                </p>
+              </div>
+
+              <div className="form-actions">
+                <button
+                  type="submit"
+                  className="primary-btn"
+                  disabled={saving || !selectedCourse}
+                >
+                  {saving ? t('saving') : 'Salvar'}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Aba AoLSyllabus (protegida por senha)
+const AoLSyllabusTab = () => {
+  const { t } = useTranslation();
+  const { token } = useAuth();
+  const [password, setPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const authHeaders = useMemo(() => {
+    if (!token) return {};
+    return { Authorization: `Bearer ${token}` };
+  }, [token]);
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${API_URL}/api/aolsyllabus/authenticate`, {
+        password: password
+      }, {
+        headers: authHeaders
+      });
+      if (response.data.success) {
+        setIsAuthenticated(true);
+        loadUsers();
+      } else {
+        alert('Senha incorreta.');
+      }
+    } catch (error) {
+      console.error('Erro ao autenticar', error);
+      if (error.response?.status === 401) {
+        alert('Senha incorreta.');
+      } else {
+        alert('Erro ao autenticar. Verifique a senha.');
+      }
+    }
+  };
+
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API_URL}/api/aolsyllabus/users`, {
+        headers: authHeaders
+      });
+      setUsers(response.data || []);
+    } catch (error) {
+      console.error('Erro ao carregar usuários', error);
+      alert('Erro ao carregar usuários.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateRole = async (userId, role) => {
+    setSaving(true);
+    try {
+      await axios.put(`${API_URL}/api/aolsyllabus/users/${userId}/role`, {
+        role: role
+      }, {
+        headers: authHeaders
+      });
+      alert('Role atualizado com sucesso!');
+      loadUsers();
+    } catch (error) {
+      console.error('Erro ao atualizar role', error);
+      alert('Erro ao atualizar role.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="card">
+        <div className="card-header">
+          <h3>AoLSyllabus - Acesso Restrito</h3>
+        </div>
+        <form onSubmit={handlePasswordSubmit}>
+          <div className="form-field">
+            <label>Senha de Acesso:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Digite a senha de acesso"
+              style={{ marginTop: '0.5rem' }}
+              required
+            />
+          </div>
+          <div className="form-actions">
+            <button type="submit" className="primary-btn">
+              Acessar
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="models-tab">
+      <div className="card">
+        <div className="card-header">
+          <h3>Gerenciamento de Usuários</h3>
+          <button 
+            className="ghost-btn" 
+            onClick={() => {
+              setIsAuthenticated(false);
+              setPassword('');
+            }}
+          >
+            Sair
+          </button>
+        </div>
+        {loading ? (
+          <p>{t('loading')}...</p>
+        ) : (
+          <div className="model-list-items">
+            {users.map(user => (
+              <div key={user.id} className="model-item">
+                <div>
+                  <p className="model-name">{user.nome_completo}</p>
+                  <small>{user.email}</small>
+                  <p style={{ marginTop: '0.5rem' }}>
+                    <span className={`status-pill ${user.role === 'admin' ? 'active' : user.role === 'coordenador' ? 'draft' : ''}`}>
+                      {user.role === 'admin' ? 'Administrador' : user.role === 'coordenador' ? 'Coordenador' : 'Professor'}
+                    </span>
+                  </p>
+                </div>
+                <div className="model-actions">
+                  <select
+                    value={user.role || 'professor'}
+                    onChange={(e) => handleUpdateRole(user.id, e.target.value)}
+                    disabled={saving}
+                    style={{
+                      padding: '0.5rem',
+                      borderRadius: '6px',
+                      border: '1px solid #ccc',
+                      marginRight: '0.5rem'
+                    }}
+                  >
+                    <option value="professor">Professor</option>
+                    <option value="coordenador">Coordenador</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
