@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslation } from '../hooks/useTranslation';
+import useCourseLayoutModel from '../hooks/useCourseLayoutModel';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { 
@@ -162,6 +163,7 @@ function SyllabusForm() {
   const [customTabPositionInput, setCustomTabPositionInput] = useState('end');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loadedTabs, setLoadedTabs] = useState(new Set(['cabecalho'])); // Lazy loading: começar com a primeira aba carregada
+  const { layoutModel, isLoading: layoutLoading } = useCourseLayoutModel(formData.curso);
 
   useEffect(() => {
     fetchPrograms();
@@ -183,6 +185,13 @@ function SyllabusForm() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  useEffect(() => {
+    const orderedTabs = getOrderedTabs();
+    if (orderedTabs.length > 0 && !orderedTabs.some(tab => tab.id === activeTab)) {
+      setActiveTab(orderedTabs[0].id);
+    }
+  }, [layoutModel, formData.curso]);
   
   const fetchAllProfessoresForLider = async () => {
     try {
@@ -407,8 +416,7 @@ function SyllabusForm() {
     return iconMap[tabId] || FaFileAlt;
   };
 
-  // Função para obter a lista de abas ordenadas
-  const getOrderedTabs = () => {
+  const buildBaseTabs = () => {
     const tabs = [
       { id: 'cabecalho', label: t('header') },
       { id: 'sobre', label: t('aboutDiscipline') },
@@ -420,7 +428,6 @@ function SyllabusForm() {
       { id: 'contatos', label: t('contacts') }
     ];
 
-    // Adicionar ODS se não for curso restrito
     if (!isRestrictedCourse(formData.curso)) {
       tabs.push({ id: 'ods', label: t('ods') });
     }
@@ -428,31 +435,75 @@ function SyllabusForm() {
     tabs.push({ id: 'referencias', label: t('references') });
     tabs.push({ id: 'competencias', label: t('competencies') });
 
-    // Adicionar "O que é esperado" se não for curso restrito
     if (!isRestrictedCourse(formData.curso)) {
       tabs.push({ id: 'o_que_e_esperado', label: t('expectedFromStudent') });
     }
 
-    // Inserir a aba personalizada na posição correta
-    if (formData.custom_tab_name) {
-      const customTab = { id: 'custom', label: formData.custom_tab_name, isCustom: true };
-      const position = formData.custom_tab_position || 'end';
-      
-      if (position === 'end') {
-        tabs.push(customTab);
-      } else {
-        // Encontrar o índice da aba após a qual inserir
-        const afterIndex = tabs.findIndex(tab => tab.id === position);
-        if (afterIndex !== -1) {
-          tabs.splice(afterIndex + 1, 0, customTab);
-        } else {
-          // Se não encontrar, adicionar no final
-          tabs.push(customTab);
-        }
+    return tabs;
+  };
+
+  const applyLayoutToTabs = (tabs) => {
+    if (!layoutModel) return tabs;
+    const { tabsOrder = [], tabsVisibility = {} } = layoutModel;
+    const visited = new Set();
+    const ordered = [];
+
+    tabsOrder.forEach(tabId => {
+      const tab = tabs.find(item => item.id === tabId);
+      if (!tab) return;
+      visited.add(tabId);
+      const isVisible = Object.prototype.hasOwnProperty.call(tabsVisibility, tabId)
+        ? tabsVisibility[tabId]
+        : true;
+      if (isVisible) {
+        ordered.push(tab);
       }
+    });
+
+    tabs.forEach(tab => {
+      if (visited.has(tab.id)) return;
+      const isVisible = Object.prototype.hasOwnProperty.call(tabsVisibility, tab.id)
+        ? tabsVisibility[tab.id]
+        : true;
+      if (isVisible) {
+        ordered.push(tab);
+      }
+    });
+
+    return ordered;
+  };
+
+  const insertCustomTab = (tabs, buildCustomTab) => {
+    if (!formData.custom_tab_name) {
+      return tabs;
     }
 
-    return tabs;
+    const customTab = buildCustomTab
+      ? buildCustomTab()
+      : { id: 'custom', label: formData.custom_tab_name, isCustom: true };
+    const position = formData.custom_tab_position || 'end';
+    const nextTabs = [...tabs.filter(tab => tab.id !== 'custom')];
+
+    if (position === 'end') {
+      nextTabs.push(customTab);
+      return nextTabs;
+    }
+
+    const afterIndex = nextTabs.findIndex(tab => tab.id === position);
+    if (afterIndex !== -1) {
+      nextTabs.splice(afterIndex + 1, 0, customTab);
+    } else {
+      nextTabs.push(customTab);
+    }
+
+    return nextTabs;
+  };
+
+  // Função para obter a lista de abas ordenadas
+  const getOrderedTabs = () => {
+    const baseTabs = buildBaseTabs();
+    const tabsWithLayout = applyLayoutToTabs(baseTabs);
+    return insertCustomTab(tabsWithLayout);
   };
 
   // Função para trocar de aba com animação
@@ -675,16 +726,12 @@ function SyllabusForm() {
       });
     }
 
-    // Adicionar aba customizada se existir
-    if (formData.custom_tab_name) {
-      tabs.push({
-        id: 'custom',
-        name: formData.custom_tab_name,
-        hasContent: !!(formData.custom_tab_content && formData.custom_tab_content.trim() !== '')
-      });
-    }
-
-    return tabs;
+    const filteredTabs = applyLayoutToTabs(tabs);
+    return insertCustomTab(filteredTabs, () => ({
+      id: 'custom',
+      name: formData.custom_tab_name,
+      hasContent: !!(formData.custom_tab_content && formData.custom_tab_content.trim() !== '')
+    }));
   };
 
   const handleSubmit = async (e) => {

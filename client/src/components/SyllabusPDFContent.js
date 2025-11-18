@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
+import useCourseLayoutModel from '../hooks/useCourseLayoutModel';
 
 // Componente para a tabela de competências no PDF
 const CompetenciesTablePDF = ({ data, curso }) => {
@@ -84,6 +85,7 @@ const CompetenciesTablePDF = ({ data, curso }) => {
 function SyllabusPDFContent({ formData, professoresList }) {
   const { t } = useTranslation();
   const [linkInfo, setLinkInfo] = useState(null);
+  const { layoutModel } = useCourseLayoutModel(formData.curso);
   
   // Carregar linkInfo quando o curso mudar
   useEffect(() => {
@@ -132,6 +134,30 @@ function SyllabusPDFContent({ formData, professoresList }) {
            cursoUpper.startsWith('AFA ');
   };
 
+  const applyLayoutToSections = (sectionsList) => {
+    if (!layoutModel) return sectionsList;
+    const { tabsOrder = [], tabsVisibility = {} } = layoutModel;
+    const orderMap = new Map();
+    tabsOrder.forEach((tabId, index) => orderMap.set(tabId, index));
+
+    return sectionsList
+      .filter(section => {
+        if (!section.tabId) return true;
+        if (Object.prototype.hasOwnProperty.call(tabsVisibility, section.tabId)) {
+          return tabsVisibility[section.tabId];
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const orderA = orderMap.has(a.tabId) ? orderMap.get(a.tabId) : Number.MAX_SAFE_INTEGER;
+        const orderB = orderMap.has(b.tabId) ? orderMap.get(b.tabId) : Number.MAX_SAFE_INTEGER;
+        if (orderA === orderB) {
+          return (a.order ?? 0) - (b.order ?? 0);
+        }
+        return orderA - orderB;
+      });
+  };
+
   // Função para obter seções ordenadas
   const getOrderedSections = () => {
     const sections = [];
@@ -153,6 +179,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     
     sections.push({
       id: 'info_gerais',
+      tabId: 'cabecalho',
       component: (
         <div key="info_gerais" style={{ margin: '0', marginBottom: '0', marginTop: '0', padding: '0', fontSize: '12px', lineHeight: '1.6' }}>
           {infoRows.map((row, index) => (
@@ -206,6 +233,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         if (professoresComDados.length > 0) {
           sections.push({
             id: 'professores',
+            tabId: 'professores',
             component: (
               <div key="professores" className="professores-section" style={{ marginBottom: '18px', marginTop: '0', paddingTop: '0' }}>
                 <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -309,6 +337,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const hasTableOrImg = hasTablesOrImages(formData.sobre_disciplina);
       sections.push({
         id: 'sobre',
+        tabId: 'sobre',
         component: (
           <div key="sobre" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -327,6 +356,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
     if (formData.compromisso_etico) {
       sections.push({
         id: 'compromisso_etico',
+        tabId: 'compromisso_etico',
         component: (
           <div key="compromisso_etico" className="compromisso-etico-section" style={{ marginBottom: '18px' }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -358,6 +388,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       
       sections.push({
         id: 'competencias',
+        tabId: 'competencias',
         component: (
           <div key="competencias" style={{ marginBottom: '18px', pageBreakInside: 'avoid' }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -408,6 +439,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const hasTableOrImg = hasTablesOrImages(formData.ods);
       sections.push({
         id: 'ods',
+        tabId: 'ods',
         component: (
           <div key="ods" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -427,6 +459,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const hasTableOrImg = hasTablesOrImages(formData.conteudo);
       sections.push({
         id: 'conteudo',
+        tabId: 'conteudo',
         component: (
           <div key="conteudo" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -446,6 +479,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const hasTableOrImg = hasTablesOrImages(formData.metodologia);
       sections.push({
         id: 'metodologia',
+        tabId: 'metodologia',
         component: (
           <div key="metodologia" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -539,6 +573,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
       sections.push({
         id: 'avaliacao',
+        tabId: 'avaliacao',
         component: avaliacaoComponent
       });
     }
@@ -548,6 +583,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const hasTableOrImg = hasTablesOrImages(formData.o_que_e_esperado);
       sections.push({
         id: 'o_que_e_esperado',
+        tabId: 'o_que_e_esperado',
         component: (
           <div key="o_que_e_esperado" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -586,7 +622,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
         sections.push(customSection);
       } else {
         // Encontrar o índice da seção após a qual inserir
-        const afterIndex = sections.findIndex(section => section.id === position);
+        const afterIndex = sections.findIndex(section => section.id === position || section.tabId === position);
         if (afterIndex !== -1) {
           sections.splice(afterIndex + 1, 0, customSection);
         } else {
@@ -667,6 +703,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const hasTableOrImg = hasTablesOrImages(formData.referencias);
       sections.push({
         id: 'referencias',
+        tabId: 'referencias',
         component: (
           <div key="referencias" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -683,6 +720,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const hasTableOrImg = hasTablesOrImages(formData.contatos);
       sections.push({
         id: 'contatos',
+        tabId: 'contatos',
         component: (
           <div key="contatos" style={{ marginBottom: '18px', ...(hasTableOrImg ? { pageBreakInside: 'avoid' } : {}) }}>
             <h3 style={{ fontSize: '15px', color: '#000', fontWeight: 'bold',  marginBottom: '10px', marginTop: '15px', border: 'none', lineHeight: '1.4', textAlign: 'left' }}>
@@ -697,9 +735,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
       });
     }
 
-    return sections;
+    return applyLayoutToSections(sections);
   };
-  
+
   const sections = getOrderedSections();
   
   return (

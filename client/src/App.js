@@ -4,6 +4,7 @@ import Login from './components/Login';
 import SyllabusList from './components/SyllabusList';
 import SyllabusForm from './components/SyllabusForm';
 import CompetenciesManager from './components/CompetenciesManager';
+import SyllabusConfigurationsPage from './components/SyllabusConfigurationsPage';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -40,9 +41,17 @@ function App() {
               }
             />
             <Route
+              path="/configuracoes"
+              element={
+                <PrivateRoute allowedRoles={['coordenador', 'admin']}>
+                  <SyllabusConfigurationsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="/competencias"
               element={
-                <PrivateRoute>
+                <PrivateRoute allowedRoles={['coordenador', 'admin']}>
                   <CompetenciesManager />
                 </PrivateRoute>
               }

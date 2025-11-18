@@ -11,6 +11,28 @@ const multer = require('multer');
 const PDFDocument = require('pdfkit');
 const axios = require('axios');
 
+const AVAILABLE_TABS = [
+  { id: 'cabecalho', labelKey: 'header', description: 'Informações gerais' },
+  { id: 'sobre', labelKey: 'aboutDiscipline', description: 'Sobre a disciplina' },
+  { id: 'conteudo', labelKey: 'content', description: 'Conteúdo programático' },
+  { id: 'metodologia', labelKey: 'methodology', description: 'Metodologia' },
+  { id: 'avaliacao', labelKey: 'evaluation', description: 'Avaliação' },
+  { id: 'compromisso_etico', labelKey: 'ethics', description: 'Compromisso ético' },
+  { id: 'professores', labelKey: 'professors', description: 'Equipe docente' },
+  { id: 'contatos', labelKey: 'contacts', description: 'Contatos' },
+  { id: 'ods', labelKey: 'ods', description: 'Objetivos de desenvolvimento sustentável', requiresNonRestrictedCourse: true },
+  { id: 'referencias', labelKey: 'references', description: 'Referências bibliográficas' },
+  { id: 'competencias', labelKey: 'competencies', description: 'Competências' },
+  { id: 'o_que_e_esperado', labelKey: 'expectedFromStudent', description: 'O que é esperado do(a) estudante', requiresNonRestrictedCourse: true }
+];
+
+const DEFAULT_TABS_ORDER = AVAILABLE_TABS.map(tab => tab.id);
+const DEFAULT_TABS_VISIBILITY = AVAILABLE_TABS.reduce((acc, tab) => {
+  acc[tab.id] = true;
+  return acc;
+}, {});
+const SYLLABUS_CONFIG_ROLES = ['coordenador', 'admin'];
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = 'your-secret-key-change-in-production';
@@ -74,8 +96,16 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         nome_completo TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
         senha TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'professor',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
+
+      // Add role column if it doesn't exist (migration for legacy DBs)
+      db.run(`ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'professor'`, (err) => {
+        if (err && !err.message.includes('duplicate column')) {
+          console.warn('Não foi possível adicionar coluna role em users:', err.message);
+        }
+      });
 
       db.run(`CREATE TABLE IF NOT EXISTS syllabi (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -225,6 +255,37 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
       db.run(`ALTER TABLE competencia_limits ADD COLUMN link_info TEXT`, (err) => {
         // Ignorar erro se coluna já existir
       });
+
+      // Modelos de layout de syllabus
+      db.run(`CREATE TABLE IF NOT EXISTS syllabus_layout_models (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        curso_code TEXT NOT NULL,
+        nome TEXT NOT NULL,
+        tabs_order TEXT NOT NULL,
+        tabs_visibility TEXT NOT NULL,
+        notes TEXT,
+        is_active INTEGER DEFAULT 0,
+        version INTEGER DEFAULT 1,
+        created_by INTEGER,
+        updated_by INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        activated_at DATETIME,
+        FOREIGN KEY (created_by) REFERENCES users(id),
+        FOREIGN KEY (updated_by) REFERENCES users(id)
+      )`);
+
+      db.run(`CREATE TABLE IF NOT EXISTS syllabus_layout_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        layout_model_id INTEGER,
+        curso_code TEXT NOT NULL,
+        snapshot TEXT NOT NULL,
+        action TEXT NOT NULL,
+        performed_by INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (layout_model_id) REFERENCES syllabus_layout_models(id),
+        FOREIGN KEY (performed_by) REFERENCES users(id)
+      )`);
 
       // Normalização retroativa de valores de semestre (idempotente)
       const normalizeSemesters = () => {
@@ -485,6 +546,57 @@ function getCursoCode(cursoNome) {
   return null;
 }
 
+const normalizeCursoCode = (cursoNome) => {
+  if (!cursoNome) return null;
+  const code = getCursoCode(cursoNome);
+  const value = (code || cursoNome || '').trim();
+  return value ? value.toUpperCase() : null;
+};
+
+const safeJsonParse = (value, fallback) => {
+  try {
+    if (typeof value === 'string') {
+      return JSON.parse(value);
+    }
+    return typeof value === 'object' ? value : fallback;
+  } catch (error) {
+    return fallback;
+  }
+};
+
+const parseLayoutModelRow = (row) => {
+  if (!row) return null;
+  return {
+    id: row.id,
+    cursoCode: row.curso_code,
+    nome: row.nome,
+    tabsOrder: safeJsonParse(row.tabs_order, []),
+    tabsVisibility: safeJsonParse(row.tabs_visibility, {}),
+    notes: row.notes || null,
+    isActive: !!row.is_active,
+    version: row.version,
+    createdBy: row.created_by,
+    updatedBy: row.updated_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    activatedAt: row.activated_at
+  };
+};
+
+const recordLayoutHistory = (layoutModelId, cursoCode, action, snapshot, performedBy) => {
+  const snapshotString = JSON.stringify(snapshot || {});
+  db.run(
+    `INSERT INTO syllabus_layout_history (layout_model_id, curso_code, snapshot, action, performed_by)
+     VALUES (?, ?, ?, ?, ?)`,
+    [layoutModelId || null, cursoCode, snapshotString, action, performedBy || null],
+    (err) => {
+      if (err) {
+        console.warn('Erro ao registrar histórico de layout:', err.message);
+      }
+    }
+  );
+};
+
 function insertDisciplines(disciplinasData, programsMap) {
   db.serialize(() => {
     db.run('DELETE FROM disciplines');
@@ -537,9 +649,19 @@ const authenticateToken = (req, res, next) => {
     if (err) {
       return res.status(403).json({ error: 'Token inválido' });
     }
-    req.user = user;
+    req.user = { ...user, role: user.role || 'professor' };
     next();
   });
+};
+
+const requireRole = (allowedRoles = []) => {
+  return (req, res, next) => {
+    const userRole = (req.user && req.user.role) || 'professor';
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(403).json({ error: 'Acesso restrito para este recurso' });
+    }
+    next();
+  };
 };
 
 // Routes
@@ -552,11 +674,12 @@ app.post('/api/register', async (req, res) => {
     return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
   }
 
+  const role = 'professor';
   const hashedPassword = await bcrypt.hash(senha, 10);
 
   db.run(
-    'INSERT INTO users (nome_completo, email, senha) VALUES (?, ?, ?)',
-    [nome_completo, email, hashedPassword],
+    'INSERT INTO users (nome_completo, email, senha, role) VALUES (?, ?, ?, ?)',
+    [nome_completo, email, hashedPassword, role],
     function(err) {
       if (err) {
         if (err.message.includes('UNIQUE')) {
@@ -565,8 +688,9 @@ app.post('/api/register', async (req, res) => {
         return res.status(500).json({ error: 'Erro ao cadastrar usuário' });
       }
 
-      const token = jwt.sign({ id: this.lastID, email, nome_completo }, JWT_SECRET);
-      res.json({ token, user: { id: this.lastID, nome_completo, email } });
+      const tokenPayload = { id: this.lastID, email, nome_completo, role };
+      const token = jwt.sign(tokenPayload, JWT_SECRET);
+      res.json({ token, user: { id: this.lastID, nome_completo, email, role } });
     }
   );
 });
@@ -588,8 +712,10 @@ app.post('/api/login', (req, res) => {
       return res.status(401).json({ error: 'Credenciais inválidas' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, nome_completo: user.nome_completo }, JWT_SECRET);
-    res.json({ token, user: { id: user.id, nome_completo: user.nome_completo, email: user.email } });
+    const userRole = user.role || 'professor';
+    const tokenPayload = { id: user.id, email: user.email, nome_completo: user.nome_completo, role: userRole };
+    const token = jwt.sign(tokenPayload, JWT_SECRET);
+    res.json({ token, user: { id: user.id, nome_completo: user.nome_completo, email: user.email, role: userRole } });
   });
 });
 
@@ -780,6 +906,306 @@ app.get('/api/competencias/limits', authenticateToken, (req, res) => {
     }
   );
 });
+
+// ===== Syllabus configuration (layouts) =====
+app.get(
+  '/api/syllabus-config/available-tabs',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    res.json(AVAILABLE_TABS);
+  }
+);
+
+app.get(
+  '/api/syllabus-config/models',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { curso } = req.query;
+    const allowedTabIds = new Set(AVAILABLE_TABS.map(tab => tab.id));
+    let sql = 'SELECT * FROM syllabus_layout_models';
+    const params = [];
+
+    if (curso) {
+      const cursoCode = normalizeCursoCode(curso);
+      sql += ' WHERE curso_code = ?';
+      params.push(cursoCode);
+    }
+
+    sql += ' ORDER BY updated_at DESC';
+
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        console.error('Erro ao listar modelos de layout:', err);
+        return res.status(500).json({ error: 'Erro ao listar modelos' });
+      }
+
+      const models = (rows || []).map(parseLayoutModelRow).map(model => {
+        const filteredOrder = model.tabsOrder.filter(id => allowedTabIds.has(id));
+        return {
+          ...model,
+          tabsOrder: filteredOrder.length ? filteredOrder : DEFAULT_TABS_ORDER
+        };
+      });
+
+      res.json(models);
+    });
+  }
+);
+
+app.post(
+  '/api/syllabus-config/models',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { id, curso, nome, tabsOrder, tabsVisibility, notes } = req.body;
+
+    if (!curso || !nome) {
+      return res.status(400).json({ error: 'Curso e nome são obrigatórios' });
+    }
+
+    const cursoCode = normalizeCursoCode(curso);
+    if (!cursoCode) {
+      return res.status(400).json({ error: 'Curso inválido' });
+    }
+
+    const allowedTabIds = new Set(AVAILABLE_TABS.map(tab => tab.id));
+    const requestedOrder = Array.isArray(tabsOrder) ? tabsOrder : [];
+    let finalOrder = requestedOrder.filter(tabId => allowedTabIds.has(tabId));
+    if (!finalOrder.length) {
+      finalOrder = [...DEFAULT_TABS_ORDER];
+    } else {
+      DEFAULT_TABS_ORDER.forEach(tabId => {
+        if (!finalOrder.includes(tabId)) {
+          finalOrder.push(tabId);
+        }
+      });
+    }
+
+    const sanitizedVisibility = { ...DEFAULT_TABS_VISIBILITY };
+    if (tabsVisibility && typeof tabsVisibility === 'object') {
+      Object.keys(tabsVisibility).forEach(tabId => {
+        if (allowedTabIds.has(tabId)) {
+          sanitizedVisibility[tabId] = !!tabsVisibility[tabId];
+        }
+      });
+    }
+
+    const serializedOrder = JSON.stringify(finalOrder);
+    const serializedVisibility = JSON.stringify(sanitizedVisibility);
+    const normalizedNotes = notes && notes.trim ? notes.trim() : notes || null;
+    const userId = req.user.id;
+
+    if (id) {
+      db.get(
+        'SELECT * FROM syllabus_layout_models WHERE id = ?',
+        [id],
+        (err, existing) => {
+          if (err) {
+            console.error('Erro ao buscar modelo:', err);
+            return res.status(500).json({ error: 'Erro ao atualizar modelo' });
+          }
+          if (!existing) {
+            return res.status(404).json({ error: 'Modelo não encontrado' });
+          }
+
+          if (existing.curso_code !== cursoCode) {
+            return res.status(400).json({ error: 'Não é permitido alterar o curso de um modelo existente' });
+          }
+
+          const newVersion = (existing.version || 1) + 1;
+          db.run(
+            `UPDATE syllabus_layout_models
+             SET nome = ?, tabs_order = ?, tabs_visibility = ?, notes = ?, version = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+             WHERE id = ?`,
+            [nome, serializedOrder, serializedVisibility, normalizedNotes, newVersion, userId, id],
+            (updateErr) => {
+              if (updateErr) {
+                console.error('Erro ao atualizar modelo:', updateErr);
+                return res.status(500).json({ error: 'Erro ao atualizar modelo' });
+              }
+
+              db.get(
+                'SELECT * FROM syllabus_layout_models WHERE id = ?',
+                [id],
+                (fetchErr, row) => {
+                  if (fetchErr) {
+                    console.error('Erro ao recuperar modelo atualizado:', fetchErr);
+                    return res.status(500).json({ error: 'Erro ao recuperar modelo' });
+                  }
+                  const parsed = parseLayoutModelRow(row);
+                  recordLayoutHistory(id, cursoCode, 'updated', parsed, userId);
+                  res.json({ message: 'Modelo atualizado com sucesso', model: parsed });
+                }
+              );
+            }
+          );
+        }
+      );
+    } else {
+      db.run(
+        `INSERT INTO syllabus_layout_models (
+          curso_code, nome, tabs_order, tabs_visibility, notes, is_active, version, created_by, updated_by
+        ) VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?)`,
+        [cursoCode, nome, serializedOrder, serializedVisibility, normalizedNotes, userId, userId],
+        function(err) {
+          if (err) {
+            console.error('Erro ao criar modelo:', err);
+            return res.status(500).json({ error: 'Erro ao criar modelo' });
+          }
+
+          const newId = this.lastID;
+          db.get(
+            'SELECT * FROM syllabus_layout_models WHERE id = ?',
+            [newId],
+            (fetchErr, row) => {
+              if (fetchErr) {
+                console.error('Erro ao recuperar modelo criado:', fetchErr);
+                return res.status(500).json({ error: 'Erro ao recuperar modelo' });
+              }
+              const parsed = parseLayoutModelRow(row);
+              recordLayoutHistory(newId, cursoCode, 'created', parsed, userId);
+              res.status(201).json({ message: 'Modelo criado com sucesso', model: parsed });
+            }
+          );
+        }
+      );
+    }
+  }
+);
+
+app.post(
+  '/api/syllabus-config/models/:id/activate',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const { id } = req.params;
+
+    db.get(
+      'SELECT * FROM syllabus_layout_models WHERE id = ?',
+      [id],
+      (err, model) => {
+        if (err) {
+          console.error('Erro ao buscar modelo:', err);
+          return res.status(500).json({ error: 'Erro ao ativar modelo' });
+        }
+        if (!model) {
+          return res.status(404).json({ error: 'Modelo não encontrado' });
+        }
+
+        const cursoCode = model.curso_code;
+        db.serialize(() => {
+          db.run(
+            'UPDATE syllabus_layout_models SET is_active = 0 WHERE curso_code = ?',
+            [cursoCode],
+            (resetErr) => {
+              if (resetErr) {
+                console.error('Erro ao desativar modelos existentes:', resetErr);
+                return res.status(500).json({ error: 'Erro ao ativar modelo' });
+              }
+
+              db.run(
+                `UPDATE syllabus_layout_models
+                 SET is_active = 1, activated_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP, updated_by = ?
+                 WHERE id = ?`,
+                [req.user.id, id],
+                (activateErr) => {
+                  if (activateErr) {
+                    console.error('Erro ao ativar modelo:', activateErr);
+                    return res.status(500).json({ error: 'Erro ao ativar modelo' });
+                  }
+
+                  db.get(
+                    'SELECT * FROM syllabus_layout_models WHERE id = ?',
+                    [id],
+                    (fetchErr, row) => {
+                      if (fetchErr) {
+                        console.error('Erro ao recuperar modelo ativado:', fetchErr);
+                        return res.status(500).json({ error: 'Erro ao recuperar modelo' });
+                      }
+                      const parsed = parseLayoutModelRow(row);
+                      recordLayoutHistory(id, cursoCode, 'activated', parsed, req.user.id);
+                      res.json({ message: 'Modelo ativado com sucesso', model: parsed });
+                    }
+                  );
+                }
+              );
+            }
+          );
+        });
+      }
+    );
+  }
+);
+
+app.get('/api/syllabus-config/active', authenticateToken, (req, res) => {
+  const { curso } = req.query;
+
+  if (!curso) {
+    return res.status(400).json({ error: 'Curso é obrigatório' });
+  }
+
+  const cursoCode = normalizeCursoCode(curso);
+  if (!cursoCode) {
+    return res.json(null);
+  }
+
+  db.get(
+    `SELECT * FROM syllabus_layout_models
+     WHERE curso_code = ? AND is_active = 1
+     ORDER BY activated_at DESC LIMIT 1`,
+    [cursoCode],
+    (err, row) => {
+      if (err) {
+        console.error('Erro ao buscar modelo ativo:', err);
+        return res.status(500).json({ error: 'Erro ao buscar modelo ativo' });
+      }
+
+      res.json(row ? parseLayoutModelRow(row) : null);
+    }
+  );
+});
+
+app.get(
+  '/api/syllabus-config/history/:curso',
+  authenticateToken,
+  requireRole(SYLLABUS_CONFIG_ROLES),
+  (req, res) => {
+    const cursoParam = req.params.curso;
+    const cursoCode = normalizeCursoCode(cursoParam);
+
+    if (!cursoCode) {
+      return res.status(400).json({ error: 'Curso inválido' });
+    }
+
+    db.all(
+      `SELECT * FROM syllabus_layout_history
+       WHERE curso_code = ?
+       ORDER BY created_at DESC
+       LIMIT 100`,
+      [cursoCode],
+      (err, rows) => {
+        if (err) {
+          console.error('Erro ao buscar histórico de modelos:', err);
+          return res.status(500).json({ error: 'Erro ao buscar histórico' });
+        }
+
+        const history = (rows || []).map(entry => ({
+          id: entry.id,
+          layoutModelId: entry.layout_model_id,
+          cursoCode: entry.curso_code,
+          snapshot: safeJsonParse(entry.snapshot, {}),
+          action: entry.action,
+          performedBy: entry.performed_by,
+          createdAt: entry.created_at
+        }));
+
+        res.json(history);
+      }
+    );
+  }
+);
 
 // Google Scholar endpoint (via backend para usar API key do servidor)
 app.get('/api/search-scholar', async (req, res) => {

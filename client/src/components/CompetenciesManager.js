@@ -6,7 +6,7 @@ import { API_URL } from '../config';
 import { FaArrowLeft, FaSave, FaPlus, FaTrash } from 'react-icons/fa';
 import './CompetenciesManager.css';
 
-const CompetenciesManager = () => {
+const CompetenciesManager = ({ isEmbedded = false }) => {
   const navigate = useNavigate();
   const { token } = useAuth();
   const [competenciasData, setCompetenciasData] = useState({});
@@ -183,11 +183,13 @@ const CompetenciesManager = () => {
   }
 
   return (
-    <div className="competencies-manager-container">
+    <div className={`competencies-manager-container${isEmbedded ? ' embedded' : ''}`}>
       <div className="manager-header">
-        <button className="back-btn" onClick={() => navigate('/syllabi')}>
-          <FaArrowLeft /> Voltar
-        </button>
+        {!isEmbedded && (
+          <button className="back-btn" onClick={() => navigate('/syllabi')}>
+            <FaArrowLeft /> Voltar
+          </button>
+        )}
         <h1 className="manager-title">Gerenciar Competências</h1>
       </div>
 
