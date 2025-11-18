@@ -253,6 +253,13 @@ const SyllabusList = () => {
   };
 
   const canAccessConfigurations = user && ['coordenador', 'admin'].includes((user.role || 'professor').toLowerCase());
+  
+  // Debug: log user role to console
+  useEffect(() => {
+    if (user) {
+      console.log('User role:', user.role, 'Can access configurations:', canAccessConfigurations);
+    }
+  }, [user, canAccessConfigurations]);
 
   return (
     <div className="syllabus-list-container">
@@ -286,6 +293,11 @@ const SyllabusList = () => {
             <option value="es">ES - Español</option>
           </select>
           <div className="user-badge" title={user?.email}>{t('professor')}: {user?.nome_completo || '—'}</div>
+          {canAccessConfigurations && (
+            <button className="icon-btn" onClick={() => navigate('/configuracoes')} style={{ backgroundColor: '#28a745', color: 'white' }}>
+              <FaCog /> {t('syllabusConfigurations')}
+            </button>
+          )}
           <button className="icon-btn" onClick={handleLogout}>
             <FaSignOutAlt /> {t('logout')}
           </button>
@@ -496,11 +508,6 @@ const SyllabusList = () => {
         <button className="add-button" onClick={() => navigate('/syllabus/new')}>
           <FaPlus /> {t('newSyllabus')}
         </button>
-        {canAccessConfigurations && (
-          <button className="manage-competencias-btn" onClick={() => navigate('/configuracoes')}>
-            <FaCog /> {t('syllabusConfigurations')}
-          </button>
-        )}
       </div>
 
       {/* Modal de Adicionar Professor */}
