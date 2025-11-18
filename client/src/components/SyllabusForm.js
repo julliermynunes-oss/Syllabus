@@ -1189,6 +1189,7 @@ function SyllabusForm() {
               <AvaliacaoTable
                 data={formData.criterio_avaliacao}
                 onChange={(content) => setFormData(prev => ({ ...prev, criterio_avaliacao: content }))}
+                curso={formData.curso}
               />
             </div>
           </div>

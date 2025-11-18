@@ -92,6 +92,16 @@
   border-color: #235795;
 }
 
+.table-input.error-input {
+  border-color: #ff4444;
+  background-color: #fff5f5;
+}
+
+.table-input.error-input:focus {
+  border-color: #ff4444;
+  box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.2);
+}
+
 
 .remove-row-btn {
   background: #ff4444;

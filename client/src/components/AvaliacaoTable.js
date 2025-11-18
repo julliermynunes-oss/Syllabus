@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaPlus, FaTrash } from 'react-icons/fa';
+import axios from 'axios';
+import { API_URL } from '../config';
+import { useAuth } from '../context/AuthContext';
 import TiptapEditor from './TiptapEditor';
 import './AvaliacaoTable.css';
 
-const AvaliacaoTable = ({ data, onChange }) => {
+const AvaliacaoTable = ({ data, onChange, curso }) => {
   const [rows, setRows] = useState([]);
   const [observacoes, setObservacoes] = useState('');
   const initializedRef = useRef(false);
@@ -51,10 +54,88 @@ const AvaliacaoTable = ({ data, onChange }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rows, observacoes]);
 
+  // Carregar limites de peso quando o curso mudar
+  useEffect(() => {
+    if (curso && token) {
+      axios.get(`${API_URL}/api/general-settings/weight-limits`, {
+        params: { curso },
+        headers: { Authorization: `Bearer ${token}` }
+      }).then(response => {
+        if (response.data) {
+          setWeightLimits({
+            min: response.data.min_weight || null,
+            max: response.data.max_weight || null
+          });
+        } else {
+          setWeightLimits({ min: null, max: null });
+        }
+      }).catch(error => {
+        console.error('Erro ao carregar limites de peso', error);
+        setWeightLimits({ min: null, max: null });
+      });
+    } else {
+      setWeightLimits({ min: null, max: null });
+    }
+  }, [curso, token]);
+
+  // Função para converter peso para porcentagem
+  const parseWeight = (pesoStr) => {
+    if (!pesoStr || !pesoStr.trim()) return null;
+    
+    const str = pesoStr.trim();
+    
+    // Se termina com %, remover e converter
+    if (str.endsWith('%')) {
+      const num = parseFloat(str.slice(0, -1));
+      return isNaN(num) ? null : num;
+    }
+    
+    // Se tem barra (fração), converter
+    if (str.includes('/')) {
+      const parts = str.split('/');
+      if (parts.length === 2) {
+        const num = parseFloat(parts[0]);
+        const den = parseFloat(parts[1]);
+        if (!isNaN(num) && !isNaN(den) && den !== 0) {
+          return (num / den) * 100;
+        }
+      }
+    }
+    
+    // Se é decimal (0.0 a 1.0), converter para porcentagem
+    const num = parseFloat(str);
+    if (!isNaN(num)) {
+      if (num <= 1 && num >= 0) {
+        return num * 100;
+      }
+      return num;
+    }
+    
+    return null;
+  };
+
   const updateRow = (index, field, value) => {
     const newRows = rows.map((row, i) => {
       if (i === index) {
-        return { ...row, [field]: value };
+        const updatedRow = { ...row, [field]: value };
+        
+        // Validar peso se for o campo peso
+        if (field === 'peso' && weightLimits.min !== null && weightLimits.max !== null) {
+          const pesoPercent = parseWeight(value);
+          if (pesoPercent !== null) {
+            if (pesoPercent < weightLimits.min || pesoPercent > weightLimits.max) {
+              setWeightError(`O peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`);
+            } else {
+              setWeightError('');
+            }
+          } else if (value.trim() !== '') {
+            setWeightError('Formato de peso inválido. Use porcentagem (ex: 40%), decimal (ex: 0.4) ou fração (ex: 4/10)');
+          } else {
+            setWeightError('');
+          }
+        }
+        
+        return updatedRow;
       }
       return row;
     });
