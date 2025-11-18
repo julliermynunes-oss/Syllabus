@@ -9,7 +9,6 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [addedReferences, setAddedReferences] = useState([]);
-  const [searchBy, setSearchBy] = useState('title'); // 'title' ou 'author'
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [pendingReference, setPendingReference] = useState(null);
   const [pendingIndex, setPendingIndex] = useState(null);
@@ -21,7 +20,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     if (!searchTerm.trim()) return;
 
     // Verificar cache antes de buscar
-    const cacheKey = `${searchTerm.toLowerCase()}_${searchBy}`;
+    const cacheKey = searchTerm.toLowerCase();
     if (searchCacheRef.current.has(cacheKey)) {
       const cachedResults = searchCacheRef.current.get(cacheKey);
       setSearchResults(cachedResults);
@@ -57,7 +56,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
 
       // Salvar no cache após a busca (usar setTimeout para garantir que searchResults foi atualizado)
       setTimeout(() => {
-        const cacheKey = `${searchTerm.toLowerCase()}_${searchBy}`;
+        const cacheKey = searchTerm.toLowerCase();
         setSearchResults(currentResults => {
           if (currentResults.length > 0) {
             searchCacheRef.current.set(cacheKey, [...currentResults]);
@@ -72,17 +71,31 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     }
   };
 
+  // Função para destacar palavras buscadas em negrito
+  const highlightText = (text, searchTerm) => {
+    if (!text || !searchTerm) return text;
+    
+    const words = searchTerm.trim().split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 0) return text;
+    
+    let highlightedText = String(text);
+    words.forEach(word => {
+      const regex = new RegExp(`(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      highlightedText = highlightedText.replace(regex, '<strong>$1</strong>');
+    });
+    
+    return highlightedText;
+  };
+
   // Funções individuais ajustadas para não limpar resultados quando usado em searchAll
   const searchCrossRef = async (append = false) => {
     if (!searchTerm.trim()) return;
 
     if (!append) setIsSearching(true);
     try {
-      // Ajustar query baseado em searchBy
-      let query = searchTerm;
-      if (searchBy === 'author') {
-        query = `author:"${searchTerm}"`;
-      }
+      // Busca combinada: buscar tanto por título quanto por autor
+      // Usar busca geral que inclui ambos
+      const query = searchTerm;
       
       const response = await axios.get(
         `https://api.crossref.org/works?query=${encodeURIComponent(query)}&rows=10`,
@@ -116,13 +129,9 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
 
     if (!append) setIsSearching(true);
     try {
-      // Ajustar query baseado em searchBy
-      let query = searchTerm;
-      if (searchBy === 'author') {
-        query = `inauthor:"${searchTerm}"`;
-      } else {
-        query = `intitle:"${searchTerm}"`;
-      }
+      // Busca combinada: buscar tanto por título quanto por autor
+      // Usar busca geral que inclui ambos
+      const query = searchTerm;
       
       const response = await axios.get(
         `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=10`,
@@ -643,35 +652,13 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   };
 
   const getPlaceholder = () => {
-    if (searchBy === 'author') {
-      return 'Digite o nome do autor...';
-    } else {
-      return 'Digite o título...';
-    }
+    return 'Digite o título, autor ou palavra-chave...';
   };
 
   return (
     <div className="reference-manager">
       <div className="reference-search">
         <div className="search-input-group">
-          <div className="search-by-buttons">
-            <button
-              type="button"
-              className={`search-by-btn ${searchBy === 'title' ? 'active' : ''}`}
-              onClick={() => setSearchBy('title')}
-              title="Buscar por título"
-            >
-              <FaBook />
-            </button>
-            <button
-              type="button"
-              className={`search-by-btn ${searchBy === 'author' ? 'active' : ''}`}
-              onClick={() => setSearchBy('author')}
-              title="Buscar por autor"
-            >
-              <FaUser />
-            </button>
-          </div>
           <input
             type="text"
             placeholder={getPlaceholder()}
@@ -708,19 +695,57 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
             <h3 className="results-title">Resultados da busca:</h3>
             {searchResults.filter(hasTitleAndAuthor).map((item, index) => {
               const outdated = isOutdated(item);
+              
+              // Obter título para highlight
+              const getTitle = () => {
+                if (item.type === 'book') {
+                  return item.volumeInfo?.title || 'Sem título';
+                } else if (item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex') {
+                  return item.title || 'Sem título';
+                } else {
+                  return item.title?.[0] || 'Sem título';
+                }
+              };
+              
+              // Obter autor para highlight
+              const getAuthor = () => {
+                if (item.type === 'book') {
+                  return item.volumeInfo?.authors?.join(', ') || 'Autor não especificado';
+                } else if (item.type === 'scholar') {
+                  return item.authors?.map(a => a.name || a).join(', ') || 'Autor não especificado';
+                } else if (item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex') {
+                  return item.authors || 'Autor não especificado';
+                } else if (item.type === 'article') {
+                  if (item.author && Array.isArray(item.author) && item.author.length > 0) {
+                    const authorNames = item.author.map(author => {
+                      if (author.given && author.family) {
+                        return `${author.given} ${author.family}`.trim();
+                      }
+                      if (author.family) return typeof author.family === 'string' ? author.family : String(author.family || '');
+                      if (author.given) return typeof author.given === 'string' ? author.given : String(author.given || '');
+                      if (author.name) return typeof author.name === 'string' ? author.name : String(author.name || '');
+                      const literal = author.literal || author.fullName || '';
+                      return typeof literal === 'string' ? literal : String(literal || '');
+                    }).filter(name => name && typeof name === 'string' && name.trim() !== '');
+                    return authorNames.length > 0 ? authorNames.join(', ') : 'Autor não especificado';
+                  }
+                  if (item.author && typeof item.author === 'string') {
+                    return item.author;
+                  }
+                  return 'Autor não especificado';
+                }
+                return 'Autor não especificado';
+              };
+              
+              const highlightedTitle = highlightText(getTitle(), searchTerm);
+              const highlightedAuthor = highlightText(getAuthor(), searchTerm);
+              
               return (
                 <div key={index} className={`result-item ${outdated ? 'outdated' : ''}`}>
                     <div className="result-content">
                     <div className="result-header">
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        <strong>
-                          {item.type === 'book' 
-                            ? (item.volumeInfo?.title || 'Sem título')
-                            : item.type === 'scholar' || item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex'
-                            ? (item.title || 'Sem título')
-                            : (item.title?.[0] || 'Sem título')
-                          }
-                        </strong>
+                        <strong dangerouslySetInnerHTML={{ __html: highlightedTitle }} />
                         {item.source && (
                           <span className="source-badge" title={`Fonte: ${item.source}`}>
                             {item.source}
@@ -734,35 +759,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
                       </div>
                     </div>
                     <p className="result-details">
-                      {item.type === 'book' 
-                        ? (item.volumeInfo?.authors?.join(', ') || 'Autor não especificado')
-                        : item.type === 'scholar'
-                        ? (item.authors?.map(a => a.name || a).join(', ') || 'Autor não especificado')
-                        : item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex'
-                        ? (item.authors || 'Autor não especificado')
-                        : item.type === 'article'
-                        ? (() => {
-                            // Extrair autores do Crossref com diferentes formatos
-                            if (item.author && Array.isArray(item.author) && item.author.length > 0) {
-                              const authorNames = item.author.map(author => {
-                                if (author.given && author.family) {
-                                  return `${author.given} ${author.family}`.trim();
-                                }
-                                if (author.family) return typeof author.family === 'string' ? author.family : String(author.family || '');
-                                if (author.given) return typeof author.given === 'string' ? author.given : String(author.given || '');
-                                if (author.name) return typeof author.name === 'string' ? author.name : String(author.name || '');
-                                const literal = author.literal || author.fullName || '';
-                                return typeof literal === 'string' ? literal : String(literal || '');
-                              }).filter(name => name && typeof name === 'string' && name.trim() !== '');
-                              return authorNames.length > 0 ? authorNames.join(', ') : 'Autor não especificado';
-                            }
-                            if (item.author && typeof item.author === 'string') {
-                              return item.author;
-                            }
-                            return 'Autor não especificado';
-                          })()
-                        : 'Autor não especificado'
-                      }
+                      <span dangerouslySetInnerHTML={{ __html: highlightedAuthor }} />
                       {item.type === 'book' && item.volumeInfo?.publishedDate && 
                         ` (${item.volumeInfo.publishedDate.split('-')[0]})`
                       }
