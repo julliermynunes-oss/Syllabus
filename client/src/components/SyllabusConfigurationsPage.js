@@ -100,6 +100,75 @@ const SyllabusConfigurationsPage = () => {
   );
 };
 
+// Componente sortable para drag and drop (fora do componente principal para evitar problemas com hooks)
+const SortableTabRow = ({ tabId, availableTabs, formState, toggleTabVisibility, t }) => {
+  // Hook deve ser chamado antes de qualquer return condicional
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ 
+    id: tabId,
+    disabled: tabId === 'cabecalho' // Desabilitar drag para cabecalho
+  });
+  
+  const tab = availableTabs.find(item => item.id === tabId);
+  if (!tab) return null;
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  const label = t(tab.labelKey) || tab.labelKey;
+  const visible = formState.tabsVisibility?.[tabId] ?? true;
+  const isCabecalho = tabId === 'cabecalho';
+
+  return (
+    <div ref={setNodeRef} style={style} className="tab-row">
+      <div className="tab-row-main">
+        {!isCabecalho && (
+          <div 
+            {...attributes} 
+            {...listeners}
+            className="drag-handle"
+            style={{ 
+              cursor: 'grab',
+              padding: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              color: '#666'
+            }}
+          >
+            <FaGripVertical />
+          </div>
+        )}
+        {isCabecalho && (
+          <div style={{ width: '24px', padding: '0.5rem' }} />
+        )}
+        <div className="tab-row-title">
+          <strong>{label}</strong>
+          {tab.requiresNonRestrictedCourse && <span className="tab-pill">{t('configTabRestricted')}</span>}
+          {isCabecalho && <span className="tab-pill" style={{ backgroundColor: '#28a745', color: 'white' }}>Sempre ativo</span>}
+        </div>
+        <label className="switch">
+          <input 
+            type="checkbox" 
+            checked={visible} 
+            onChange={() => toggleTabVisibility(tabId)} 
+            disabled={isCabecalho}
+          />
+          <span className="slider round" />
+        </label>
+      </div>
+    </div>
+  );
+};
+
 const LayoutModelsTab = () => {
   const { t } = useTranslation();
   const { token } = useAuth();
@@ -378,74 +447,6 @@ const LayoutModelsTab = () => {
     return new Date(value).toLocaleString();
   };
 
-  // Componente sortable para drag and drop
-  const SortableTabRow = ({ tabId, index }) => {
-    const tab = availableTabs.find(item => item.id === tabId);
-    if (!tab) return null;
-    
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-    } = useSortable({ 
-      id: tabId,
-      disabled: tabId === 'cabecalho' // Desabilitar drag para cabecalho
-    });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-      opacity: isDragging ? 0.5 : 1,
-    };
-
-    const label = t(tab.labelKey) || tab.labelKey;
-    const visible = formState.tabsVisibility?.[tabId] ?? true;
-    const isCabecalho = tabId === 'cabecalho';
-
-    return (
-      <div ref={setNodeRef} style={style} className="tab-row">
-        <div className="tab-row-main">
-          {!isCabecalho && (
-            <div 
-              {...attributes} 
-              {...listeners}
-              className="drag-handle"
-              style={{ 
-                cursor: 'grab',
-                padding: '0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                color: '#666'
-              }}
-            >
-              <FaGripVertical />
-            </div>
-          )}
-          {isCabecalho && (
-            <div style={{ width: '24px', padding: '0.5rem' }} />
-          )}
-          <div className="tab-row-title">
-            <strong>{label}</strong>
-            {tab.requiresNonRestrictedCourse && <span className="tab-pill">{t('configTabRestricted')}</span>}
-            {isCabecalho && <span className="tab-pill" style={{ backgroundColor: '#28a745', color: 'white' }}>Sempre ativo</span>}
-          </div>
-          <label className="switch">
-            <input 
-              type="checkbox" 
-              checked={visible} 
-              onChange={() => toggleTabVisibility(tabId)} 
-              disabled={isCabecalho}
-            />
-            <span className="slider round" />
-          </label>
-        </div>
-      </div>
-    );
-  };
-
   const handleCourseChange = (event) => {
     setSelectedCourse(event.target.value);
       setFormState(getInitialFormState());
@@ -612,7 +613,15 @@ const LayoutModelsTab = () => {
                         strategy={verticalListSortingStrategy}
                       >
                         {formState.tabsOrder.map((tabId, index) => (
-                          <SortableTabRow key={tabId} tabId={tabId} index={index} />
+                          <SortableTabRow 
+                            key={tabId} 
+                            tabId={tabId} 
+                            index={index}
+                            availableTabs={availableTabs}
+                            formState={formState}
+                            toggleTabVisibility={toggleTabVisibility}
+                            t={t}
+                          />
                         ))}
                       </SortableContext>
                     </DndContext>
