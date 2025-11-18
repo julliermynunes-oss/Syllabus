@@ -82,26 +82,42 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     
     let highlightedText = String(text);
     
-    // Criar um padrão único para cada palavra e substituir todas de uma vez
-    // Isso evita problemas com substituições múltiplas que podem quebrar tags HTML
-    const placeholders = {};
-    const placeholderPrefix = '___HL_PLACEHOLDER_';
-    let placeholderIndex = 0;
+    // Ordenar palavras por tamanho (maior primeiro) para evitar problemas com palavras que contêm outras
+    const sortedWords = [...words].sort((a, b) => b.length - a.length);
     
-    // Primeiro, substituir todas as ocorrências por placeholders únicos
-    words.forEach(word => {
+    // Usar um array de índices para rastrear posições já destacadas
+    const highlightedRanges = [];
+    
+    sortedWords.forEach(word => {
       const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(`\\b(${escapedWord})\\b`, 'gi');
-      highlightedText = highlightedText.replace(regex, (match) => {
-        const placeholder = `${placeholderPrefix}${placeholderIndex++}`;
-        placeholders[placeholder] = match;
-        return placeholder;
-      });
+      let match;
+      
+      while ((match = regex.exec(highlightedText)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        
+        // Verificar se esta posição já está destacada
+        const isOverlapping = highlightedRanges.some(range => 
+          (start >= range.start && start < range.end) ||
+          (end > range.start && end <= range.end) ||
+          (start <= range.start && end >= range.end)
+        );
+        
+        if (!isOverlapping) {
+          highlightedRanges.push({ start, end, text: match[0] });
+        }
+      }
     });
     
-    // Depois, substituir os placeholders por tags strong
-    Object.keys(placeholders).forEach(placeholder => {
-      highlightedText = highlightedText.replace(placeholder, `<strong>${placeholders[placeholder]}</strong>`);
+    // Ordenar ranges por posição (do fim para o início) para substituir sem afetar índices
+    highlightedRanges.sort((a, b) => b.start - a.start);
+    
+    // Substituir do fim para o início para não afetar os índices
+    highlightedRanges.forEach(range => {
+      const before = highlightedText.substring(0, range.start);
+      const after = highlightedText.substring(range.end);
+      highlightedText = before + `<strong>${range.text}</strong>` + after;
     });
     
     return highlightedText;
