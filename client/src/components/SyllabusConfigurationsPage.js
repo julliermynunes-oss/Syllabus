@@ -55,9 +55,7 @@ const SyllabusConfigurationsPage = () => {
           >
             <FaArrowLeft /> {t('back') || 'Voltar'}
           </button>
-          <p className="configEyebrow">{t('syllabusConfigurations')}</p>
-          <h1>{t('syllabusConfigurationsTitle')}</h1>
-          <p className="config-description">{t('syllabusConfigurationsDescription')}</p>
+          <h1 className="form-title">{t('syllabusConfigurationsTitle')}</h1>
         </div>
         <div className="config-highlight-card">
           <FaInfoCircle size={24} />

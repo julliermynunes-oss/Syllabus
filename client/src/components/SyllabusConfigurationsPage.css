@@ -12,10 +12,13 @@
   margin-bottom: 30px;
 }
 
-.config-header h1 {
+.config-header h1,
+.config-header .form-title {
   margin: 0;
-  font-size: 28px;
-  color: #1b2a41;
+  font-size: 2.5rem;
+  color: #235795;
+  font-weight: 800;
+  flex: 1;
 }
 
 .configEyebrow {
