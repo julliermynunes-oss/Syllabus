@@ -10,7 +10,7 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
   const [rows, setRows] = useState([]);
   const [observacoes, setObservacoes] = useState('');
   const [weightLimits, setWeightLimits] = useState({ min: null, max: null });
-  const [weightError, setWeightError] = useState('');
+  const [weightErrors, setWeightErrors] = useState({}); // Objeto: { index: 'mensagem' }
   const initializedRef = useRef(false);
   const isInitializingRef = useRef(false);
   const { token } = useAuth();
@@ -65,21 +65,36 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
         headers: { Authorization: `Bearer ${token}` }
       }).then(response => {
         if (response.data) {
-          setWeightLimits({
+          const limits = {
             min: response.data.min_weight || null,
             max: response.data.max_weight || null
-          });
+          };
+          setWeightLimits(limits);
+          // Validar todos os pesos existentes quando os limites são carregados
+          if (limits.min !== null && limits.max !== null && rows.length > 0) {
+            validateAllWeights(rows, limits);
+          }
         } else {
           setWeightLimits({ min: null, max: null });
+          setWeightErrors({});
         }
       }).catch(error => {
         console.error('Erro ao carregar limites de peso', error);
         setWeightLimits({ min: null, max: null });
+        setWeightErrors({});
       });
     } else {
       setWeightLimits({ min: null, max: null });
+      setWeightErrors({});
     }
   }, [curso, token]);
+
+  // Validar todos os pesos quando os limites mudarem
+  useEffect(() => {
+    if (weightLimits.min !== null && weightLimits.max !== null && rows.length > 0) {
+      validateAllWeights(rows, weightLimits);
+    }
+  }, [weightLimits.min, weightLimits.max]);
 
   // Função para converter peso para porcentagem
   const parseWeight = (pesoStr) => {
@@ -117,6 +132,38 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
     return null;
   };
 
+  // Função para validar um peso individual
+  const validateWeight = (pesoStr, limits) => {
+    if (!pesoStr || !pesoStr.trim()) {
+      return null; // Sem erro se vazio
+    }
+    
+    const pesoPercent = parseWeight(pesoStr);
+    if (pesoPercent === null) {
+      return 'Formato de peso inválido. Use porcentagem (ex: 40%), decimal (ex: 0.4) ou fração (ex: 4/10)';
+    }
+    
+    if (pesoPercent < limits.min || pesoPercent > limits.max) {
+      return `O peso deve estar entre ${limits.min}% e ${limits.max}%`;
+    }
+    
+    return null; // Sem erro
+  };
+
+  // Validar todos os pesos de uma vez
+  const validateAllWeights = (rowsToValidate, limits) => {
+    const errors = {};
+    rowsToValidate.forEach((row, index) => {
+      if (row.peso) {
+        const error = validateWeight(row.peso, limits);
+        if (error) {
+          errors[index] = error;
+        }
+      }
+    });
+    setWeightErrors(errors);
+  };
+
   const updateRow = (index, field, value) => {
     const newRows = rows.map((row, i) => {
       if (i === index) {
@@ -124,18 +171,16 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
         
         // Validar peso se for o campo peso
         if (field === 'peso' && weightLimits.min !== null && weightLimits.max !== null) {
-          const pesoPercent = parseWeight(value);
-          if (pesoPercent !== null) {
-            if (pesoPercent < weightLimits.min || pesoPercent > weightLimits.max) {
-              setWeightError(`O peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`);
+          const error = validateWeight(value, weightLimits);
+          setWeightErrors(prev => {
+            const newErrors = { ...prev };
+            if (error) {
+              newErrors[index] = error;
             } else {
-              setWeightError('');
+              delete newErrors[index];
             }
-          } else if (value.trim() !== '') {
-            setWeightError('Formato de peso inválido. Use porcentagem (ex: 40%), decimal (ex: 0.4) ou fração (ex: 4/10)');
-          } else {
-            setWeightError('');
-          }
+            return newErrors;
+          });
         }
         
         return updatedRow;
@@ -197,14 +242,14 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                     placeholder={weightLimits.min !== null && weightLimits.max !== null 
                       ? `Ex: ${weightLimits.min}% - ${weightLimits.max}%`
                       : "Ex: 40%, 0.4, 4/10"}
-                    className={`table-input ${weightError && row.peso && index === rows.findIndex((r, idx) => idx === index && r.peso === row.peso) ? 'error-input' : ''}`}
+                    className={`table-input ${weightErrors[index] ? 'error-input' : ''}`}
                     title={weightLimits.min !== null && weightLimits.max !== null 
                       ? `Peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`
                       : ''}
                   />
-                  {weightError && row.peso && index === rows.findIndex((r, idx) => idx === index && r.peso === row.peso) && (
+                  {weightErrors[index] && (
                     <small style={{ color: '#ff4444', fontSize: '0.75rem', display: 'block', marginTop: '0.25rem' }}>
-                      {weightError}
+                      {weightErrors[index]}
                     </small>
                   )}
                 </td>
