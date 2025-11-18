@@ -1121,7 +1121,7 @@ const AoLSyllabusTab = () => {
                   value={newUser.nome_completo}
                   onChange={(e) => setNewUser(prev => ({ ...prev, nome_completo: e.target.value }))}
                   required
-                  style={{ marginTop: '0.5rem' }}
+                  style={{ marginTop: '0.25rem' }}
                 />
               </div>
               <div className="form-field">
@@ -1131,7 +1131,7 @@ const AoLSyllabusTab = () => {
                   value={newUser.email}
                   onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
                   required
-                  style={{ marginTop: '0.5rem' }}
+                  style={{ marginTop: '0.25rem' }}
                 />
               </div>
               <div className="form-field">
@@ -1141,15 +1141,15 @@ const AoLSyllabusTab = () => {
                   value={newUser.senha}
                   onChange={(e) => setNewUser(prev => ({ ...prev, senha: e.target.value }))}
                   required
-                  style={{ marginTop: '0.5rem' }}
+                  style={{ marginTop: '0.25rem' }}
                 />
               </div>
               <div className="form-field">
-                <label>Role:</label>
+                <label>Tipo:</label>
                 <select
                   value={newUser.role}
                   onChange={(e) => setNewUser(prev => ({ ...prev, role: e.target.value }))}
-                  style={{ marginTop: '0.5rem' }}
+                  style={{ marginTop: '0.25rem' }}
                 >
                   <option value="professor">Professor</option>
                   <option value="coordenador">Coordenador</option>
