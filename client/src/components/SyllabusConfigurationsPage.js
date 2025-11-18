@@ -23,8 +23,8 @@ const SyllabusConfigurationsPage = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('models');
 
-  return (
-    <div className="syllabus-config-page">
+    return (
+      <div className="syllabus-config-page">
       <div className="config-header">
         <div>
           <p className="configEyebrow">{t('syllabusConfigurations')}</p>
@@ -36,7 +36,7 @@ const SyllabusConfigurationsPage = () => {
           <div>
             <strong>{t('syllabusConfigurationsAccess')}</strong>
             <p>{t('syllabusConfigurationsAccessHint')}</p>
-          </div>
+      </div>
         </div>
       </div>
 
@@ -414,8 +414,8 @@ const LayoutModelsTab = () => {
                       </div>
                       {entry.snapshot?.nome && <p className="history-model-name">{entry.snapshot.nome}</p>}
                     </li>
-                  ))}
-                </ul>
+        ))}
+      </ul>
               )}
             </div>
           </div>
@@ -459,7 +459,7 @@ const LayoutModelsTab = () => {
                   <button
                     type="button"
                     className="ghost-btn"
-                    onClick={() => setFormState(DEFAULT_FORM_STATE)}
+                    onClick={() => setFormState(getInitialFormState())}
                     disabled={saving}
                   >
                     {t('configCancel')}
