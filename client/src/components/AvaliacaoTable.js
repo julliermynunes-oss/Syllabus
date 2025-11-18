@@ -342,9 +342,8 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                           if (!row.peso) return '';
                           const num = parseFloat(row.peso.toString().replace('%', ''));
                           if (isNaN(num)) return '';
-                          // Garantir que o valor exibido está dentro dos limites
-                          if (num < weightLimits.min) return weightLimits.min;
-                          if (num > weightLimits.max) return weightLimits.max;
+                          // Exibir o valor como está durante a digitação
+                          // A validação e ajuste serão feitos apenas no onBlur
                           return num;
                         })()}
                         onChange={(e) => {
@@ -366,18 +365,9 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                             return; // Não atualizar se não for número
                           }
                           
-                          // Bloquear valores fora dos limites durante a digitação
-                          if (numVal < weightLimits.min) {
-                            // Permitir digitar valores menores temporariamente (para poder apagar e corrigir)
-                            updateRow(index, 'peso', `${numVal}%`);
-                          } else if (numVal > weightLimits.max) {
-                            // Bloquear valores maiores que o máximo
-                            // Não atualizar o valor, mantendo o anterior
-                            return;
-                          } else {
-                            // Valor válido, sempre adicionar %
-                            updateRow(index, 'peso', `${numVal}%`);
-                          }
+                          // Durante a digitação, permitir qualquer valor (para poder digitar 25 começando com 2)
+                          // A validação será feita apenas no onBlur
+                          updateRow(index, 'peso', `${numVal}%`);
                         }}
                         onBlur={(e) => {
                           const val = parseFloat(e.target.value);

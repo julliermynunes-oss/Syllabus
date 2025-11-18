@@ -36,6 +36,11 @@
   vertical-align: top;
 }
 
+.avaliacao-table td.col-criterio {
+  vertical-align: top;
+  padding-top: 12px;
+}
+
 .avaliacao-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -59,9 +64,11 @@
   border-radius: 4px;
   font-size: 14px;
   resize: vertical;
-  min-height: 50px;
+  min-height: 38px;
   font-family: inherit;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  line-height: 1.4;
 }
 
 .table-textarea:focus {
