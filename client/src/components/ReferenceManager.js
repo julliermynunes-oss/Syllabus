@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { FaSearch, FaPlus, FaSpinner, FaBook, FaFileAlt, FaDatabase, FaFlask, FaUser } from 'react-icons/fa';
+import Cite from 'citation-js';
 import './ReferenceManager.css';
 
 const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
@@ -12,6 +13,7 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [pendingReference, setPendingReference] = useState(null);
   const [pendingIndex, setPendingIndex] = useState(null);
+  const [citationStyle, setCitationStyle] = useState('apa'); // 'apa' ou 'abnt'
   const searchCacheRef = useRef(new Map()); // Cache de resultados de busca
   const debounceTimerRef = useRef(null);
 
@@ -448,7 +450,150 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     }
   };
 
-  const formatReference = (item) => {
+  // Converter item para formato compatível com citation-js
+  const convertToCitationFormat = (item) => {
+    if (item.type === 'book') {
+      const volumeInfo = item.volumeInfo || {};
+      return {
+        type: 'book',
+        title: volumeInfo.title || 'Sem título',
+        author: volumeInfo.authors ? volumeInfo.authors.map(author => ({ literal: author })) : [],
+        'publisher-place': volumeInfo.publisher || '',
+        issued: volumeInfo.publishedDate ? { 'date-parts': [[volumeInfo.publishedDate.split('-')[0]]] } : undefined,
+        ISBN: volumeInfo.industryIdentifiers?.[0]?.identifier || ''
+      };
+    } else if (item.type === 'article') {
+      let authors = [];
+      if (item.author && Array.isArray(item.author)) {
+        authors = item.author.map(author => {
+          if (author.given && author.family) {
+            return { given: author.given, family: author.family };
+          } else if (author.literal) {
+            return { literal: author.literal };
+          } else if (author.family) {
+            return { family: author.family };
+          }
+          return { literal: String(author) };
+        });
+      }
+      
+      return {
+        type: 'article-journal',
+        title: item.title?.[0] || 'Sem título',
+        author: authors,
+        'container-title': item['container-title']?.[0] || '',
+        issued: item.published || item.created,
+        DOI: item.DOI || ''
+      };
+    } else if (item.type === 'scholar') {
+      return {
+        type: 'article-journal',
+        title: item.title || 'Sem título',
+        author: item.authors ? item.authors.map(a => ({ literal: a.name || a })) : [],
+        issued: item.publication_info?.summary ? { 
+          'date-parts': [[item.publication_info.summary.match(/\d{4}/)?.[0] || '']] 
+        } : undefined
+      };
+    } else if (item.type === 'dataverse' || item.type === 'arxiv' || item.type === 'openalex') {
+      const authors = item.authors ? (typeof item.authors === 'string' ? [{ literal: item.authors }] : item.authors.map(a => ({ literal: a }))) : [];
+      return {
+        type: 'article-journal',
+        title: item.title || 'Sem título',
+        author: authors,
+        issued: item.year ? { 'date-parts': [[item.year]] } : undefined,
+        DOI: item.doi || ''
+      };
+    }
+    
+    // Fallback
+    return {
+      type: 'article-journal',
+      title: 'Sem título',
+      author: []
+    };
+  };
+
+  // Formatar em APA usando citation-js
+  const formatAPA = (item) => {
+    try {
+      const citationData = convertToCitationFormat(item);
+      const cite = new Cite(citationData);
+      return cite.format('bibliography', {
+        format: 'text',
+        template: 'apa',
+        lang: 'pt-BR'
+      });
+    } catch (error) {
+      console.error('Erro ao formatar em APA:', error);
+      // Fallback para formatação manual
+      return formatReferenceFallback(item);
+    }
+  };
+
+  // Formatar em ABNT (formatação customizada)
+  const formatABNT = (item) => {
+    if (item.type === 'book') {
+      const volumeInfo = item.volumeInfo || {};
+      const authors = volumeInfo.authors || [];
+      const title = volumeInfo.title || 'Sem título';
+      const edition = volumeInfo.edition || '';
+      const place = volumeInfo.publisherLocation || '';
+      const publisher = volumeInfo.publisher || '';
+      const year = volumeInfo.publishedDate ? volumeInfo.publishedDate.split('-')[0] : '';
+      
+      // Formato ABNT para livro: SOBRENOME, Nome. Título. Edição. Local: Editora, Ano.
+      let formatted = '';
+      if (authors.length > 0) {
+        const firstAuthor = authors[0].split(' ');
+        const lastName = firstAuthor[firstAuthor.length - 1];
+        const firstName = firstAuthor.slice(0, -1).join(' ');
+        formatted = `${lastName.toUpperCase()}, ${firstName}`;
+        if (authors.length > 1) {
+          formatted += ` et al.`;
+        }
+      } else {
+        formatted = 'AUTOR NÃO ESPECIFICADO';
+      }
+      
+      formatted += `. ${title}.`;
+      if (edition) formatted += ` ${edition} ed.`;
+      formatted += ` ${place ? place + ':' : ''} ${publisher ? publisher + ',' : ''} ${year}.`;
+      return formatted;
+    } else if (item.type === 'article') {
+      let authors = 'AUTOR NÃO ESPECIFICADO';
+      if (item.author && Array.isArray(item.author) && item.author.length > 0) {
+        const authorNames = item.author.map(author => {
+          if (author.family && author.given) {
+            return `${author.family.toUpperCase()}, ${author.given}`;
+          } else if (author.family) {
+            return author.family.toUpperCase();
+          } else if (author.literal) {
+            return author.literal;
+          }
+          return '';
+        }).filter(name => name);
+        if (authorNames.length > 0) {
+          authors = authorNames[0];
+          if (authorNames.length > 1) {
+            authors += ' et al.';
+          }
+        }
+      }
+      
+      const title = item.title?.[0] || 'Sem título';
+      const journal = item['container-title']?.[0] || '';
+      const year = item.published?.['date-parts']?.[0]?.[0] || '';
+      
+      // Formato ABNT para artigo: SOBRENOME, Nome. Título do artigo. Nome do Periódico, Local, v. X, n. Y, p. Z-W, ano.
+      return `${authors}. ${title}. ${journal}, ${year}.`;
+    } else {
+      // Para outros tipos, usar formatação similar
+      return formatReferenceFallback(item);
+    }
+  };
+
+  // Formatação fallback (formato atual)
+  const formatReferenceFallback = (item) => {
     if (item.type === 'book') {
       const volumeInfo = item.volumeInfo || {};
       const authors = volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Autor não especificado';
@@ -557,6 +702,17 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
     }
   };
 
+  // Função principal de formatação que escolhe o estilo
+  const formatReference = (item) => {
+    if (citationStyle === 'apa') {
+      return formatAPA(item);
+    } else if (citationStyle === 'abnt') {
+      return formatABNT(item);
+    }
+    // Fallback
+    return formatReferenceFallback(item);
+  };
+
   // Função para parsear referências do conteúdo
   const parseReferences = () => {
     if (!content) return [];
@@ -658,6 +814,29 @@ const ReferenceManager = ({ content, onChange, layout = 'lista' }) => {
   return (
     <div className="reference-manager">
       <div className="reference-search">
+        <div className="citation-style-selector" style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <label style={{ fontWeight: 600, color: '#235795' }}>Padrão de Citação:</label>
+          <select
+            value={citationStyle}
+            onChange={(e) => setCitationStyle(e.target.value)}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              border: '2px solid #e0e0e0',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              color: '#235795',
+              cursor: 'pointer',
+              backgroundColor: 'white',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.borderColor = '#235795'}
+            onMouseLeave={(e) => e.target.style.borderColor = '#e0e0e0'}
+          >
+            <option value="apa">APA</option>
+            <option value="abnt">ABNT</option>
+          </select>
+        </div>
         <div className="search-input-group">
           <input
             type="text"
