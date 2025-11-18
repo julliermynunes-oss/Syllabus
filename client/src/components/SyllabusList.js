@@ -7,7 +7,6 @@ import axios from 'axios';
 import { API_URL } from '../config';
 import useCourseLayoutModel from '../hooks/useCourseLayoutModel';
 import { FaPlus, FaSignOutAlt, FaEdit, FaTrash, FaCopy, FaEye, FaCog } from 'react-icons/fa';
-import ProfessorModal from './ProfessorModal';
 import SyllabusPreviewContent from './SyllabusPreviewContent';
 import './SyllabusList.css';
 
@@ -28,7 +27,6 @@ const SyllabusList = () => {
   const [showProgramDropdown, setShowProgramDropdown] = useState(false);
   const [showDisciplineDropdown, setShowDisciplineDropdown] = useState(false);
   const [showProfessorDropdown, setShowProfessorDropdown] = useState(false);
-  const [showProfessorModal, setShowProfessorModal] = useState(false);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [previewSyllabus, setPreviewSyllabus] = useState(null);
   const [professoresList, setProfessoresList] = useState([]);
@@ -214,25 +212,6 @@ const SyllabusList = () => {
     navigate('/login');
   };
 
-  const handleAddProfessor = async (professorData) => {
-    try {
-      // Send request to backend
-      await axios.post(`${API_URL}/api/requests`, {
-        professor_nome: professorData.professores,
-        professor_email: '', // We'll need to get this from the user
-        curso: professorData.curso,
-        disciplina: professorData.disciplina,
-        semestre_ano: professorData.turma_semestral,
-        turma_nome: professorData.turma_nome
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert(`${t('requestCreated')} ${professorData.professores}`);
-    } catch (err) {
-      console.error('Erro ao criar requisição:', err);
-      alert(t('errorCreatingRequest'));
-    }
-  };
 
   const handleView = async (id) => {
     try {
@@ -281,9 +260,6 @@ const SyllabusList = () => {
           )}
           <button className="icon-btn" onClick={handleLogout}>
             <FaSignOutAlt /> {t('logout')}
-          </button>
-          <button className="icon-btn" onClick={() => setShowProfessorModal(true)}>
-            {t('addProfessor')}
           </button>
         </div>
       </header>
@@ -490,13 +466,6 @@ const SyllabusList = () => {
           <FaPlus /> {t('newSyllabus')}
         </button>
       </div>
-
-      {/* Modal de Adicionar Professor */}
-      <ProfessorModal
-        isOpen={showProfessorModal}
-        onClose={() => setShowProfessorModal(false)}
-        onAddProfessor={handleAddProfessor}
-      />
 
       {/* Modal de Preview */}
       {previewSyllabus && (

@@ -859,7 +859,7 @@ function SyllabusForm() {
               </button>
             );
           })}
-          {!formData.custom_tab_name && (
+          {!formData.custom_tab_name && layoutModel?.allowCustomTabs !== false && (
             <button
               className="tab add-custom-tab-btn"
               onClick={() => {
