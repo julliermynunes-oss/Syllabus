@@ -407,9 +407,12 @@
 }
 
 .form-row .form-field input,
-.form-row .form-field select {
+.form-row .form-field select,
+.form-row .form-field textarea {
   width: 100%;
   box-sizing: border-box;
+  padding: 1.25rem 1.5rem;
+  min-height: 3.5rem;
 }
 
 /* Linha full width para rich text */
