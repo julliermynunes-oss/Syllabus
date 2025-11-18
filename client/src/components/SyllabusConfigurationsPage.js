@@ -143,7 +143,7 @@ const SortableTabRow = ({ tabId, availableTabs, formState, toggleTabVisibility, 
               justifyContent: 'center',
               color: '#666',
               padding: '0 4px',
-              min-width: '20px'
+              minWidth: '20px'
             }}
           >
             <FaGripVertical />
@@ -408,7 +408,8 @@ const LayoutModelsTab = () => {
         curso: selectedCourse,
         nome: formState.nome.trim(),
         tabsOrder: formState.tabsOrder,
-        tabsVisibility: formState.tabsVisibility
+        tabsVisibility: formState.tabsVisibility,
+        allowCustomTabs: formState.allowCustomTabs !== undefined ? formState.allowCustomTabs : true
       };
       const response = await axios.post(`${API_URL}/api/syllabus-config/models`, payload, {
         headers: authHeaders
