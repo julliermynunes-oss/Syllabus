@@ -264,6 +264,7 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         tabs_order TEXT NOT NULL,
         tabs_visibility TEXT NOT NULL,
         notes TEXT,
+        allow_custom_tabs INTEGER DEFAULT 1,
         is_active INTEGER DEFAULT 0,
         version INTEGER DEFAULT 1,
         created_by INTEGER,
@@ -274,6 +275,11 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
         FOREIGN KEY (created_by) REFERENCES users(id),
         FOREIGN KEY (updated_by) REFERENCES users(id)
       )`);
+      
+      // Adicionar coluna allow_custom_tabs se não existir (migração)
+      db.run(`ALTER TABLE syllabus_layout_models ADD COLUMN allow_custom_tabs INTEGER DEFAULT 1`, (err) => {
+        // Ignorar erro se coluna já existir
+      });
 
       db.run(`CREATE TABLE IF NOT EXISTS syllabus_layout_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -573,6 +579,7 @@ const parseLayoutModelRow = (row) => {
     tabsOrder: safeJsonParse(row.tabs_order, []),
     tabsVisibility: safeJsonParse(row.tabs_visibility, {}),
     notes: row.notes || null,
+    allowCustomTabs: row.allow_custom_tabs !== undefined ? !!row.allow_custom_tabs : true,
     isActive: !!row.is_active,
     version: row.version,
     createdBy: row.created_by,
@@ -959,7 +966,7 @@ app.post(
   authenticateToken,
   requireRole(SYLLABUS_CONFIG_ROLES),
   (req, res) => {
-    const { id, curso, nome, tabsOrder, tabsVisibility, notes } = req.body;
+    const { id, curso, nome, tabsOrder, tabsVisibility, notes, allowCustomTabs } = req.body;
 
     if (!curso || !nome) {
       return res.status(400).json({ error: 'Curso e nome são obrigatórios' });
@@ -1015,11 +1022,12 @@ app.post(
           }
 
           const newVersion = (existing.version || 1) + 1;
+          const allowCustomTabsValue = allowCustomTabs !== undefined ? (allowCustomTabs ? 1 : 0) : 1;
           db.run(
             `UPDATE syllabus_layout_models
-             SET nome = ?, tabs_order = ?, tabs_visibility = ?, notes = ?, version = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+             SET nome = ?, tabs_order = ?, tabs_visibility = ?, notes = ?, allow_custom_tabs = ?, version = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
              WHERE id = ?`,
-            [nome, serializedOrder, serializedVisibility, normalizedNotes, newVersion, userId, id],
+            [nome, serializedOrder, serializedVisibility, normalizedNotes, allowCustomTabsValue, newVersion, userId, id],
             (updateErr) => {
               if (updateErr) {
                 console.error('Erro ao atualizar modelo:', updateErr);
@@ -1044,11 +1052,12 @@ app.post(
         }
       );
     } else {
+      const allowCustomTabsValue = allowCustomTabs !== undefined ? (allowCustomTabs ? 1 : 0) : 1;
       db.run(
         `INSERT INTO syllabus_layout_models (
-          curso_code, nome, tabs_order, tabs_visibility, notes, is_active, version, created_by, updated_by
-        ) VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?)`,
-        [cursoCode, nome, serializedOrder, serializedVisibility, normalizedNotes, userId, userId],
+          curso_code, nome, tabs_order, tabs_visibility, notes, allow_custom_tabs, is_active, version, created_by, updated_by
+        ) VALUES (?, ?, ?, ?, ?, ?, 0, 1, ?, ?)`,
+        [cursoCode, nome, serializedOrder, serializedVisibility, normalizedNotes, allowCustomTabsValue, userId, userId],
         function(err) {
           if (err) {
             console.error('Erro ao criar modelo:', err);

@@ -1,6 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaChevronUp, FaChevronDown, FaPlus, FaArrowLeft } from 'react-icons/fa';
+import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaPlus, FaArrowLeft, FaGripVertical } from 'react-icons/fa';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import axios from 'axios';
 import { useTranslation } from '../hooks/useTranslation';
 import { API_URL } from '../config';
@@ -17,7 +33,8 @@ const getInitialFormState = () => ({
   id: null,
   nome: '',
   tabsOrder: [],
-  tabsVisibility: {}
+  tabsVisibility: {},
+  allowCustomTabs: true
 });
 
 const SyllabusConfigurationsPage = () => {
@@ -97,6 +114,13 @@ const LayoutModelsTab = () => {
   const [formState, setFormState] = useState(getInitialFormState());
   const [saving, setSaving] = useState(false);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const authHeaders = useMemo(() => {
     if (!token) return {};
@@ -182,52 +206,112 @@ const LayoutModelsTab = () => {
     }
   };
 
+  // Função para ordenar abas: cabecalho sempre primeiro, depois alfabético
+  const sortTabsAlphabetically = (tabs) => {
+    const cabecalhoTab = tabs.find(tab => tab.id === 'cabecalho');
+    const otherTabs = tabs.filter(tab => tab.id !== 'cabecalho');
+    
+    // Ordenar alfabeticamente pelo labelKey
+    otherTabs.sort((a, b) => {
+      const labelA = t(a.labelKey) || a.labelKey;
+      const labelB = t(b.labelKey) || b.labelKey;
+      return labelA.localeCompare(labelB, 'pt-BR');
+    });
+    
+    return cabecalhoTab ? [cabecalhoTab, ...otherTabs] : otherTabs;
+  };
+
   const normalizeOrder = (order = []) => {
     const availableIds = availableTabs.map(tab => tab.id);
     const filtered = order.filter(id => availableIds.includes(id));
-    availableIds.forEach(id => {
-      if (!filtered.includes(id)) filtered.push(id);
-    });
+    
+    // Garantir que cabecalho está sempre primeiro
+    const cabecalhoIndex = filtered.indexOf('cabecalho');
+    if (cabecalhoIndex > 0) {
+      filtered.splice(cabecalhoIndex, 1);
+      filtered.unshift('cabecalho');
+    } else if (cabecalhoIndex === -1 && availableIds.includes('cabecalho')) {
+      filtered.unshift('cabecalho');
+    }
+    
+    // Adicionar outras abas que faltam, ordenadas alfabeticamente
+    const missingIds = availableIds.filter(id => !filtered.includes(id));
+    if (missingIds.length > 0) {
+      const missingTabs = missingIds.map(id => availableTabs.find(tab => tab.id === id)).filter(Boolean);
+      const sortedMissing = sortTabsAlphabetically(missingTabs);
+      filtered.push(...sortedMissing.map(tab => tab.id));
+    }
+    
     return filtered;
   };
 
-  const getDefaultVisibility = () =>
-    availableTabs.reduce((acc, tab) => {
+  const getDefaultVisibility = () => {
+    const visibility = availableTabs.reduce((acc, tab) => {
       acc[tab.id] = true;
       return acc;
     }, {});
+    // Garantir que cabecalho está sempre ativo
+    visibility.cabecalho = true;
+    return visibility;
+  };
 
   const startNewModel = () => {
+    // Ordenar abas alfabeticamente (exceto cabecalho que fica primeiro)
+    const sortedTabs = sortTabsAlphabetically(availableTabs);
+    const sortedTabIds = sortedTabs.map(tab => tab.id);
+    
     setFormState({
       ...getInitialFormState(),
       nome: '',
-      tabsOrder: normalizeOrder(availableTabs.map(tab => tab.id)),
-      tabsVisibility: getDefaultVisibility()
+      tabsOrder: sortedTabIds,
+      tabsVisibility: getDefaultVisibility(),
+      allowCustomTabs: true
     });
   };
 
   const startEditModel = (model) => {
+    const visibility = { ...getDefaultVisibility(), ...(model.tabsVisibility || {}) };
+    // Garantir que cabecalho está sempre ativo
+    visibility.cabecalho = true;
+    
     setFormState({
       id: model.id,
       nome: model.nome || '',
       tabsOrder: normalizeOrder(model.tabsOrder || []),
-      tabsVisibility: { ...getDefaultVisibility(), ...(model.tabsVisibility || {}) }
+      tabsVisibility: visibility,
+      allowCustomTabs: model.allowCustomTabs !== undefined ? model.allowCustomTabs : true
     });
   };
 
-  const moveTab = (tabId, direction) => {
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) return;
+    
     setFormState(prev => {
       const order = [...prev.tabsOrder];
-      const index = order.indexOf(tabId);
-      if (index === -1) return prev;
-      const newIndex = direction === 'up' ? index - 1 : index + 1;
-      if (newIndex < 0 || newIndex >= order.length) return prev;
-      [order[index], order[newIndex]] = [order[newIndex], order[index]];
-      return { ...prev, tabsOrder: order };
+      const oldIndex = order.indexOf(active.id);
+      const newIndex = order.indexOf(over.id);
+      
+      // Não permitir mover cabecalho
+      if (active.id === 'cabecalho' || over.id === 'cabecalho') {
+        return prev;
+      }
+      
+      // Não permitir mover para antes de cabecalho
+      if (newIndex === 0 && order[0] === 'cabecalho') {
+        return prev;
+      }
+      
+      const newOrder = arrayMove(order, oldIndex, newIndex);
+      return { ...prev, tabsOrder: newOrder };
     });
   };
 
   const toggleTabVisibility = (tabId) => {
+    // Não permitir desativar cabecalho
+    if (tabId === 'cabecalho') return;
+    
     setFormState(prev => ({
       ...prev,
       tabsVisibility: {
@@ -294,30 +378,69 @@ const LayoutModelsTab = () => {
     return new Date(value).toLocaleString();
   };
 
-  const renderTabRow = (tabId, index) => {
+  // Componente sortable para drag and drop
+  const SortableTabRow = ({ tabId, index }) => {
     const tab = availableTabs.find(item => item.id === tabId);
     if (!tab) return null;
+    
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ 
+      id: tabId,
+      disabled: tabId === 'cabecalho' // Desabilitar drag para cabecalho
+    });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
     const label = t(tab.labelKey) || tab.labelKey;
     const visible = formState.tabsVisibility?.[tabId] ?? true;
+    const isCabecalho = tabId === 'cabecalho';
+
     return (
-      <div key={tabId} className="tab-row">
+      <div ref={setNodeRef} style={style} className="tab-row">
         <div className="tab-row-main">
+          {!isCabecalho && (
+            <div 
+              {...attributes} 
+              {...listeners}
+              className="drag-handle"
+              style={{ 
+                cursor: 'grab',
+                padding: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                color: '#666'
+              }}
+            >
+              <FaGripVertical />
+            </div>
+          )}
+          {isCabecalho && (
+            <div style={{ width: '24px', padding: '0.5rem' }} />
+          )}
           <div className="tab-row-title">
             <strong>{label}</strong>
             {tab.requiresNonRestrictedCourse && <span className="tab-pill">{t('configTabRestricted')}</span>}
+            {isCabecalho && <span className="tab-pill" style={{ backgroundColor: '#28a745', color: 'white' }}>Sempre ativo</span>}
           </div>
           <label className="switch">
-            <input type="checkbox" checked={visible} onChange={() => toggleTabVisibility(tabId)} />
+            <input 
+              type="checkbox" 
+              checked={visible} 
+              onChange={() => toggleTabVisibility(tabId)} 
+              disabled={isCabecalho}
+            />
             <span className="slider round" />
           </label>
-        </div>
-        <div className="tab-row-actions">
-          <button type="button" onClick={() => moveTab(tabId, 'up')} disabled={index === 0} aria-label={t('configMoveUp')}>
-            <FaChevronUp />
-          </button>
-          <button type="button" onClick={() => moveTab(tabId, 'down')} disabled={index === formState.tabsOrder.length - 1} aria-label={t('configMoveDown')}>
-            <FaChevronDown />
-          </button>
         </div>
       </div>
     );
@@ -479,7 +602,35 @@ const LayoutModelsTab = () => {
                     <p>{t('configTabsSectionDescription')}</p>
                   </div>
                   <div className="tabs-order-list">
-                    {formState.tabsOrder.map((tabId, index) => renderTabRow(tabId, index))}
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={formState.tabsOrder}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {formState.tabsOrder.map((tabId, index) => (
+                          <SortableTabRow key={tabId} tabId={tabId} index={index} />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  </div>
+                  
+                  <div className="form-field" style={{ marginTop: '2rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={formState.allowCustomTabs !== undefined ? formState.allowCustomTabs : true}
+                        onChange={(e) => setFormState(prev => ({ ...prev, allowCustomTabs: e.target.checked }))}
+                        style={{ width: 'auto', margin: 0 }}
+                      />
+                      <span>{t('configAllowCustomTabs') || 'Permitir abas customizadas no Syllabus'}</span>
+                    </label>
+                    <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem', marginLeft: '1.5rem' }}>
+                      {t('configAllowCustomTabsHint') || 'Quando ativado, professores podem criar abas personalizadas além das abas padrão.'}
+                    </p>
                   </div>
                 </div>
 
