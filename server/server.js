@@ -1935,6 +1935,53 @@ if (isProduction && buildExists) {
 }
 
 
+// Função para atualizar roles de administradores
+function updateAdminRoles() {
+  const adminUsers = [
+    'Julliermy Nunes das Chagas',
+    'Ana Aureliano',
+    'Alexandre Pignanelli'
+  ];
+  
+  // Primeiro, garantir que a coluna role existe
+  db.run(`ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'professor'`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.warn('Aviso ao adicionar coluna role:', err.message);
+    }
+    
+    // Agora atualizar os roles
+    const placeholders = adminUsers.map(() => '?').join(',');
+    const updateQuery = `UPDATE users SET role = 'admin' WHERE nome_completo IN (${placeholders})`;
+    
+    db.run(updateQuery, adminUsers, function(err) {
+      if (err) {
+        console.error('Erro ao atualizar roles de admin:', err);
+        return;
+      }
+      
+      if (this.changes > 0) {
+        console.log(`✓ ${this.changes} usuário(s) atualizado(s) para admin`);
+      }
+      
+      // Verificar os resultados
+      const selectQuery = `SELECT id, nome_completo, email, role FROM users WHERE nome_completo IN (${placeholders})`;
+      db.all(selectQuery, adminUsers, (err, rows) => {
+        if (err) {
+          console.error('Erro ao verificar roles atualizados:', err);
+          return;
+        }
+        
+        if (rows.length > 0) {
+          console.log('✓ Usuários com role admin:');
+          rows.forEach(user => {
+            console.log(`  - ${user.nome_completo} (${user.email}): ${user.role || 'professor'}`);
+          });
+        }
+      });
+    });
+  });
+}
+
 // Endpoint temporário para atualizar roles de administradores
 // TODO: Remover após atualizar os roles no Railway
 app.post('/api/admin/update-roles', (req, res) => {
@@ -1984,4 +2031,13 @@ setTimeout(() => {
     console.error('Erro ao carregar dados CSV (não crítico):', error);
   }
 }, 1000);
+
+// Atualizar roles de administradores na inicialização
+setTimeout(() => {
+  try {
+    updateAdminRoles();
+  } catch (error) {
+    console.error('Erro ao atualizar roles de admin (não crítico):', error);
+  }
+}, 2000);
 
