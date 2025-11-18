@@ -733,6 +733,8 @@ export const translations = {
     configCancel: 'Cancelar',
     configSaveDraft: 'Guardar borrador',
     configSaveAndActivate: 'Guardar y activar',
+    configAllowCustomTabs: 'Permitir pestañas personalizadas en el Syllabus',
+    configAllowCustomTabsHint: 'Cuando está habilitado, los profesores pueden crear pestañas personalizadas además de las pestañas predeterminadas.',
     loading: 'Cargando',
     saving: 'Guardando',
     unauthorizedConfigurations: 'No tienes permiso para acceder a Configuraciones del Syllabus.',
