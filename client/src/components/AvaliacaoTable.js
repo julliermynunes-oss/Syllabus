@@ -171,6 +171,16 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
         
         // Validar peso se for o campo peso
         if (field === 'peso' && weightLimits.min !== null && weightLimits.max !== null) {
+          // Se o campo estiver vazio, permitir (para poder apagar)
+          if (!value || !value.trim()) {
+            setWeightErrors(prev => {
+              const newErrors = { ...prev };
+              delete newErrors[index];
+              return newErrors;
+            });
+            return updatedRow;
+          }
+          
           const error = validateWeight(value, weightLimits);
           setWeightErrors(prev => {
             const newErrors = { ...prev };
@@ -188,6 +198,58 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
       return row;
     });
     setRows(newRows);
+  };
+
+  // Função para formatar o valor do peso para exibição
+  const formatWeightValue = (value) => {
+    if (!value) return '';
+    // Se já está em formato de porcentagem, manter
+    if (typeof value === 'string' && value.includes('%')) {
+      return value;
+    }
+    // Se é um número, adicionar % se necessário
+    const num = parseFloat(value);
+    if (!isNaN(num) && weightLimits.min !== null && weightLimits.max !== null) {
+      // Se o número está entre 0 e 1, pode ser decimal, senão é porcentagem
+      if (num > 0 && num <= 1) {
+        return value; // Manter como está (decimal)
+      }
+      // Se não tem %, adicionar
+      if (!value.toString().includes('%')) {
+        return value;
+      }
+    }
+    return value;
+  };
+
+  // Handler específico para input numérico de peso
+  const handleWeightChange = (index, value) => {
+    // Permitir apagar
+    if (value === '') {
+      updateRow(index, 'peso', '');
+      return;
+    }
+    
+    // Se há limites configurados, usar input numérico
+    if (weightLimits.min !== null && weightLimits.max !== null) {
+      // Remover caracteres não numéricos exceto ponto e vírgula
+      const numericValue = value.replace(/[^0-9.,]/g, '');
+      // Converter vírgula para ponto
+      const normalizedValue = numericValue.replace(',', '.');
+      
+      // Verificar se está dentro dos limites antes de atualizar
+      const numValue = parseFloat(normalizedValue);
+      if (!isNaN(numValue)) {
+        // Se o valor está fora dos limites, mostrar erro mas permitir digitar (para poder corrigir)
+        updateRow(index, 'peso', normalizedValue);
+      } else if (normalizedValue === '' || normalizedValue === '.') {
+        // Permitir digitação parcial
+        updateRow(index, 'peso', normalizedValue);
+      }
+    } else {
+      // Sem limites, permitir qualquer formato
+      updateRow(index, 'peso', value);
+    }
   };
 
   const addRow = () => {
@@ -235,22 +297,45 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                   />
                 </td>
                 <td className="col-peso">
-                  <input
-                    type="text"
-                    value={row.peso || ''}
-                    onChange={(e) => updateRow(index, 'peso', e.target.value)}
-                    placeholder={weightLimits.min !== null && weightLimits.max !== null 
-                      ? `Ex: ${weightLimits.min}% - ${weightLimits.max}%`
-                      : "Ex: 40%, 0.4, 4/10"}
-                    className={`table-input ${weightErrors[index] ? 'error-input' : ''}`}
-                    title={weightLimits.min !== null && weightLimits.max !== null 
-                      ? `Peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`
-                      : ''}
-                  />
-                  {weightErrors[index] && (
-                    <small style={{ color: '#ff4444', fontSize: '0.75rem', display: 'block', marginTop: '0.25rem' }}>
-                      {weightErrors[index]}
-                    </small>
+                  {weightLimits.min !== null && weightLimits.max !== null ? (
+                    <>
+                      <input
+                        type="number"
+                        min={weightLimits.min}
+                        max={weightLimits.max}
+                        step="0.1"
+                        value={row.peso ? (parseFloat(row.peso) || '') : ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (val === '' || (!isNaN(parseFloat(val)) && parseFloat(val) >= weightLimits.min && parseFloat(val) <= weightLimits.max)) {
+                            updateRow(index, 'peso', val ? `${val}%` : '');
+                          }
+                        }}
+                        onBlur={(e) => {
+                          const val = parseFloat(e.target.value);
+                          if (!isNaN(val) && val >= weightLimits.min && val <= weightLimits.max) {
+                            updateRow(index, 'peso', `${val}%`);
+                          }
+                        }}
+                        placeholder={`${weightLimits.min}% - ${weightLimits.max}%`}
+                        className={`table-input ${weightErrors[index] ? 'error-input' : ''}`}
+                        title={`Peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`}
+                        style={{ width: '100%' }}
+                      />
+                      {weightErrors[index] && (
+                        <small style={{ color: '#ff4444', fontSize: '0.75rem', display: 'block', marginTop: '0.25rem' }}>
+                          {weightErrors[index]}
+                        </small>
+                      )}
+                    </>
+                  ) : (
+                    <input
+                      type="text"
+                      value={row.peso || ''}
+                      onChange={(e) => updateRow(index, 'peso', e.target.value)}
+                      placeholder="Ex: 40%, 0.4, 4/10"
+                      className="table-input"
+                    />
                   )}
                 </td>
                 <td className="col-actions">
