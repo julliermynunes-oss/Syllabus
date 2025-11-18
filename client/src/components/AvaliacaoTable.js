@@ -140,7 +140,7 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
     
     const pesoPercent = parseWeight(pesoStr);
     if (pesoPercent === null) {
-      return 'Formato de peso inválido. Use porcentagem (ex: 40%), decimal (ex: 0.4) ou fração (ex: 4/10)';
+      return 'Formato de peso inválido. Use um número seguido de % (ex: 40%)';
     }
     
     if (pesoPercent < limits.min || pesoPercent > limits.max) {
