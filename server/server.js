@@ -335,9 +335,9 @@ function loadCSVData() {
           cursosData.push(row);
         })
         .on('end', () => {
-          db.serialize(() => {
-            db.run('DELETE FROM programs');
-            const programsMap = new Map();
+    db.serialize(() => {
+      db.run('DELETE FROM programs');
+      const programsMap = new Map();
             
             // Insert programs
             const uniquePrograms = [...new Set(cursosData.map(r => r.programa))];
@@ -1180,9 +1180,13 @@ app.get(
     }
 
     db.all(
-      `SELECT * FROM syllabus_layout_history
-       WHERE curso_code = ?
-       ORDER BY created_at DESC
+      `SELECT 
+        h.*,
+        u.nome_completo as performed_by_name
+       FROM syllabus_layout_history h
+       LEFT JOIN users u ON h.performed_by = u.id
+       WHERE h.curso_code = ?
+       ORDER BY h.created_at DESC
        LIMIT 100`,
       [cursoCode],
       (err, rows) => {
@@ -1197,7 +1201,7 @@ app.get(
           cursoCode: entry.curso_code,
           snapshot: safeJsonParse(entry.snapshot, {}),
           action: entry.action,
-          performedBy: entry.performed_by,
+          performedBy: entry.performed_by_name || 'Sistema',
           createdAt: entry.created_at
         }));
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaChevronUp, FaChevronDown, FaPlus } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaLayerGroup, FaSlidersH, FaInfoCircle, FaSyncAlt, FaChevronUp, FaChevronDown, FaPlus, FaArrowLeft } from 'react-icons/fa';
 import axios from 'axios';
 import { useTranslation } from '../hooks/useTranslation';
 import { API_URL } from '../config';
@@ -21,12 +22,33 @@ const getInitialFormState = () => ({
 
 const SyllabusConfigurationsPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('models');
 
     return (
       <div className="syllabus-config-page">
       <div className="config-header">
         <div>
+          <button 
+            className="back-button" 
+            onClick={() => navigate('/syllabi')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '1rem',
+              padding: '0.5rem 1rem',
+              backgroundColor: 'transparent',
+              border: '2px solid #235795',
+              borderRadius: '8px',
+              color: '#235795',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: '600'
+            }}
+          >
+            <FaArrowLeft /> Voltar
+          </button>
           <p className="configEyebrow">{t('syllabusConfigurations')}</p>
           <h1>{t('syllabusConfigurationsTitle')}</h1>
           <p className="config-description">{t('syllabusConfigurationsDescription')}</p>
@@ -90,7 +112,7 @@ const LayoutModelsTab = () => {
         setAvailableTabs(response.data || []);
       } catch (error) {
         console.error('Erro ao carregar abas disponíveis', error);
-        alert(t('configErrorLoadingTabs'));
+        // Não mostrar alert, apenas logar o erro
       } finally {
         setLoadingTabs(false);
       }
@@ -102,13 +124,14 @@ const LayoutModelsTab = () => {
         setCourses(response.data || []);
       } catch (error) {
         console.error('Erro ao carregar cursos', error);
-        alert(t('configErrorLoadingCourses'));
+        // Não mostrar alert, apenas logar o erro
       }
     };
 
-    fetchAvailableTabs();
+    // Carregar cursos imediatamente, sem depender de outras abas
     fetchCourses();
-  }, [authHeaders, t]);
+    fetchAvailableTabs();
+  }, [authHeaders]);
 
   useEffect(() => {
     if (!selectedCourse) {
@@ -411,6 +434,11 @@ const LayoutModelsTab = () => {
                       <div>
                         <strong>{t(`configHistoryAction_${entry.action}`) || entry.action}</strong>
                         <p>{formatDate(entry.createdAt || entry.created_at)}</p>
+                        {entry.performedBy && (
+                          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.25rem' }}>
+                            Por: {entry.performedBy}
+                          </p>
+                        )}
                       </div>
                       {entry.snapshot?.nome && <p className="history-model-name">{entry.snapshot.nome}</p>}
                     </li>
