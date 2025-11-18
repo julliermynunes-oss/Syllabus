@@ -271,7 +271,7 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
             <tr>
               <th className="col-tipo">Tipo</th>
               <th className="col-criterio">Critério</th>
-              <th className="col-peso">Peso</th>
+              <th className="col-peso">Peso %</th>
               <th className="col-actions">Ações</th>
             </tr>
           </thead>
@@ -320,7 +320,14 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                             return;
                           }
                           
-                          const numVal = parseFloat(val);
+                          // Remover qualquer caractere que não seja número ou ponto
+                          const cleanVal = val.replace(/[^0-9.]/g, '');
+                          if (cleanVal === '') {
+                            updateRow(index, 'peso', '');
+                            return;
+                          }
+                          
+                          const numVal = parseFloat(cleanVal);
                           if (isNaN(numVal)) {
                             return; // Não atualizar se não for número
                           }
@@ -334,7 +341,7 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                             // Não atualizar o valor, mantendo o anterior
                             return;
                           } else {
-                            // Valor válido, atualizar
+                            // Valor válido, sempre adicionar %
                             updateRow(index, 'peso', `${numVal}%`);
                           }
                         }}
@@ -367,7 +374,7 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                             }
                           }
                         }}
-                        placeholder={`${weightLimits.min}% - ${weightLimits.max}%`}
+                        placeholder={`${weightLimits.min}% a ${weightLimits.max}%`}
                         className={`table-input ${weightErrors[index] ? 'error-input' : ''}`}
                         title={`Peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`}
                         style={{ width: '100%' }}
@@ -380,10 +387,33 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                     </>
                   ) : (
                     <input
-                      type="text"
-                      value={row.peso || ''}
-                      onChange={(e) => updateRow(index, 'peso', e.target.value)}
-                      placeholder="Ex: 40%, 0.4, 4/10"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={row.peso ? (parseFloat(row.peso.toString().replace('%', '')) || '') : ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          updateRow(index, 'peso', '');
+                        } else {
+                          const numVal = parseFloat(val);
+                          if (!isNaN(numVal)) {
+                            // Sempre adicionar % automaticamente
+                            updateRow(index, 'peso', `${numVal}%`);
+                          }
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val) && e.target.value !== '') {
+                          // Garantir que tem % ao sair do campo
+                          if (!row.peso || !row.peso.toString().includes('%')) {
+                            updateRow(index, 'peso', `${val}%`);
+                          }
+                        }
+                      }}
+                      placeholder="Ex: 40%"
                       className="table-input"
                     />
                   )}
