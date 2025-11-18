@@ -1,5 +1,5 @@
 .syllabus-config-page {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 30px 20px 60px;
 }
@@ -237,8 +237,8 @@
 
 .models-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(400px, 1fr);
+  gap: 24px;
 }
 
 .card {
@@ -362,7 +362,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
+  padding: 12px 16px;
   border-radius: 10px;
   border: 1px solid #e7ecfb;
   background: #f9fbff;
@@ -371,6 +371,9 @@
 
 .tab-row-main {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .tab-row-title {

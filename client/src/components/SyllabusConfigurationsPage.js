@@ -138,24 +138,26 @@ const SortableTabRow = ({ tabId, availableTabs, formState, toggleTabVisibility, 
             className="drag-handle"
             style={{ 
               cursor: 'grab',
-              padding: '0.5rem',
               display: 'flex',
               alignItems: 'center',
-              color: '#666'
+              justifyContent: 'center',
+              color: '#666',
+              padding: '0 4px',
+              min-width: '20px'
             }}
           >
             <FaGripVertical />
           </div>
         )}
         {isCabecalho && (
-          <div style={{ width: '24px', padding: '0.5rem' }} />
+          <div style={{ width: '20px', minWidth: '20px' }} />
         )}
-        <div className="tab-row-title">
+        <div className="tab-row-title" style={{ flex: 1 }}>
           <strong>{label}</strong>
           {tab.requiresNonRestrictedCourse && <span className="tab-pill">{t('configTabRestricted')}</span>}
           {isCabecalho && <span className="tab-pill" style={{ backgroundColor: '#28a745', color: 'white' }}>Sempre ativo</span>}
         </div>
-        <label className="switch">
+        <label className="switch" style={{ flexShrink: 0 }}>
           <input 
             type="checkbox" 
             checked={visible} 
