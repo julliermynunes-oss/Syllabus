@@ -431,7 +431,8 @@
 }
 
 .form-field input,
-.form-field select {
+.form-field select,
+.form-field textarea {
   padding: 1.25rem 1.5rem;
   border: 2px solid #a4a4a4;
   border-radius: 10px;
@@ -440,16 +441,22 @@
   background: #fafafa;
   color: #235795;
   width: 100%;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 3.5rem;
+  font-family: inherit;
 }
 
 .form-field input:hover,
-.form-field select:hover {
+.form-field select:hover,
+.form-field textarea:hover {
   border-color: #85aac4;
   background: #fff;
 }
 
 .form-field input:focus,
-.form-field select:focus {
+.form-field select:focus,
+.form-field textarea:focus {
   outline: none;
   border-color: #235795;
   background: #fff;
