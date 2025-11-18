@@ -1321,7 +1321,7 @@ app.post(
 );
 
 // ===== AoLSyllabus (gerenciamento de usuários) =====
-const AOLSYLLABUS_PASSWORD = process.env.AOLSYLLABUS_PASSWORD || 'AoL2025!Syllabus';
+const AOLSYLLABUS_PASSWORD = process.env.AOLSYLLABUS_PASSWORD || 'AolSyllabus';
 
 app.post(
   '/api/aolsyllabus/authenticate',

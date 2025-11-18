@@ -938,7 +938,7 @@ const AoLSyllabusTab = () => {
     return (
       <div className="card">
         <div className="card-header">
-          <h3>AoLSyllabus - Acesso Restrito</h3>
+          <h3>Gerenciamento de Acesso - Acesso Restrito</h3>
         </div>
         <form onSubmit={handlePasswordSubmit}>
           <div className="form-field">
