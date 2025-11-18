@@ -9,8 +9,11 @@ import './AvaliacaoTable.css';
 const AvaliacaoTable = ({ data, onChange, curso }) => {
   const [rows, setRows] = useState([]);
   const [observacoes, setObservacoes] = useState('');
+  const [weightLimits, setWeightLimits] = useState({ min: null, max: null });
+  const [weightError, setWeightError] = useState('');
   const initializedRef = useRef(false);
   const isInitializingRef = useRef(false);
+  const { token } = useAuth();
 
   // Inicializar dados quando receber props (apenas uma vez)
   useEffect(() => {
@@ -191,9 +194,19 @@ const AvaliacaoTable = ({ data, onChange, curso }) => {
                     type="text"
                     value={row.peso || ''}
                     onChange={(e) => updateRow(index, 'peso', e.target.value)}
-                    placeholder="Ex: 40%, 0.4, 4/10"
-                    className="table-input"
+                    placeholder={weightLimits.min !== null && weightLimits.max !== null 
+                      ? `Ex: ${weightLimits.min}% - ${weightLimits.max}%`
+                      : "Ex: 40%, 0.4, 4/10"}
+                    className={`table-input ${weightError && row.peso && index === rows.findIndex((r, idx) => idx === index && r.peso === row.peso) ? 'error-input' : ''}`}
+                    title={weightLimits.min !== null && weightLimits.max !== null 
+                      ? `Peso deve estar entre ${weightLimits.min}% e ${weightLimits.max}%`
+                      : ''}
                   />
+                  {weightError && row.peso && index === rows.findIndex((r, idx) => idx === index && r.peso === row.peso) && (
+                    <small style={{ color: '#ff4444', fontSize: '0.75rem', display: 'block', marginTop: '0.25rem' }}>
+                      {weightError}
+                    </small>
+                  )}
                 </td>
                 <td className="col-actions">
                   <button
