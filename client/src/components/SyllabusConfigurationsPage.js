@@ -1094,6 +1094,15 @@ const AoLSyllabusTab = () => {
                     <option value="coordenador">Coordenador</option>
                     <option value="admin">Administrador</option>
                   </select>
+                  <button
+                    className="ghost-btn"
+                    onClick={() => handleDeleteUser(user.id, user.nome_completo)}
+                    disabled={saving}
+                    title="Excluir usuário"
+                    style={{ color: '#ff4444' }}
+                  >
+                    <FaTrash />
+                  </button>
                 </div>
               </div>
             ))}
