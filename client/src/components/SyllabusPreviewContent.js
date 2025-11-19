@@ -203,18 +203,31 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           const parsed = JSON.parse(formData.sobre_disciplina);
           if (parsed.layout === 'estruturado' && parsed.data) {
             const data = parsed.data;
-            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            let html = '<div style="font-size: 14px; line-height: 1.6; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">';
+            
             if (data.objetivos) {
-              html += `<p><strong>Objetivos:</strong></p>${data.objetivos}`;
+              html += `<div style="padding: 1rem; background: #e8f4f8; border-left: 4px solid #235795; border-radius: 6px;">
+                <strong style="color: #235795; display: block; margin-bottom: 0.5rem; font-size: 1rem;">Objetivos</strong>
+                <div>${data.objetivos}</div>
+              </div>`;
             }
             if (data.ementa) {
-              html += `<p><strong>Ementa:</strong></p>${data.ementa}`;
+              html += `<div style="padding: 1rem; background: #f8f9fa; border-left: 4px solid #6c757d; border-radius: 6px;">
+                <strong style="color: #6c757d; display: block; margin-bottom: 0.5rem; font-size: 1rem;">Ementa</strong>
+                <div>${data.ementa}</div>
+              </div>`;
             }
             if (data.pre_requisitos) {
-              html += `<p><strong>Pré-requisitos:</strong></p>${data.pre_requisitos}`;
+              html += `<div style="padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 6px;">
+                <strong style="color: #856404; display: block; margin-bottom: 0.5rem; font-size: 1rem;">Pré-requisitos</strong>
+                <div>${data.pre_requisitos}</div>
+              </div>`;
             }
             if (data.carga_horaria) {
-              html += `<p><strong>Carga Horária:</strong> ${data.carga_horaria}</p>`;
+              html += `<div style="padding: 1rem; background: #d1ecf1; border-left: 4px solid #0c5460; border-radius: 6px; grid-column: 1 / -1;">
+                <strong style="color: #0c5460; display: block; margin-bottom: 0.25rem; font-size: 1rem;">Carga Horária</strong>
+                <span style="font-size: 1.2rem; font-weight: 600;">${data.carga_horaria}</span>
+              </div>`;
             }
             html += '</div>';
             return html;
@@ -249,18 +262,40 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
           const parsed = JSON.parse(formData.compromisso_etico);
           if (parsed.layout === 'template') {
             // Combinar template padrão com conteúdo personalizado
-            const TEMPLATE_PADRAO = `<p><strong>Compromisso Ético</strong></p>
-<p>Ao se matricular nesta disciplina, o(a) aluno(a) assume o compromisso de:</p>
-<ul>
-<li>Respeitar os prazos estabelecidos para entrega de trabalhos e avaliações</li>
-<li>Manter integridade acadêmica, evitando plágio e outras formas de fraude</li>
-<li>Participar ativamente das atividades propostas</li>
-<li>Respeitar colegas, professores e funcionários</li>
-<li>Seguir as normas da instituição e da disciplina</li>
-</ul>`;
+            const TEMPLATE_PADRAO = `<div style="padding: 1.5rem; background: #f8f9fa; border-left: 4px solid #235795; border-radius: 6px; margin-bottom: 1rem;">
+              <h4 style="margin: 0 0 1rem 0; color: #235795; font-size: 1.1rem; font-weight: 600;">Compromisso Ético</h4>
+              <p style="margin: 0 0 1rem 0; font-weight: 500;">Ao se matricular nesta disciplina, o(a) aluno(a) assume o compromisso de:</p>
+              <div style="background: white; padding: 1rem; border-radius: 4px; border: 1px solid #e0e0e0;">
+                <ul style="margin: 0; padding-left: 1.5rem; list-style-type: none;">
+                  <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">
+                    <span style="position: absolute; left: 0; color: #235795; font-weight: bold;">✓</span>
+                    Respeitar os prazos estabelecidos para entrega de trabalhos e avaliações
+                  </li>
+                  <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">
+                    <span style="position: absolute; left: 0; color: #235795; font-weight: bold;">✓</span>
+                    Manter integridade acadêmica, evitando plágio e outras formas de fraude
+                  </li>
+                  <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">
+                    <span style="position: absolute; left: 0; color: #235795; font-weight: bold;">✓</span>
+                    Participar ativamente das atividades propostas
+                  </li>
+                  <li style="margin-bottom: 0.75rem; padding-left: 1.5rem; position: relative;">
+                    <span style="position: absolute; left: 0; color: #235795; font-weight: bold;">✓</span>
+                    Respeitar colegas, professores e funcionários
+                  </li>
+                  <li style="margin-bottom: 0; padding-left: 1.5rem; position: relative;">
+                    <span style="position: absolute; left: 0; color: #235795; font-weight: bold;">✓</span>
+                    Seguir as normas da instituição e da disciplina
+                  </li>
+                </ul>
+              </div>
+            </div>`;
             let html = TEMPLATE_PADRAO;
-            if (parsed.texto_personalizado) {
-              html += parsed.texto_personalizado;
+            if (parsed.texto_personalizado && parsed.texto_personalizado.trim()) {
+              html += `<div style="margin-top: 1rem; padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 6px;">
+                <strong style="display: block; margin-bottom: 0.5rem; color: #856404;">Informações Adicionais:</strong>
+                ${parsed.texto_personalizado}
+              </div>`;
             }
             return html;
           }
@@ -338,15 +373,33 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         try {
           const parsed = JSON.parse(formData.ods);
           if (parsed.layout === 'visual' && parsed.ods_selecionados) {
-            let html = '<div style="font-size: 14px; line-height: 1.6;"><p><strong>Objetivos de Desenvolvimento Sustentável abordados nesta disciplina:</strong></p><ul>';
+            const ODS_COLORS = {
+              1: '#E5243B', 2: '#DDA63A', 3: '#4C9F38', 4: '#C5192D', 5: '#FF3A21',
+              6: '#26BDE2', 7: '#FCC30B', 8: '#A21942', 9: '#FD6925', 10: '#DD1367',
+              11: '#FD9D24', 12: '#BF8B2E', 13: '#3F7E44', 14: '#0A97D9', 15: '#56C02B',
+              16: '#00689D', 17: '#19486A'
+            };
+            
+            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            html += '<p style="margin-bottom: 1rem;"><strong>Objetivos de Desenvolvimento Sustentável abordados nesta disciplina:</strong></p>';
+            
+            // Grid de cards ODS
+            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">';
             parsed.ods_selecionados.forEach(ods => {
-              html += `<li><strong>ODS ${ods.numero}: ${ods.nome}</strong>`;
+              const cor = ODS_COLORS[ods.numero] || '#235795';
+              html += `<div style="border: 2px solid ${cor}; border-radius: 8px; padding: 1rem; background: ${cor}15; display: flex; flex-direction: column; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="width: 40px; height: 40px; border-radius: 50%; background: ${cor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; flex-shrink: 0;">${ods.numero}</div>
+                  <div style="flex: 1;">
+                    <strong style="color: #235795; font-size: 1rem;">ODS ${ods.numero}: ${ods.nome}</strong>
+                  </div>
+                </div>`;
               if (ods.descricao) {
-                html += `<br/>${ods.descricao}`;
+                html += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid ${cor}40; font-size: 0.9rem;">${ods.descricao}</div>`;
               }
-              html += '</li>';
+              html += '</div>';
             });
-            html += '</ul></div>';
+            html += '</div></div>';
             return html;
           }
         } catch (e) {
@@ -378,21 +431,19 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         try {
           const parsed = JSON.parse(formData.conteudo);
           if (parsed.layout === 'lista' && parsed.unidades) {
-            let html = '<div style="font-size: 14px; line-height: 1.6;"><ol>';
+            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            html += '<table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">';
+            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 12px 16px; text-align: left; font-weight: 600; width: 5%;">#</th><th style="padding: 12px 16px; text-align: left; font-weight: 600; width: 35%;">Unidade</th><th style="padding: 12px 16px; text-align: left; font-weight: 600; width: 15%;">Carga Horária</th><th style="padding: 12px 16px; text-align: left; font-weight: 600;">Descrição</th></tr></thead>';
+            html += '<tbody>';
             parsed.unidades.forEach((unidade, index) => {
-              html += '<li style="margin-bottom: 1rem;">';
-              if (unidade.nome) {
-                html += `<strong>${unidade.nome}</strong>`;
-                if (unidade.carga_horaria) {
-                  html += ` <span style="color: #666;">(${unidade.carga_horaria})</span>`;
-                }
-              }
-              if (unidade.descricao) {
-                html += `<div style="margin-top: 0.5rem;">${unidade.descricao}</div>`;
-              }
-              html += '</li>';
+              html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                <td style="padding: 12px 16px; text-align: center; font-weight: 600; color: #235795; background: #f8f9fa; border-right: 1px solid #e0e0e0;">${index + 1}</td>
+                <td style="padding: 12px 16px; font-weight: 600; color: #235795; background: #f8f9fa; border-right: 1px solid #e0e0e0;">${unidade.nome || '-'}</td>
+                <td style="padding: 12px 16px; text-align: center; background: #f8f9fa; border-right: 1px solid #e0e0e0;">${unidade.carga_horaria || '-'}</td>
+                <td style="padding: 12px 16px;">${unidade.descricao || '-'}</td>
+              </tr>`;
             });
-            html += '</ol></div>';
+            html += '</tbody></table></div>';
             return html;
           }
         } catch (e) {
@@ -427,33 +478,49 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             const data = parsed.data;
             let html = '<div style="font-size: 14px; line-height: 1.6;">';
             
+            // Modalidade em card destacado
             if (data.modalidade) {
-              html += `<p><strong>Modalidade de Ensino:</strong> ${data.modalidade}</p>`;
+              html += `<div style="margin-bottom: 1.5rem; padding: 1rem; background: #e8f4f8; border-left: 4px solid #235795; border-radius: 4px;">
+                <strong style="color: #235795; display: block; margin-bottom: 0.25rem;">Modalidade de Ensino:</strong>
+                <span style="font-size: 1.1rem; font-weight: 600;">${data.modalidade}</span>
+              </div>`;
             }
             
+            // Recursos em badges
             if (data.recursos && data.recursos.length > 0) {
-              html += '<p><strong>Recursos Utilizados:</strong></p><ul>';
+              html += '<div style="margin-bottom: 1.5rem;"><strong style="display: block; margin-bottom: 0.75rem; color: #235795;">Recursos Utilizados:</strong>';
+              html += '<div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">';
               data.recursos.forEach(recurso => {
-                html += `<li>${recurso}</li>`;
+                html += `<span style="display: inline-block; padding: 0.5rem 1rem; background: #235795; color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">${recurso}</span>`;
               });
-              html += '</ul>';
+              html += '</div></div>';
             }
             
+            // Atividades Práticas em tabela
             if (data.atividades_praticas && data.atividades_praticas.length > 0) {
-              html += '<p><strong>Atividades Práticas:</strong></p><ul>';
-              data.atividades_praticas.forEach(atividade => {
+              html += '<div style="margin-bottom: 1.5rem;"><strong style="display: block; margin-bottom: 0.75rem; color: #235795;">Atividades Práticas:</strong>';
+              html += '<table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">';
+              html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 12px 16px; text-align: left; font-weight: 600; width: 30%;">Atividade</th><th style="padding: 12px 16px; text-align: left; font-weight: 600;">Descrição</th></tr></thead>';
+              html += '<tbody>';
+              data.atividades_praticas.forEach((atividade, index) => {
                 if (atividade.nome) {
-                  html += `<li><strong>${atividade.nome}:</strong> ${atividade.descricao || ''}</li>`;
+                  html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 12px 16px; font-weight: 600; color: #235795; background: #f8f9fa; border-right: 1px solid #e0e0e0;">${atividade.nome}</td>
+                    <td style="padding: 12px 16px;">${atividade.descricao || '-'}</td>
+                  </tr>`;
                 }
               });
-              html += '</ul>';
+              html += '</tbody></table></div>';
             }
             
+            // Avaliação Contínua em card
             if (data.avaliacao_continua && data.avaliacao_continua.ativa) {
-              html += '<p><strong>Avaliação Contínua:</strong> Sim</p>';
+              html += '<div style="padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">';
+              html += '<strong style="color: #856404; display: block; margin-bottom: 0.5rem;">✓ Avaliação Contínua: Ativa</strong>';
               if (data.avaliacao_continua.descricao) {
-                html += data.avaliacao_continua.descricao;
+                html += `<div style="margin-top: 0.5rem;">${data.avaliacao_continua.descricao}</div>`;
               }
+              html += '</div>';
             }
             
             html += '</div>';
@@ -566,30 +633,44 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
         try {
           const parsed = JSON.parse(formData.o_que_e_esperado);
           if (parsed.layout === 'checklist' && parsed.categorias) {
-            let html = '<div style="font-size: 14px; line-height: 1.6;">';
             const CATEGORIAS = {
-              participacao: 'Participação',
-              trabalhos: 'Trabalhos',
-              estudos: 'Estudos',
-              comportamento: 'Comportamento'
+              participacao: { nome: 'Participação', cor: '#235795' },
+              trabalhos: { nome: 'Trabalhos', cor: '#28a745' },
+              estudos: { nome: 'Estudos', cor: '#17a2b8' },
+              comportamento: { nome: 'Comportamento', cor: '#ffc107' }
             };
+            
+            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            html += '<table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">';
+            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 12px 16px; text-align: left; font-weight: 600; width: 25%;">Categoria</th><th style="padding: 12px 16px; text-align: left; font-weight: 600;">Expectativas</th></tr></thead>';
+            html += '<tbody>';
+            
             Object.keys(CATEGORIAS).forEach(catKey => {
+              const catInfo = CATEGORIAS[catKey];
               const categoria = parsed.categorias[catKey];
               if (categoria) {
                 const itensSelecionados = categoria.itens.filter(item => item.selecionado);
                 if (itensSelecionados.length > 0 || categoria.outros) {
-                  html += `<p><strong>${CATEGORIAS[catKey]}:</strong></p><ul>`;
-                  itensSelecionados.forEach(item => {
-                    html += `<li>${item.texto}</li>`;
+                  let expectativas = '';
+                  itensSelecionados.forEach((item, idx) => {
+                    expectativas += `${idx + 1}. ${item.texto}`;
+                    if (idx < itensSelecionados.length - 1 || categoria.outros) {
+                      expectativas += '<br/>';
+                    }
                   });
                   if (categoria.outros) {
-                    html += `<li>${categoria.outros}</li>`;
+                    expectativas += `${itensSelecionados.length > 0 ? itensSelecionados.length + 1 + '. ' : ''}${categoria.outros}`;
                   }
-                  html += '</ul>';
+                  
+                  html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 12px 16px; font-weight: 600; color: ${catInfo.cor}; background: ${catInfo.cor}15; border-right: 1px solid #e0e0e0; vertical-align: top;">${catInfo.nome}</td>
+                    <td style="padding: 12px 16px; vertical-align: top;">${expectativas || '-'}</td>
+                  </tr>`;
                 }
               }
             });
-            html += '</div>';
+            
+            html += '</tbody></table></div>';
             return html;
           }
         } catch (e) {
@@ -735,29 +816,54 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             const data = parsed.data;
             let html = '<div style="font-size: 14px; line-height: 1.6;">';
             
-            if (data.email) {
-              html += `<p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>`;
+            // Criar tabela para contatos principais
+            const hasMainInfo = data.email || data.telefone || data.horario_atendimento || data.sala;
+            if (hasMainInfo) {
+              html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">';
+              html += '<tbody>';
+              
+              if (data.email) {
+                html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                  <td style="padding: 12px 16px; font-weight: 600; color: #235795; width: 180px; background: #f8f9fa; border-right: 1px solid #e0e0e0;">Email:</td>
+                  <td style="padding: 12px 16px;"><a href="mailto:${data.email}" style="color: #235795; text-decoration: none;">${data.email}</a></td>
+                </tr>`;
+              }
+              if (data.telefone) {
+                html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                  <td style="padding: 12px 16px; font-weight: 600; color: #235795; width: 180px; background: #f8f9fa; border-right: 1px solid #e0e0e0;">Telefone:</td>
+                  <td style="padding: 12px 16px;">${data.telefone}</td>
+                </tr>`;
+              }
+              if (data.horario_atendimento) {
+                html += `<tr style="border-bottom: 1px solid #f0f0f0;">
+                  <td style="padding: 12px 16px; font-weight: 600; color: #235795; width: 180px; background: #f8f9fa; border-right: 1px solid #e0e0e0;">Horário de Atendimento:</td>
+                  <td style="padding: 12px 16px;">${data.horario_atendimento}</td>
+                </tr>`;
+              }
+              if (data.sala) {
+                html += `<tr>
+                  <td style="padding: 12px 16px; font-weight: 600; color: #235795; width: 180px; background: #f8f9fa; border-right: 1px solid #e0e0e0;">Sala/Office:</td>
+                  <td style="padding: 12px 16px;">${data.sala}</td>
+                </tr>`;
+              }
+              
+              html += '</tbody></table>';
             }
-            if (data.telefone) {
-              html += `<p><strong>Telefone:</strong> ${data.telefone}</p>`;
-            }
-            if (data.horario_atendimento) {
-              html += `<p><strong>Horário de Atendimento:</strong> ${data.horario_atendimento}</p>`;
-            }
-            if (data.sala) {
-              html += `<p><strong>Sala:</strong> ${data.sala}</p>`;
-            }
+            
+            // Links em cards/badges
             if (data.links && data.links.length > 0) {
-              html += '<p><strong>Links:</strong></p><ul>';
+              html += '<div style="margin-bottom: 1rem;"><strong style="display: block; margin-bottom: 0.5rem; color: #235795;">Links:</strong>';
+              html += '<div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">';
               data.links.forEach(link => {
                 if (link.url) {
-                  html += `<li><a href="${link.url}">${link.label || link.url}</a></li>`;
+                  html += `<a href="${link.url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 0.5rem 1rem; background: #235795; color: white; text-decoration: none; border-radius: 4px; font-size: 0.9rem; font-weight: 500;">${link.label || link.url}</a>`;
                 }
               });
-              html += '</ul>';
+              html += '</div></div>';
             }
+            
             if (data.outras_informacoes) {
-              html += data.outras_informacoes;
+              html += `<div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-left: 4px solid #235795; border-radius: 4px;">${data.outras_informacoes}</div>`;
             }
             
             html += '</div>';
