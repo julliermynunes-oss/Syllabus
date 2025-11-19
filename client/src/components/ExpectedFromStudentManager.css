@@ -1,0 +1,21 @@
+.expected-from-student-manager {
+  width: 100%;
+}
+
+.expected-checklist {
+  display: flex;
+  flex-direction: column;
+}
+
+.categoria-section {
+  transition: all 0.2s ease;
+}
+
+.categoria-section:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checklist-items label:hover {
+  background: #f0f0f0 !important;
+}
+

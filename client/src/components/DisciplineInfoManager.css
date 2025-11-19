@@ -1,0 +1,10 @@
+.discipline-info-manager {
+  width: 100%;
+}
+
+.discipline-info-structured {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+

@@ -31,6 +31,9 @@ import ContactsManager from './ContactsManager';
 import MethodologyManager from './MethodologyManager';
 import ContentManager from './ContentManager';
 import ODSManager from './ODSManager';
+import DisciplineInfoManager from './DisciplineInfoManager';
+import ExpectedFromStudentManager from './ExpectedFromStudentManager';
+import EthicalCommitmentManager from './EthicalCommitmentManager';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
 import ProfessoresManager from './ProfessoresManager';
@@ -1138,15 +1141,10 @@ function SyllabusForm() {
         {activeTab === 'sobre' && loadedTabs.has('sobre') && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>{t('description')}</label>
-              <TiptapEditor
+              <DisciplineInfoManager
                 content={formData.sobre_disciplina}
                 onChange={(content) => setFormData(prev => ({ ...prev, sobre_disciplina: content }))}
-                showCharCount={true}
               />
-              <p className="editor-note">
-                {t('editorNote')}
-              </p>
             </div>
           </div>
         )}
@@ -1194,15 +1192,10 @@ function SyllabusForm() {
         {activeTab === 'compromisso_etico' && loadedTabs.has('compromisso_etico') && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>{t('ethicalCommitment')}</label>
-              <TiptapEditor
+              <EthicalCommitmentManager
                 content={formData.compromisso_etico}
                 onChange={(content) => setFormData(prev => ({ ...prev, compromisso_etico: content }))}
-                showCharCount={true}
               />
-              <p className="editor-note">
-                {t('editorNote')}
-              </p>
             </div>
           </div>
         )}
@@ -1561,15 +1554,10 @@ function SyllabusForm() {
         {activeTab === 'o_que_e_esperado' && !isRestrictedCourse(formData.curso) && loadedTabs.has('o_que_e_esperado') && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>{t('expectedFromStudentLabel')}</label>
-              <TiptapEditor
+              <ExpectedFromStudentManager
                 content={formData.o_que_e_esperado}
                 onChange={(content) => setFormData(prev => ({ ...prev, o_que_e_esperado: content }))}
-                showCharCount={true}
               />
-              <p className="editor-note">
-                {t('editorNote')}
-              </p>
             </div>
           </div>
         )}

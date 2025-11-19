@@ -198,6 +198,33 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.sobre_disciplina) {
+      const sobreComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.sobre_disciplina);
+          if (parsed.layout === 'estruturado' && parsed.data) {
+            const data = parsed.data;
+            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            if (data.objetivos) {
+              html += `<p><strong>Objetivos:</strong></p>${data.objetivos}`;
+            }
+            if (data.ementa) {
+              html += `<p><strong>Ementa:</strong></p>${data.ementa}`;
+            }
+            if (data.pre_requisitos) {
+              html += `<p><strong>Pré-requisitos:</strong></p>${data.pre_requisitos}`;
+            }
+            if (data.carga_horaria) {
+              html += `<p><strong>Carga Horária:</strong> ${data.carga_horaria}</p>`;
+            }
+            html += '</div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.sobre_disciplina;
+      })();
+
       sections.push({
         id: 'sobre',
         tabId: 'sobre',
@@ -209,7 +236,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             <div
               style={{ fontSize: '14px', lineHeight: '1.6' }}
               className="preview-content"
-              dangerouslySetInnerHTML={{ __html: formData.sobre_disciplina }}
+              dangerouslySetInnerHTML={{ __html: sobreComponent }}
             />
           </div>
         )
@@ -217,6 +244,32 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.compromisso_etico) {
+      const compromissoComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.compromisso_etico);
+          if (parsed.layout === 'template') {
+            // Combinar template padrão com conteúdo personalizado
+            const TEMPLATE_PADRAO = `<p><strong>Compromisso Ético</strong></p>
+<p>Ao se matricular nesta disciplina, o(a) aluno(a) assume o compromisso de:</p>
+<ul>
+<li>Respeitar os prazos estabelecidos para entrega de trabalhos e avaliações</li>
+<li>Manter integridade acadêmica, evitando plágio e outras formas de fraude</li>
+<li>Participar ativamente das atividades propostas</li>
+<li>Respeitar colegas, professores e funcionários</li>
+<li>Seguir as normas da instituição e da disciplina</li>
+</ul>`;
+            let html = TEMPLATE_PADRAO;
+            if (parsed.texto_personalizado) {
+              html += parsed.texto_personalizado;
+            }
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.compromisso_etico;
+      })();
+
       sections.push({
         id: 'compromisso_etico',
         tabId: 'compromisso_etico',
@@ -228,7 +281,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             <div
               style={{ fontSize: '14px', lineHeight: '1.6' }}
               className="preview-content"
-              dangerouslySetInnerHTML={{ __html: formData.compromisso_etico }}
+              dangerouslySetInnerHTML={{ __html: compromissoComponent }}
             />
           </div>
         )
@@ -509,6 +562,42 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.o_que_e_esperado && !isRestrictedCourse(formData.curso)) {
+      const esperadoComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.o_que_e_esperado);
+          if (parsed.layout === 'checklist' && parsed.categorias) {
+            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            const CATEGORIAS = {
+              participacao: 'Participação',
+              trabalhos: 'Trabalhos',
+              estudos: 'Estudos',
+              comportamento: 'Comportamento'
+            };
+            Object.keys(CATEGORIAS).forEach(catKey => {
+              const categoria = parsed.categorias[catKey];
+              if (categoria) {
+                const itensSelecionados = categoria.itens.filter(item => item.selecionado);
+                if (itensSelecionados.length > 0 || categoria.outros) {
+                  html += `<p><strong>${CATEGORIAS[catKey]}:</strong></p><ul>`;
+                  itensSelecionados.forEach(item => {
+                    html += `<li>${item.texto}</li>`;
+                  });
+                  if (categoria.outros) {
+                    html += `<li>${categoria.outros}</li>`;
+                  }
+                  html += '</ul>';
+                }
+              }
+            });
+            html += '</div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.o_que_e_esperado;
+      })();
+
       sections.push({
         id: 'o_que_e_esperado',
         tabId: 'o_que_e_esperado',
@@ -520,7 +609,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             <div
               style={{ fontSize: '14px', lineHeight: '1.6' }}
               className="preview-content"
-              dangerouslySetInnerHTML={{ __html: formData.o_que_e_esperado }}
+              dangerouslySetInnerHTML={{ __html: esperadoComponent }}
             />
           </div>
         )
