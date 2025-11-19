@@ -284,7 +284,7 @@ const ExpectedFromStudentManager = ({ content, onChange }) => {
                               type="checkbox"
                               checked={item.selecionado}
                               onChange={() => toggleItem(catKey, index)}
-                              style={{ marginRight: '0.75rem', cursor: 'pointer' }}
+                              style={{ marginRight: '0.75rem', cursor: 'pointer', width: '16px', height: '16px', minWidth: '16px', flexShrink: 0 }}
                             />
                             <span style={{ flex: 1 }}>{item.texto}</span>
                             {!isDefault && (

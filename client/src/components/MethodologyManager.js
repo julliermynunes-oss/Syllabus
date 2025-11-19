@@ -280,7 +280,7 @@ const MethodologyManager = ({ content, onChange }) => {
                       type="checkbox"
                       checked={structuredData.recursos.includes(recurso)}
                       onChange={() => toggleRecurso(recurso)}
-                      style={{ marginRight: '0.5rem', cursor: 'pointer' }}
+                      style={{ marginRight: '0.5rem', cursor: 'pointer', width: '16px', height: '16px', minWidth: '16px', flexShrink: 0 }}
                     />
                     <span>{recurso}</span>
                   </label>
@@ -390,7 +390,7 @@ const MethodologyManager = ({ content, onChange }) => {
                   type="checkbox"
                   checked={structuredData.avaliacao_continua.ativa}
                   onChange={(e) => updateAvaliacaoContinua('ativa', e.target.checked)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', width: '16px', height: '16px', minWidth: '16px', flexShrink: 0 }}
                 />
                 <span>Avaliação Contínua</span>
               </label>

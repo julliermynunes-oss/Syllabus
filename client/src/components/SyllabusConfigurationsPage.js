@@ -153,6 +153,7 @@ const SortableTabRow = ({ tabId, availableTabs, formState, toggleTabVisibility, 
             checked={visible} 
             onChange={() => toggleTabVisibility(tabId)} 
             disabled={isCabecalho}
+            style={{ width: '16px', height: '16px', minWidth: '16px', flexShrink: 0, cursor: 'pointer' }}
           />
           <span className="slider round" />
         </label>
@@ -655,7 +656,7 @@ const LayoutModelsTab = () => {
                         type="checkbox"
                         checked={formState.allowCustomTabs !== undefined ? formState.allowCustomTabs : true}
                         onChange={(e) => setFormState(prev => ({ ...prev, allowCustomTabs: e.target.checked }))}
-                        style={{ width: 'auto', margin: 0 }}
+                        style={{ width: '16px', height: '16px', minWidth: '16px', flexShrink: 0, cursor: 'pointer', margin: 0 }}
                       />
                       <span>{t('configAllowCustomTabs') || 'Permitir abas customizadas no Syllabus'}</span>
                     </label>
