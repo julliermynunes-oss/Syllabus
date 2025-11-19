@@ -300,6 +300,33 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.conteudo) {
+      const conteudoComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.conteudo);
+          if (parsed.layout === 'lista' && parsed.unidades) {
+            let html = '<div style="font-size: 14px; line-height: 1.6;"><ol>';
+            parsed.unidades.forEach((unidade, index) => {
+              html += '<li style="margin-bottom: 1rem;">';
+              if (unidade.nome) {
+                html += `<strong>${unidade.nome}</strong>`;
+                if (unidade.carga_horaria) {
+                  html += ` <span style="color: #666;">(${unidade.carga_horaria})</span>`;
+                }
+              }
+              if (unidade.descricao) {
+                html += `<div style="margin-top: 0.5rem;">${unidade.descricao}</div>`;
+              }
+              html += '</li>';
+            });
+            html += '</ol></div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.conteudo;
+      })();
+
       sections.push({
         id: 'conteudo',
         tabId: 'conteudo',
@@ -311,7 +338,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             <div
               style={{ fontSize: '14px', lineHeight: '1.6' }}
               className="preview-content"
-              dangerouslySetInnerHTML={{ __html: formData.conteudo }}
+              dangerouslySetInnerHTML={{ __html: conteudoComponent }}
             />
           </div>
         )
@@ -319,6 +346,51 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.metodologia) {
+      const metodologiaComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.metodologia);
+          if (parsed.layout === 'estruturado' && parsed.data) {
+            const data = parsed.data;
+            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            
+            if (data.modalidade) {
+              html += `<p><strong>Modalidade de Ensino:</strong> ${data.modalidade}</p>`;
+            }
+            
+            if (data.recursos && data.recursos.length > 0) {
+              html += '<p><strong>Recursos Utilizados:</strong></p><ul>';
+              data.recursos.forEach(recurso => {
+                html += `<li>${recurso}</li>`;
+              });
+              html += '</ul>';
+            }
+            
+            if (data.atividades_praticas && data.atividades_praticas.length > 0) {
+              html += '<p><strong>Atividades Práticas:</strong></p><ul>';
+              data.atividades_praticas.forEach(atividade => {
+                if (atividade.nome) {
+                  html += `<li><strong>${atividade.nome}:</strong> ${atividade.descricao || ''}</li>`;
+                }
+              });
+              html += '</ul>';
+            }
+            
+            if (data.avaliacao_continua && data.avaliacao_continua.ativa) {
+              html += '<p><strong>Avaliação Contínua:</strong> Sim</p>';
+              if (data.avaliacao_continua.descricao) {
+                html += data.avaliacao_continua.descricao;
+              }
+            }
+            
+            html += '</div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.metodologia;
+      })();
+
       sections.push({
         id: 'metodologia',
         tabId: 'metodologia',
@@ -330,7 +402,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             <div
               style={{ fontSize: '14px', lineHeight: '1.6' }}
               className="preview-content"
-              dangerouslySetInnerHTML={{ __html: formData.metodologia }}
+              dangerouslySetInnerHTML={{ __html: metodologiaComponent }}
             />
           </div>
         )

@@ -456,7 +456,34 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 6. Conteúdo
     if (formData.conteudo) {
-      const hasTableOrImg = hasTablesOrImages(formData.conteudo);
+      const conteudoComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.conteudo);
+          if (parsed.layout === 'lista' && parsed.unidades) {
+            let html = '<div style="font-size: 11px; line-height: 1.5;"><ol>';
+            parsed.unidades.forEach((unidade, index) => {
+              html += '<li style="margin-bottom: 0.5rem;">';
+              if (unidade.nome) {
+                html += `<strong>${unidade.nome}</strong>`;
+                if (unidade.carga_horaria) {
+                  html += ` <span style="color: #666;">(${unidade.carga_horaria})</span>`;
+                }
+              }
+              if (unidade.descricao) {
+                html += `<div style="margin-top: 0.25rem;">${unidade.descricao}</div>`;
+              }
+              html += '</li>';
+            });
+            html += '</ol></div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.conteudo;
+      })();
+
+      const hasTableOrImg = hasTablesOrImages(conteudoComponent);
       sections.push({
         id: 'conteudo',
         tabId: 'conteudo',
@@ -466,8 +493,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
               {t('contentTitle')}
             </h3>
             <div 
-              style={{ fontSize: '15px', lineHeight: '1.5' }}
-              dangerouslySetInnerHTML={{ __html: formData.conteudo }}
+              style={{ fontSize: '11px', lineHeight: '1.5' }}
+              dangerouslySetInnerHTML={{ __html: conteudoComponent }}
             />
           </div>
         )
@@ -476,7 +503,52 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 7. Metodologia
     if (formData.metodologia) {
-      const hasTableOrImg = hasTablesOrImages(formData.metodologia);
+      const metodologiaComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.metodologia);
+          if (parsed.layout === 'estruturado' && parsed.data) {
+            const data = parsed.data;
+            let html = '<div style="font-size: 11px; line-height: 1.5;">';
+            
+            if (data.modalidade) {
+              html += `<p><strong>Modalidade de Ensino:</strong> ${data.modalidade}</p>`;
+            }
+            
+            if (data.recursos && data.recursos.length > 0) {
+              html += '<p><strong>Recursos Utilizados:</strong></p><ul>';
+              data.recursos.forEach(recurso => {
+                html += `<li>${recurso}</li>`;
+              });
+              html += '</ul>';
+            }
+            
+            if (data.atividades_praticas && data.atividades_praticas.length > 0) {
+              html += '<p><strong>Atividades Práticas:</strong></p><ul>';
+              data.atividades_praticas.forEach(atividade => {
+                if (atividade.nome) {
+                  html += `<li><strong>${atividade.nome}:</strong> ${atividade.descricao || ''}</li>`;
+                }
+              });
+              html += '</ul>';
+            }
+            
+            if (data.avaliacao_continua && data.avaliacao_continua.ativa) {
+              html += '<p><strong>Avaliação Contínua:</strong> Sim</p>';
+              if (data.avaliacao_continua.descricao) {
+                html += data.avaliacao_continua.descricao;
+              }
+            }
+            
+            html += '</div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.metodologia;
+      })();
+
+      const hasTableOrImg = hasTablesOrImages(metodologiaComponent);
       sections.push({
         id: 'metodologia',
         tabId: 'metodologia',
@@ -486,8 +558,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
               {t('methodologyTitle')}
             </h3>
             <div 
-              style={{ fontSize: '15px', lineHeight: '1.5' }}
-              dangerouslySetInnerHTML={{ __html: formData.metodologia }}
+              style={{ fontSize: '11px', lineHeight: '1.5' }}
+              dangerouslySetInnerHTML={{ __html: metodologiaComponent }}
             />
           </div>
         )

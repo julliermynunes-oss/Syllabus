@@ -1,0 +1,38 @@
+.methodology-manager {
+  width: 100%;
+}
+
+.methodology-structured {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recursos-checkboxes label:hover {
+  background: #f0f0f0 !important;
+  border-color: #235795 !important;
+}
+
+.recursos-checkboxes input[type="checkbox"]:checked + span {
+  font-weight: 600;
+  color: #235795;
+}
+
+.atividades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.atividade-item input:focus,
+.atividade-item textarea:focus {
+  outline: none;
+  border-color: #235795;
+  box-shadow: 0 0 0 2px rgba(35, 87, 149, 0.1);
+}
+
+.add-activity-btn:hover {
+  background: #2a6ca8 !important;
+  transform: translateY(-1px);
+}
+

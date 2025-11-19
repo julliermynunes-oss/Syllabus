@@ -28,6 +28,8 @@ import {
 // html2pdf será importado dinamicamente para evitar problemas no build
 import TiptapEditor from './TiptapEditor';
 import ContactsManager from './ContactsManager';
+import MethodologyManager from './MethodologyManager';
+import ContentManager from './ContentManager';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
 import ProfessoresManager from './ProfessoresManager';
@@ -1152,15 +1154,10 @@ function SyllabusForm() {
         {activeTab === 'conteudo' && loadedTabs.has('conteudo') && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>{t('programmaticContent')}</label>
-              <TiptapEditor
+              <ContentManager
                 content={formData.conteudo}
                 onChange={(content) => setFormData(prev => ({ ...prev, conteudo: content }))}
-                showCharCount={true}
               />
-              <p className="editor-note">
-                {t('editorNote')}
-              </p>
             </div>
           </div>
         )}
@@ -1169,15 +1166,10 @@ function SyllabusForm() {
         {activeTab === 'metodologia' && loadedTabs.has('metodologia') && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>{t('teachingMethodology')}</label>
-              <TiptapEditor
+              <MethodologyManager
                 content={formData.metodologia}
                 onChange={(content) => setFormData(prev => ({ ...prev, metodologia: content }))}
-                showCharCount={true}
               />
-              <p className="editor-note">
-                {t('editorNote')}
-              </p>
             </div>
           </div>
         )}
