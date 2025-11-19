@@ -717,7 +717,48 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 11. Contatos (sempre por último)
     if (formData.contatos) {
-      const hasTableOrImg = hasTablesOrImages(formData.contatos);
+      const contatosComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.contatos);
+          if (parsed.layout === 'estruturado' && parsed.data) {
+            const data = parsed.data;
+            let html = '<div style="font-size: 11px; line-height: 1.5;">';
+            
+            if (data.email) {
+              html += `<p><strong>Email:</strong> ${data.email}</p>`;
+            }
+            if (data.telefone) {
+              html += `<p><strong>Telefone:</strong> ${data.telefone}</p>`;
+            }
+            if (data.horario_atendimento) {
+              html += `<p><strong>Horário de Atendimento:</strong> ${data.horario_atendimento}</p>`;
+            }
+            if (data.sala) {
+              html += `<p><strong>Sala:</strong> ${data.sala}</p>`;
+            }
+            if (data.links && data.links.length > 0) {
+              html += '<p><strong>Links:</strong></p><ul>';
+              data.links.forEach(link => {
+                if (link.url) {
+                  html += `<li>${link.label || link.url} (${link.url})</li>`;
+                }
+              });
+              html += '</ul>';
+            }
+            if (data.outras_informacoes) {
+              html += data.outras_informacoes;
+            }
+            
+            html += '</div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.contatos;
+      })();
+
+      const hasTableOrImg = hasTablesOrImages(contatosComponent);
       sections.push({
         id: 'contatos',
         tabId: 'contatos',
@@ -727,8 +768,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
               {t('contactsTitle')}
             </h3>
             <div 
-              style={{ fontSize: '15px', lineHeight: '1.5' }}
-              dangerouslySetInnerHTML={{ __html: formData.contatos }}
+              style={{ fontSize: '11px', lineHeight: '1.5' }}
+              dangerouslySetInnerHTML={{ __html: contatosComponent }}
             />
           </div>
         )

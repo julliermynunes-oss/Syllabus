@@ -1,0 +1,39 @@
+.contacts-manager {
+  width: 100%;
+}
+
+.contacts-structured {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.add-link-btn:hover {
+  background: #2a6ca8 !important;
+  transform: translateY(-1px);
+}
+
+.link-item input,
+.link-item select {
+  transition: border-color 0.2s ease;
+}
+
+.link-item input:focus,
+.link-item select:focus {
+  outline: none;
+  border-color: #235795;
+  box-shadow: 0 0 0 2px rgba(35, 87, 149, 0.1);
+}
+

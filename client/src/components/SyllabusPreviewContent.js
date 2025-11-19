@@ -546,6 +546,47 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.contatos) {
+      const contatosComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.contatos);
+          if (parsed.layout === 'estruturado' && parsed.data) {
+            const data = parsed.data;
+            let html = '<div style="font-size: 14px; line-height: 1.6;">';
+            
+            if (data.email) {
+              html += `<p><strong>Email:</strong> <a href="mailto:${data.email}">${data.email}</a></p>`;
+            }
+            if (data.telefone) {
+              html += `<p><strong>Telefone:</strong> ${data.telefone}</p>`;
+            }
+            if (data.horario_atendimento) {
+              html += `<p><strong>Horário de Atendimento:</strong> ${data.horario_atendimento}</p>`;
+            }
+            if (data.sala) {
+              html += `<p><strong>Sala:</strong> ${data.sala}</p>`;
+            }
+            if (data.links && data.links.length > 0) {
+              html += '<p><strong>Links:</strong></p><ul>';
+              data.links.forEach(link => {
+                if (link.url) {
+                  html += `<li><a href="${link.url}">${link.label || link.url}</a></li>`;
+                }
+              });
+              html += '</ul>';
+            }
+            if (data.outras_informacoes) {
+              html += data.outras_informacoes;
+            }
+            
+            html += '</div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.contatos;
+      })();
+
       sections.push({
         id: 'contatos',
         tabId: 'contatos',
@@ -557,7 +598,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             <div
               style={{ fontSize: '14px', lineHeight: '1.6' }}
               className="preview-content"
-              dangerouslySetInnerHTML={{ __html: formData.contatos }}
+              dangerouslySetInnerHTML={{ __html: contatosComponent }}
             />
           </div>
         )

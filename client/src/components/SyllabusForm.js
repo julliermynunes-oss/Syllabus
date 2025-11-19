@@ -27,6 +27,7 @@ import {
 } from 'react-icons/fa';
 // html2pdf será importado dinamicamente para evitar problemas no build
 import TiptapEditor from './TiptapEditor';
+import ContactsManager from './ContactsManager';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
 import ProfessoresManager from './ProfessoresManager';
@@ -1231,15 +1232,10 @@ function SyllabusForm() {
         {activeTab === 'contatos' && loadedTabs.has('contatos') && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>{t('contactsLabel')}</label>
-              <TiptapEditor
+              <ContactsManager
                 content={formData.contatos}
                 onChange={(content) => setFormData(prev => ({ ...prev, contatos: content }))}
-                showCharCount={true}
               />
-              <p className="editor-note">
-                {t('editorNote')}
-              </p>
             </div>
           </div>
         )}
