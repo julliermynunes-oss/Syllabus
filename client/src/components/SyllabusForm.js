@@ -30,6 +30,7 @@ import TiptapEditor from './TiptapEditor';
 import ContactsManager from './ContactsManager';
 import MethodologyManager from './MethodologyManager';
 import ContentManager from './ContentManager';
+import ODSManager from './ODSManager';
 import ReferenceManager from './ReferenceManager';
 import CompetenciesTable from './CompetenciesTable';
 import ProfessoresManager from './ProfessoresManager';
@@ -1236,15 +1237,10 @@ function SyllabusForm() {
         {activeTab === 'ods' && !isRestrictedCourse(formData.curso) && loadedTabs.has('ods') && (
           <div className="form-row full-width">
             <div className="form-field">
-              <label>{t('odsLabel')}</label>
-              <TiptapEditor
+              <ODSManager
                 content={formData.ods}
                 onChange={(content) => setFormData(prev => ({ ...prev, ods: content }))}
-                showCharCount={true}
               />
-              <p className="editor-note">
-                {t('editorNote')}
-              </p>
             </div>
           </div>
         )}

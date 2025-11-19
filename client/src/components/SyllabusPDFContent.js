@@ -436,7 +436,28 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 5. ODS (se não for curso restrito)
     if (formData.ods && !isRestrictedCourse(formData.curso)) {
-      const hasTableOrImg = hasTablesOrImages(formData.ods);
+      const odsComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.ods);
+          if (parsed.layout === 'visual' && parsed.ods_selecionados) {
+            let html = '<div style="font-size: 11px; line-height: 1.5;"><p><strong>Objetivos de Desenvolvimento Sustentável abordados nesta disciplina:</strong></p><ul>';
+            parsed.ods_selecionados.forEach(ods => {
+              html += `<li><strong>ODS ${ods.numero}: ${ods.nome}</strong>`;
+              if (ods.descricao) {
+                html += `<br/>${ods.descricao}`;
+              }
+              html += '</li>';
+            });
+            html += '</ul></div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.ods;
+      })();
+
+      const hasTableOrImg = hasTablesOrImages(odsComponent);
       sections.push({
         id: 'ods',
         tabId: 'ods',
@@ -446,8 +467,8 @@ function SyllabusPDFContent({ formData, professoresList }) {
               {t('odsTitle')}
             </h3>
             <div 
-              style={{ fontSize: '15px', lineHeight: '1.5' }}
-              dangerouslySetInnerHTML={{ __html: formData.ods }}
+              style={{ fontSize: '11px', lineHeight: '1.5' }}
+              dangerouslySetInnerHTML={{ __html: odsComponent }}
             />
           </div>
         )

@@ -281,6 +281,27 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.ods && !isRestrictedCourse(formData.curso)) {
+      const odsComponent = (() => {
+        try {
+          const parsed = JSON.parse(formData.ods);
+          if (parsed.layout === 'visual' && parsed.ods_selecionados) {
+            let html = '<div style="font-size: 14px; line-height: 1.6;"><p><strong>Objetivos de Desenvolvimento Sustentável abordados nesta disciplina:</strong></p><ul>';
+            parsed.ods_selecionados.forEach(ods => {
+              html += `<li><strong>ODS ${ods.numero}: ${ods.nome}</strong>`;
+              if (ods.descricao) {
+                html += `<br/>${ods.descricao}`;
+              }
+              html += '</li>';
+            });
+            html += '</ul></div>';
+            return html;
+          }
+        } catch (e) {
+          // Não é JSON, retornar como texto livre
+        }
+        return formData.ods;
+      })();
+
       sections.push({
         id: 'ods',
         tabId: 'ods',
@@ -292,7 +313,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             <div
               style={{ fontSize: '14px', lineHeight: '1.6' }}
               className="preview-content"
-              dangerouslySetInnerHTML={{ __html: formData.ods }}
+              dangerouslySetInnerHTML={{ __html: odsComponent }}
             />
           </div>
         )
