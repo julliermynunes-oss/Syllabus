@@ -412,15 +412,20 @@ const SyllabusList = () => {
             </tr>
           </thead>
           <tbody>
-            {syllabi.map((syllabus) => (
+            {syllabi.map((syllabus) => {
+              const professorDisplay = syllabus.professores && syllabus.professores.trim()
+                ? syllabus.professores.trim()
+                : (syllabus.usuario || '—');
+
+              return (
               <tr key={syllabus.id}>
-                <td>{syllabus.usuario}</td>
-                <td>{syllabus.semestre_ano}</td>
-                <td>{syllabus.programa}</td>
-                <td>{syllabus.disciplina}</td>
-                <td>{syllabus.linha}</td>
-                <td>{syllabus.coordenador}</td>
-                <td>{syllabus.sem_curricular}</td>
+                <td>{professorDisplay}</td>
+                <td>{syllabus.semestre_ano || '—'}</td>
+                <td>{syllabus.programa || '—'}</td>
+                <td>{syllabus.disciplina || '—'}</td>
+                <td>{syllabus.linha || '—'}</td>
+                <td>{syllabus.coordenador || '—'}</td>
+                <td>{syllabus.sem_curricular || '—'}</td>
                 <td className="actions-cell">
                   <button
                     className="action-btn view"
@@ -456,7 +461,8 @@ const SyllabusList = () => {
                   )}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
