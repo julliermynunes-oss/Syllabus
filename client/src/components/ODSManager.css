@@ -94,6 +94,20 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  display: block;
+}
+
+.ods-dropdown-icon .ods-icon-number {
+  display: none;
+}
+
+.ods-dropdown-icon img:not([src=""]) {
+  display: block;
+}
+
+.ods-dropdown-icon:has(img[style*="display: none"]) .ods-icon-number,
+.ods-dropdown-icon img[style*="display: none"] ~ .ods-icon-number {
+  display: flex !important;
 }
 
 .ods-dropdown-info {
@@ -168,6 +182,16 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  display: block;
+}
+
+.ods-selecionado-icon .ods-icon-number {
+  display: none;
+}
+
+.ods-selecionado-icon:has(img[style*="display: none"]) .ods-icon-number,
+.ods-selecionado-icon img[style*="display: none"] ~ .ods-icon-number {
+  display: flex !important;
 }
 
 .btn-remover-ods {

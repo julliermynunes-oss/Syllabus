@@ -254,9 +254,16 @@ const ODSManager = ({ content, onChange }) => {
                           style={{ background: ods.cor, position: 'relative' }}
                         >
                           <img 
-                            src={`https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`}
+                            src={`https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`}
                             alt={`ODS ${ods.numero}`}
                             className="ods-icon-img"
+                            onLoad={(e) => {
+                              // Quando o ícone carregar, esconder o número
+                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
+                              if (numberSpan) {
+                                numberSpan.style.display = 'none';
+                              }
+                            }}
                             style={{ 
                               width: '100%', 
                               height: '100%', 
@@ -264,9 +271,17 @@ const ODSManager = ({ content, onChange }) => {
                               filter: 'brightness(0) invert(1)',
                               position: 'absolute',
                               top: 0,
-                              left: 0
+                              left: 0,
+                              zIndex: 2
                             }}
                             onError={(e) => {
+                              // Tentar URL alternativa
+                              if (!e.target.dataset.triedAlternative) {
+                                e.target.dataset.triedAlternative = 'true';
+                                e.target.src = `https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
+                                return;
+                              }
+                              // Se ambas falharem, esconder ícone e mostrar número
                               e.target.style.display = 'none';
                               const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
                               if (numberSpan) {
@@ -277,7 +292,7 @@ const ODSManager = ({ content, onChange }) => {
                           <span 
                             className="ods-icon-number"
                             style={{ 
-                              display: 'none',
+                              display: 'flex',
                               width: '100%', 
                               height: '100%', 
                               alignItems: 'center', 
@@ -337,9 +352,16 @@ const ODSManager = ({ content, onChange }) => {
                           style={{ background: odsInfo.cor, position: 'relative' }}
                         >
                           <img 
-                            src={`https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`}
+                            src={`https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`}
                             alt={`ODS ${ods.numero}`}
                             className="ods-icon-img"
+                            onLoad={(e) => {
+                              // Quando o ícone carregar, esconder o número
+                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
+                              if (numberSpan) {
+                                numberSpan.style.display = 'none';
+                              }
+                            }}
                             style={{ 
                               width: '100%', 
                               height: '100%', 
@@ -347,9 +369,17 @@ const ODSManager = ({ content, onChange }) => {
                               filter: 'brightness(0) invert(1)',
                               position: 'absolute',
                               top: 0,
-                              left: 0
+                              left: 0,
+                              zIndex: 2
                             }}
                             onError={(e) => {
+                              // Tentar URL alternativa
+                              if (!e.target.dataset.triedAlternative) {
+                                e.target.dataset.triedAlternative = 'true';
+                                e.target.src = `https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
+                                return;
+                              }
+                              // Se ambas falharem, esconder ícone e mostrar número
                               e.target.style.display = 'none';
                               const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
                               if (numberSpan) {
@@ -360,7 +390,7 @@ const ODSManager = ({ content, onChange }) => {
                           <span 
                             className="ods-icon-number"
                             style={{ 
-                              display: 'none',
+                              display: 'flex',
                               width: '100%', 
                               height: '100%', 
                               alignItems: 'center', 
