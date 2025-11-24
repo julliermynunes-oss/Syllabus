@@ -247,6 +247,7 @@ const ODSManager = ({ content, onChange }) => {
                       <img 
                         src={`https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`}
                         alt={`ODS ${ods.numero}`}
+                        className="ods-icon"
                         style={{ 
                           width: '100%', 
                           height: '100%', 
@@ -258,20 +259,27 @@ const ODSManager = ({ content, onChange }) => {
                         }}
                         onError={(e) => {
                           e.target.style.display = 'none';
+                          const numberSpan = e.target.parentElement.querySelector('.ods-number-text');
+                          if (numberSpan) {
+                            numberSpan.style.display = 'flex';
+                          }
                         }}
                       />
-                      <span style={{ 
-                        display: 'inline-flex',
-                        width: '100%', 
-                        height: '100%', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        fontWeight: '700',
-                        fontSize: '0.9rem',
-                        color: 'white',
-                        position: 'relative',
-                        zIndex: 1
-                      }}>
+                      <span 
+                        className="ods-number-text"
+                        style={{ 
+                          display: 'none',
+                          width: '100%', 
+                          height: '100%', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          fontWeight: '700',
+                          fontSize: '0.9rem',
+                          color: 'white',
+                          position: 'relative',
+                          zIndex: 1
+                        }}
+                      >
                         {ods.numero}
                       </span>
                     </div>
