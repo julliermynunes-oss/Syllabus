@@ -383,21 +383,22 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             let html = '<div style="font-size: 14px; line-height: 1.6;">';
             html += '<p style="margin-bottom: 1rem;"><strong>Objetivos de Desenvolvimento Sustentável abordados nesta disciplina:</strong></p>';
             
-            // Grid de cards ODS
-            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">';
+            // Grid de cards ODS (mais compacto, estilo header + corpo)
+            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">';
             parsed.ods_selecionados.forEach(ods => {
               const cor = ODS_COLORS[ods.numero] || '#235795';
-              html += `<div style="border: 2px solid ${cor}; border-radius: 8px; padding: 1rem; background: ${cor}15; display: flex; flex-direction: column; gap: 0.5rem;">
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                  <div style="width: 40px; height: 40px; border-radius: 50%; background: ${cor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; flex-shrink: 0;">${ods.numero}</div>
+              html += `<div style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); background: #fff; display: flex; flex-direction: column; min-height: 150px;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.9rem; background: ${cor}; color: white;">
+                  <div style="width: 42px; height: 42px; border-radius: 6px; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px;">${ods.numero}</div>
                   <div style="flex: 1;">
-                    <strong style="color: #235795; font-size: 1rem;">ODS ${ods.numero}: ${ods.nome}</strong>
+                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">ODS</div>
+                    <div style="font-weight: 600; font-size: 0.95rem; line-height: 1.2;">${ods.nome}</div>
                   </div>
-                </div>`;
-              if (ods.descricao) {
-                html += `<div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid ${cor}40; font-size: 0.9rem;">${ods.descricao}</div>`;
-              }
-              html += '</div>';
+                </div>
+                <div style="flex: 1; padding: 0.85rem 0.9rem; background: ${cor}12; font-size: 0.92rem; color: #2f2f2f;">
+                  ${ods.descricao || '<span style="color:#777;">Sem descrição informada</span>'}
+                </div>
+              </div>`;
             });
             html += '</div></div>';
             return html;

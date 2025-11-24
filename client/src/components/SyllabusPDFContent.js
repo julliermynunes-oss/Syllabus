@@ -528,12 +528,14 @@ function SyllabusPDFContent({ formData, professoresList }) {
             
             // Tabela compacta para PDF
             html += '<table style="width: 100%; border-collapse: collapse; font-size: 10px;">';
-            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 4px 6px; text-align: center; border: 1px solid #1a4270; width: 8%;">ODS</th><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270;">Nome</th><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270;">Descrição</th></tr></thead>';
+            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 4px 6px; text-align: center; border: 1px solid #1a4270; width: 10%;">ODS</th><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270;">Nome</th><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270;">Descrição</th></tr></thead>';
             html += '<tbody>';
             parsed.ods_selecionados.forEach(ods => {
               const cor = ODS_COLORS[ods.numero] || '#235795';
               html += `<tr>
-                <td style="padding: 4px 6px; text-align: center; font-weight: bold; color: white; background: ${cor}; border: 1px solid #e0e0e0;">${ods.numero}</td>
+                <td style="padding: 4px 6px; text-align: center; border: 1px solid #e0e0e0;">
+                  <span style="display: inline-block; min-width: 28px; padding: 2px 6px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">${ods.numero}</span>
+                </td>
                 <td style="padding: 4px 6px; font-weight: 600; border: 1px solid #e0e0e0;">${ods.nome}</td>
                 <td style="padding: 4px 6px; border: 1px solid #e0e0e0;">${ods.descricao || '-'}</td>
               </tr>`;
