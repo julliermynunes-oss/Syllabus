@@ -339,13 +339,6 @@ const ODSManager = ({ content, onChange }) => {
               </div>
             </div>
           )}
-            
-            {odsSelecionados.length > 0 && (
-              <span style={{ color: '#666', fontSize: '0.9rem' }}>
-                {odsSelecionados.length} ODS selecionado{odsSelecionados.length > 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
 
           {odsSelecionados.length === 0 ? (
             <div className="ods-empty-state">
