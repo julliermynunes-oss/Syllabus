@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FaGlobe, FaFileAlt, FaPlus, FaTimes } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaGlobe, FaFileAlt } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import './ODSManager.css';
 
@@ -27,7 +27,7 @@ const ODSManager = ({ content, onChange }) => {
   const [layout, setLayout] = useState('visual'); // 'visual' ou 'texto'
   const [odsSelecionados, setOdsSelecionados] = useState([]);
   const [textContent, setTextContent] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [expandedODS, setExpandedODS] = useState(null);
 
   // Inicializar dados quando receber content
   useEffect(() => {
@@ -54,25 +54,6 @@ const ODSManager = ({ content, onChange }) => {
     setLayout('texto');
     setTextContent(content);
   }, [content]);
-
-  // Fechar modal ao pressionar ESC
-  useEffect(() => {
-    const handleEscape = (event) => {
-      if (event.key === 'Escape' && showDropdown) {
-        setShowDropdown(false);
-      }
-    };
-
-    if (showDropdown) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden'; // Prevenir scroll do body
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [showDropdown]);
 
   // Salvar dados visuais
   const saveODSSelecionados = (newODS) => {
@@ -146,25 +127,20 @@ const ODSManager = ({ content, onChange }) => {
     }
   };
 
-  const adicionarODS = (ods) => {
-    // Verificar se já está selecionado
-    if (odsSelecionados.some(o => o.numero === ods.numero)) {
-      setShowDropdown(false);
-      return;
-    }
-
-    const novosODS = [...odsSelecionados, {
-      numero: ods.numero,
-      nome: ods.nome,
-      descricao: ''
-    }];
+  const toggleODS = (ods) => {
+    const index = odsSelecionados.findIndex(o => o.numero === ods.numero);
+    let novosODS;
     
-    saveODSSelecionados(novosODS);
-    setShowDropdown(false);
-  };
-
-  const removerODS = (numero) => {
-    const novosODS = odsSelecionados.filter(o => o.numero !== numero);
+    if (index >= 0) {
+      novosODS = odsSelecionados.filter(o => o.numero !== ods.numero);
+    } else {
+      novosODS = [...odsSelecionados, {
+        numero: ods.numero,
+        nome: ods.nome,
+        descricao: ''
+      }];
+    }
+    
     saveODSSelecionados(novosODS);
   };
 
@@ -187,8 +163,17 @@ const ODSManager = ({ content, onChange }) => {
     return odsSelecionados.some(o => o.numero === numero);
   };
 
-  // ODS disponíveis para adicionar (não selecionados)
-  const odsDisponiveis = ODS_LIST.filter(ods => !isODSSelecionado(ods.numero));
+  // Função para obter URL da imagem do ODS
+  const getODSImageUrl = (numero) => {
+    // Tentar múltiplas URLs possíveis para as imagens oficiais da ONU Brasil
+    const urls = [
+      `https://brasil.un.org/sites/default/files/2021-04/ODS-${numero}.png`,
+      `https://brasil.un.org/sites/default/files/2021-04/E_SDG_Icons-${String(numero).padStart(2, '0')}.jpg`,
+      `https://www.un.org/sustainabledevelopment/wp-content/uploads/2019/07/E_SDG_Icons-${String(numero).padStart(2, '0')}.jpg`,
+      `https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${numero}.svg`
+    ];
+    return urls[0]; // Retornar primeira URL, o onError tentará as outras
+  };
 
   return (
     <div className="ods-manager">
@@ -226,218 +211,88 @@ const ODSManager = ({ content, onChange }) => {
 
       {layout === 'visual' ? (
         <div className="ods-visual">
-          <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button
-              type="button"
-              className="btn-adicionar-ods"
-              onClick={() => setShowDropdown(true)}
-              disabled={odsDisponiveis.length === 0}
-            >
-              <FaPlus size={16} style={{ marginRight: '0.5rem' }} />
-              Adicionar ODS
-            </button>
-            
-            {odsSelecionados.length > 0 && (
-              <span style={{ color: '#666', fontSize: '0.9rem' }}>
-                {odsSelecionados.length} ODS selecionado{odsSelecionados.length > 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
-
-          {/* Modal de seleção de ODS */}
-          {showDropdown && (
-            <div className="ods-modal-overlay" onClick={() => setShowDropdown(false)}>
-              <div className="ods-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="ods-modal-header">
-                  <h3>Selecione um ODS para adicionar</h3>
-                  <button
-                    type="button"
-                    className="ods-modal-close"
-                    onClick={() => setShowDropdown(false)}
-                    title="Fechar"
-                  >
-                    <FaTimes size={20} />
-                  </button>
-                </div>
-                <div className="ods-modal-content">
-                  {odsDisponiveis.length === 0 ? (
-                    <div className="ods-modal-empty">
-                      <p>Todos os ODS já foram selecionados.</p>
-                    </div>
-                  ) : (
-                    <div className="ods-modal-grid">
-                      {odsDisponiveis.map(ods => (
-                        <div
-                          key={ods.numero}
-                          className="ods-modal-item"
-                          onClick={() => adicionarODS(ods)}
-                        >
-                          <div 
-                            className="ods-modal-icon"
-                            style={{ background: ods.cor, position: 'relative' }}
-                          >
-                            <img 
-                              src={`https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`}
-                              alt={`ODS ${ods.numero}`}
-                              className="ods-icon-img"
-                              onLoad={(e) => {
-                                const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
-                                if (numberSpan) {
-                                  numberSpan.style.display = 'none';
-                                }
-                              }}
-                              style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'contain',
-                                filter: 'brightness(0) invert(1)',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                zIndex: 2
-                              }}
-                              onError={(e) => {
-                                if (!e.target.dataset.triedAlternative) {
-                                  e.target.dataset.triedAlternative = 'true';
-                                  e.target.src = `https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
-                                  return;
-                                }
-                                e.target.style.display = 'none';
-                                const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
-                                if (numberSpan) {
-                                  numberSpan.style.display = 'flex';
-                                }
-                              }}
-                            />
-                            <span 
-                              className="ods-icon-number"
-                              style={{ 
-                                display: 'flex',
-                                width: '100%', 
-                                height: '100%', 
-                                alignItems: 'center', 
-                                justifyContent: 'center',
-                                fontWeight: '700',
-                                fontSize: '1.1rem',
-                                color: 'white',
-                                position: 'relative',
-                                zIndex: 1
-                              }}
-                            >
-                              {ods.numero}
-                            </span>
-                          </div>
-                          <div className="ods-modal-info">
-                            <div className="ods-modal-number">ODS {ods.numero}</div>
-                            <div className="ods-modal-name">{ods.nome}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {odsSelecionados.length === 0 ? (
-            <div className="ods-empty-state">
-              <p>Nenhum ODS selecionado ainda.</p>
-              <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
-                Clique em "Adicionar ODS" para começar.
-              </p>
-            </div>
-          ) : (
-            <div className="ods-selecionados-list">
-              {odsSelecionados.map(ods => {
-                const odsInfo = ODS_LIST.find(o => o.numero === ods.numero);
-                return (
-                  <div
-                    key={ods.numero}
-                    className="ods-selecionado-card"
-                    style={{
-                      borderLeft: `4px solid ${odsInfo.cor}`,
-                      background: `${odsInfo.cor}08`
-                    }}
-                  >
-                    <div className="ods-selecionado-header">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-                        <div 
-                          className="ods-selecionado-icon"
-                          style={{ background: odsInfo.cor, position: 'relative' }}
-                        >
-                          <img 
-                            src={`https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`}
-                            alt={`ODS ${ods.numero}`}
-                            className="ods-icon-img"
-                            onLoad={(e) => {
-                              // Quando o ícone carregar, esconder o número
-                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
-                              if (numberSpan) {
-                                numberSpan.style.display = 'none';
-                              }
-                            }}
-                            style={{ 
-                              width: '100%', 
-                              height: '100%', 
-                              objectFit: 'contain',
-                              filter: 'brightness(0) invert(1)',
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              zIndex: 2
-                            }}
-                            onError={(e) => {
-                              // Tentar URL alternativa
-                              if (!e.target.dataset.triedAlternative) {
-                                e.target.dataset.triedAlternative = 'true';
-                                e.target.src = `https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
-                                return;
-                              }
-                              // Se ambas falharem, esconder ícone e mostrar número
-                              e.target.style.display = 'none';
-                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
-                              if (numberSpan) {
-                                numberSpan.style.display = 'flex';
-                              }
-                            }}
-                          />
-                          <span 
-                            className="ods-icon-number"
-                            style={{ 
-                              display: 'flex',
-                              width: '100%', 
-                              height: '100%', 
-                              alignItems: 'center', 
-                              justifyContent: 'center',
-                              fontWeight: '700',
-                              fontSize: '1.1rem',
-                              color: 'white',
-                              position: 'relative',
-                              zIndex: 1
-                            }}
-                          >
-                            {ods.numero}
-                          </span>
-                        </div>
-                        <div>
-                          <div style={{ fontWeight: '600', color: '#235795', fontSize: '1rem' }}>
-                            ODS {ods.numero}: {ods.nome}
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        className="btn-remover-ods"
-                        onClick={() => removerODS(ods.numero)}
-                        title="Remover ODS"
+          <p style={{ marginBottom: '1.5rem', color: '#666', fontSize: '0.9rem' }}>
+            Selecione os Objetivos de Desenvolvimento Sustentável (ODS) abordados nesta disciplina. 
+            Clique em um ODS para selecioná-lo e adicionar uma descrição de como a disciplina o aborda.
+          </p>
+          
+          <div className="ods-grid">
+            {ODS_LIST.map(ods => {
+              const selecionado = isODSSelecionado(ods.numero);
+              const isExpanded = expandedODS === ods.numero;
+              
+              return (
+                <div
+                  key={ods.numero}
+                  className={`ods-card ${selecionado ? 'selecionado' : ''} ${isExpanded ? 'expanded' : ''}`}
+                  style={{
+                    borderColor: selecionado ? ods.cor : '#e0e0e0',
+                    background: selecionado ? `${ods.cor}15` : 'white'
+                  }}
+                  onClick={() => {
+                    toggleODS(ods);
+                    if (!selecionado) {
+                      setExpandedODS(ods.numero);
+                    } else if (isExpanded) {
+                      setExpandedODS(null);
+                    } else {
+                      setExpandedODS(ods.numero);
+                    }
+                  }}
+                >
+                  <div className="ods-card-content">
+                    <div 
+                      className="ods-card-icon"
+                      style={{ background: ods.cor }}
+                    >
+                      <img 
+                        src={getODSImageUrl(ods.numero)}
+                        alt={`ODS ${ods.numero}`}
+                        onError={(e) => {
+                          // Tentar URLs alternativas
+                          const currentSrc = e.target.src;
+                          if (currentSrc.includes('ODS-')) {
+                            e.target.src = `https://www.un.org/sustainabledevelopment/wp-content/uploads/2019/07/E_SDG_Icons-${String(ods.numero).padStart(2, '0')}.jpg`;
+                          } else if (currentSrc.includes('E_SDG_Icons')) {
+                            e.target.src = `https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`;
+                          } else {
+                            // Se todas falharem, mostrar número
+                            e.target.style.display = 'none';
+                            const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
+                            if (numberSpan) {
+                              numberSpan.style.display = 'flex';
+                            }
+                          }
+                        }}
+                      />
+                      <span 
+                        className="ods-icon-number"
+                        style={{ 
+                          display: 'none',
+                          width: '100%', 
+                          height: '100%', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          fontWeight: '700',
+                          fontSize: '1.2rem',
+                          color: 'white',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0
+                        }}
                       >
-                        <FaTimes size={14} />
-                      </button>
+                        {ods.numero}
+                      </span>
                     </div>
-                    
-                    <div className="ods-selecionado-descricao">
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem', color: '#666' }}>
+                    <div className="ods-card-text">
+                      <div className="ods-card-number">ODS {ods.numero}</div>
+                      <div className="ods-card-name">{ods.nome}</div>
+                    </div>
+                  </div>
+                  
+                  {selecionado && isExpanded && (
+                    <div className="ods-descricao" onClick={(e) => e.stopPropagation()}>
+                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem' }}>
                         Como esta disciplina aborda este ODS:
                       </label>
                       <TiptapEditor
@@ -446,9 +301,35 @@ const ODSManager = ({ content, onChange }) => {
                         showCharCount={true}
                       />
                     </div>
-                  </div>
-                );
-              })}
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {odsSelecionados.length > 0 && (
+            <div className="ods-resumo" style={{ marginTop: '2rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
+              <strong>ODS Selecionados ({odsSelecionados.length}):</strong>
+              <div style={{ marginTop: '0.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {odsSelecionados.map(ods => {
+                  const odsInfo = ODS_LIST.find(o => o.numero === ods.numero);
+                  return (
+                    <span
+                      key={ods.numero}
+                      style={{
+                        padding: '0.25rem 0.75rem',
+                        borderRadius: '20px',
+                        background: odsInfo.cor,
+                        color: 'white',
+                        fontSize: '0.85rem',
+                        fontWeight: '600'
+                      }}
+                    >
+                      ODS {ods.numero}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>

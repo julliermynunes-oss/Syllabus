@@ -7,303 +7,94 @@
   flex-direction: column;
 }
 
-/* Botão Adicionar ODS */
-.btn-adicionar-ods {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.75rem 1.25rem;
-  background: #235795;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-adicionar-ods:hover:not(:disabled) {
-  background: #1a4270;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(35, 87, 149, 0.3);
-}
-
-.btn-adicionar-ods:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Modal de seleção de ODS */
-.ods-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  padding: 1rem;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.ods-modal {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  max-width: 900px;
-  width: 100%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.ods-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
-  background: #f8f9fa;
-}
-
-.ods-modal-header h3 {
-  margin: 0;
-  color: #235795;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.ods-modal-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.ods-modal-close:hover {
-  background: #e0e0e0;
-  color: #235795;
-}
-
-.ods-modal-content {
-  padding: 1.5rem;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.ods-modal-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.ods-modal-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.ods-modal-content::-webkit-scrollbar-thumb {
-  background: #235795;
-  border-radius: 4px;
-}
-
-.ods-modal-content::-webkit-scrollbar-thumb:hover {
-  background: #1a4270;
-}
-
-.ods-modal-empty {
-  text-align: center;
-  padding: 3rem;
-  color: #666;
-}
-
-.ods-modal-grid {
+.ods-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1rem;
 }
 
-.ods-modal-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
+.ods-card {
   border: 2px solid #e0e0e0;
   border-radius: 8px;
+  padding: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: white;
-  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
-.ods-modal-item:hover {
-  border-color: #235795;
+.ods-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(35, 87, 149, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.ods-modal-icon {
-  width: 64px;
-  height: 64px;
+.ods-card.selecionado {
+  border-width: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ods-card.expanded {
+  grid-column: 1 / -1;
+}
+
+.ods-card-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ods-card-icon {
+  width: 80px;
+  height: 80px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   position: relative;
   overflow: hidden;
 }
 
-.ods-modal-icon img {
+.ods-card-icon img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
 }
 
-.ods-modal-info {
-  width: 100%;
+.ods-card-text {
+  flex: 1;
+  min-width: 0;
 }
 
-.ods-modal-number {
+.ods-card-number {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #235795;
   margin-bottom: 0.25rem;
 }
 
-.ods-modal-name {
-  font-size: 0.9rem;
-  color: #333;
+.ods-card-name {
+  font-weight: 600;
+  font-size: 1rem;
   line-height: 1.3;
-  font-weight: 500;
+  color: #333;
+  word-wrap: break-word;
 }
 
-/* Estado vazio */
-.ods-empty-state {
-  padding: 3rem 2rem;
-  text-align: center;
-  background: #f8f9fa;
-  border: 2px dashed #e0e0e0;
-  border-radius: 8px;
-  color: #666;
-}
-
-/* Lista de ODS selecionados */
-.ods-selecionados-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.ods-selecionado-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1.25rem;
-  background: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-}
-
-.ods-selecionado-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.ods-selecionado-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  gap: 1rem;
-}
-
-.ods-selecionado-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.ods-selecionado-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
-
-.ods-selecionado-icon .ods-icon-number {
-  display: none;
-}
-
-.ods-selecionado-icon:has(img[style*="display: none"]) .ods-icon-number,
-.ods-selecionado-icon img[style*="display: none"] ~ .ods-icon-number {
-  display: flex !important;
-}
-
-.btn-remover-ods {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  background: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-}
-
-.btn-remover-ods:hover {
-  background: #c82333;
-  transform: scale(1.1);
-}
-
-.ods-selecionado-descricao {
+.ods-descricao {
   margin-top: 1rem;
   padding-top: 1rem;
   border-top: 1px solid #e0e0e0;
 }
 
-/* Layout selector (mantido do original) */
+.ods-resumo {
+  border: 1px solid #e0e0e0;
+}
+
+/* Layout selector */
 .layout-selector-buttons {
   display: flex;
   gap: 1rem;
