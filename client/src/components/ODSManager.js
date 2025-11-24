@@ -28,7 +28,6 @@ const ODSManager = ({ content, onChange }) => {
   const [odsSelecionados, setOdsSelecionados] = useState([]);
   const [textContent, setTextContent] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef(null);
 
   // Inicializar dados quando receber content
   useEffect(() => {
@@ -56,20 +55,22 @@ const ODSManager = ({ content, onChange }) => {
     setTextContent(content);
   }, [content]);
 
-  // Fechar dropdown ao clicar fora
+  // Fechar modal ao pressionar ESC
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape' && showDropdown) {
         setShowDropdown(false);
       }
     };
 
     if (showDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden'; // Prevenir scroll do body
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
     };
   }, [showDropdown]);
 
@@ -226,97 +227,118 @@ const ODSManager = ({ content, onChange }) => {
       {layout === 'visual' ? (
         <div className="ods-visual">
           <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ position: 'relative' }} ref={dropdownRef}>
-              <button
-                type="button"
-                className="btn-adicionar-ods"
-                onClick={() => setShowDropdown(!showDropdown)}
-                disabled={odsDisponiveis.length === 0}
-              >
-                <FaPlus size={16} style={{ marginRight: '0.5rem' }} />
-                Adicionar ODS
-              </button>
-              
-              {showDropdown && odsDisponiveis.length > 0 && (
-                <div className="ods-dropdown">
-                  <div className="ods-dropdown-header">
-                    <strong>Selecione um ODS para adicionar:</strong>
-                  </div>
-                  <div className="ods-dropdown-list">
-                    {odsDisponiveis.map(ods => (
-                      <div
-                        key={ods.numero}
-                        className="ods-dropdown-item"
-                        onClick={() => adicionarODS(ods)}
-                      >
-                        <div 
-                          className="ods-dropdown-icon"
-                          style={{ background: ods.cor, position: 'relative' }}
-                        >
-                          <img 
-                            src={`https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`}
-                            alt={`ODS ${ods.numero}`}
-                            className="ods-icon-img"
-                            onLoad={(e) => {
-                              // Quando o ícone carregar, esconder o número
-                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
-                              if (numberSpan) {
-                                numberSpan.style.display = 'none';
-                              }
-                            }}
-                            style={{ 
-                              width: '100%', 
-                              height: '100%', 
-                              objectFit: 'contain',
-                              filter: 'brightness(0) invert(1)',
-                              position: 'absolute',
-                              top: 0,
-                              left: 0,
-                              zIndex: 2
-                            }}
-                            onError={(e) => {
-                              // Tentar URL alternativa
-                              if (!e.target.dataset.triedAlternative) {
-                                e.target.dataset.triedAlternative = 'true';
-                                e.target.src = `https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
-                                return;
-                              }
-                              // Se ambas falharem, esconder ícone e mostrar número
-                              e.target.style.display = 'none';
-                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
-                              if (numberSpan) {
-                                numberSpan.style.display = 'flex';
-                              }
-                            }}
-                          />
-                          <span 
-                            className="ods-icon-number"
-                            style={{ 
-                              display: 'flex',
-                              width: '100%', 
-                              height: '100%', 
-                              alignItems: 'center', 
-                              justifyContent: 'center',
-                              fontWeight: '700',
-                              fontSize: '0.9rem',
-                              color: 'white',
-                              position: 'relative',
-                              zIndex: 1
-                            }}
-                          >
-                            {ods.numero}
-                          </span>
-                        </div>
-                        <div className="ods-dropdown-info">
-                          <div className="ods-dropdown-number">ODS {ods.numero}</div>
-                          <div className="ods-dropdown-name">{ods.nome}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+            <button
+              type="button"
+              className="btn-adicionar-ods"
+              onClick={() => setShowDropdown(true)}
+              disabled={odsDisponiveis.length === 0}
+            >
+              <FaPlus size={16} style={{ marginRight: '0.5rem' }} />
+              Adicionar ODS
+            </button>
+            
+            {odsSelecionados.length > 0 && (
+              <span style={{ color: '#666', fontSize: '0.9rem' }}>
+                {odsSelecionados.length} ODS selecionado{odsSelecionados.length > 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+
+          {/* Modal de seleção de ODS */}
+          {showDropdown && (
+            <div className="ods-modal-overlay" onClick={() => setShowDropdown(false)}>
+              <div className="ods-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="ods-modal-header">
+                  <h3>Selecione um ODS para adicionar</h3>
+                  <button
+                    type="button"
+                    className="ods-modal-close"
+                    onClick={() => setShowDropdown(false)}
+                    title="Fechar"
+                  >
+                    <FaTimes size={20} />
+                  </button>
                 </div>
-              )}
+                <div className="ods-modal-content">
+                  {odsDisponiveis.length === 0 ? (
+                    <div className="ods-modal-empty">
+                      <p>Todos os ODS já foram selecionados.</p>
+                    </div>
+                  ) : (
+                    <div className="ods-modal-grid">
+                      {odsDisponiveis.map(ods => (
+                        <div
+                          key={ods.numero}
+                          className="ods-modal-item"
+                          onClick={() => adicionarODS(ods)}
+                        >
+                          <div 
+                            className="ods-modal-icon"
+                            style={{ background: ods.cor, position: 'relative' }}
+                          >
+                            <img 
+                              src={`https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`}
+                              alt={`ODS ${ods.numero}`}
+                              className="ods-icon-img"
+                              onLoad={(e) => {
+                                const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
+                                if (numberSpan) {
+                                  numberSpan.style.display = 'none';
+                                }
+                              }}
+                              style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                objectFit: 'contain',
+                                filter: 'brightness(0) invert(1)',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                zIndex: 2
+                              }}
+                              onError={(e) => {
+                                if (!e.target.dataset.triedAlternative) {
+                                  e.target.dataset.triedAlternative = 'true';
+                                  e.target.src = `https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
+                                  return;
+                                }
+                                e.target.style.display = 'none';
+                                const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
+                                if (numberSpan) {
+                                  numberSpan.style.display = 'flex';
+                                }
+                              }}
+                            />
+                            <span 
+                              className="ods-icon-number"
+                              style={{ 
+                                display: 'flex',
+                                width: '100%', 
+                                height: '100%', 
+                                alignItems: 'center', 
+                                justifyContent: 'center',
+                                fontWeight: '700',
+                                fontSize: '1.1rem',
+                                color: 'white',
+                                position: 'relative',
+                                zIndex: 1
+                              }}
+                            >
+                              {ods.numero}
+                            </span>
+                          </div>
+                          <div className="ods-modal-info">
+                            <div className="ods-modal-number">ODS {ods.numero}</div>
+                            <div className="ods-modal-name">{ods.nome}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
+          )}
             
             {odsSelecionados.length > 0 && (
               <span style={{ color: '#666', fontSize: '0.9rem' }}>
