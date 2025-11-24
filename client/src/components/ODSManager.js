@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaGlobe, FaFileAlt } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaGlobe, FaFileAlt, FaPlus, FaTimes } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import './ODSManager.css';
 
@@ -27,7 +27,8 @@ const ODSManager = ({ content, onChange }) => {
   const [layout, setLayout] = useState('visual'); // 'visual' ou 'texto'
   const [odsSelecionados, setOdsSelecionados] = useState([]);
   const [textContent, setTextContent] = useState('');
-  const [expandedODS, setExpandedODS] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Inicializar dados quando receber content
   useEffect(() => {
@@ -54,6 +55,23 @@ const ODSManager = ({ content, onChange }) => {
     setLayout('texto');
     setTextContent(content);
   }, [content]);
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showDropdown]);
 
   // Salvar dados visuais
   const saveODSSelecionados = (newODS) => {
@@ -127,20 +145,25 @@ const ODSManager = ({ content, onChange }) => {
     }
   };
 
-  const toggleODS = (ods) => {
-    const index = odsSelecionados.findIndex(o => o.numero === ods.numero);
-    let novosODS;
-    
-    if (index >= 0) {
-      novosODS = odsSelecionados.filter(o => o.numero !== ods.numero);
-    } else {
-      novosODS = [...odsSelecionados, {
-        numero: ods.numero,
-        nome: ods.nome,
-        descricao: ''
-      }];
+  const adicionarODS = (ods) => {
+    // Verificar se já está selecionado
+    if (odsSelecionados.some(o => o.numero === ods.numero)) {
+      setShowDropdown(false);
+      return;
     }
+
+    const novosODS = [...odsSelecionados, {
+      numero: ods.numero,
+      nome: ods.nome,
+      descricao: ''
+    }];
     
+    saveODSSelecionados(novosODS);
+    setShowDropdown(false);
+  };
+
+  const removerODS = (numero) => {
+    const novosODS = odsSelecionados.filter(o => o.numero !== numero);
     saveODSSelecionados(novosODS);
   };
 
@@ -162,6 +185,9 @@ const ODSManager = ({ content, onChange }) => {
   const isODSSelecionado = (numero) => {
     return odsSelecionados.some(o => o.numero === numero);
   };
+
+  // ODS disponíveis para adicionar (não selecionados)
+  const odsDisponiveis = ODS_LIST.filter(ods => !isODSSelecionado(ods.numero));
 
   return (
     <div className="ods-manager">
@@ -199,96 +225,174 @@ const ODSManager = ({ content, onChange }) => {
 
       {layout === 'visual' ? (
         <div className="ods-visual">
-          <p style={{ marginBottom: '1.5rem', color: '#666', fontSize: '0.9rem' }}>
-            Selecione os Objetivos de Desenvolvimento Sustentável (ODS) abordados nesta disciplina. 
-            Clique em um ODS para selecioná-lo e adicionar uma descrição de como a disciplina o aborda.
-          </p>
-          
-          <div className="ods-grid">
-            {ODS_LIST.map(ods => {
-              const selecionado = isODSSelecionado(ods.numero);
-              const isExpanded = expandedODS === ods.numero;
+          <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ position: 'relative' }} ref={dropdownRef}>
+              <button
+                type="button"
+                className="btn-adicionar-ods"
+                onClick={() => setShowDropdown(!showDropdown)}
+                disabled={odsDisponiveis.length === 0}
+              >
+                <FaPlus size={16} style={{ marginRight: '0.5rem' }} />
+                Adicionar ODS
+              </button>
               
-              return (
-                <div
-                  key={ods.numero}
-                  className={`ods-card ${selecionado ? 'selecionado' : ''} ${isExpanded ? 'expanded' : ''}`}
-                  style={{
-                    borderColor: selecionado ? ods.cor : '#e0e0e0',
-                    background: selecionado ? `${ods.cor}15` : 'white'
-                  }}
-                  onClick={() => {
-                    toggleODS(ods);
-                    if (!selecionado) {
-                      setExpandedODS(ods.numero);
-                    } else if (isExpanded) {
-                      setExpandedODS(null);
-                    } else {
-                      setExpandedODS(ods.numero);
-                    }
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div 
-                      className="ods-number" 
-                      style={{ 
-                        background: ods.cor, 
-                        position: 'relative', 
-                        width: '36px', 
-                        height: '36px', 
-                        borderRadius: '4px', 
-                        flexShrink: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <img 
-                        src={`https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`}
-                        alt={`ODS ${ods.numero}`}
-                        className="ods-icon"
-                        style={{ 
-                          width: '100%', 
-                          height: '100%', 
-                          objectFit: 'contain',
-                          filter: 'brightness(0) invert(1)',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                          const numberSpan = e.target.parentElement.querySelector('.ods-number-text');
-                          if (numberSpan) {
-                            numberSpan.style.display = 'flex';
-                          }
-                        }}
-                      />
-                      <span 
-                        className="ods-number-text"
-                        style={{ 
-                          display: 'none',
-                          width: '100%', 
-                          height: '100%', 
-                          alignItems: 'center', 
-                          justifyContent: 'center',
-                          fontWeight: '700',
-                          fontSize: '0.9rem',
-                          color: 'white',
-                          position: 'relative',
-                          zIndex: 1
-                        }}
-                      >
-                        {ods.numero}
-                      </span>
-                    </div>
-                    <div className="ods-name">{ods.nome}</div>
+              {showDropdown && odsDisponiveis.length > 0 && (
+                <div className="ods-dropdown">
+                  <div className="ods-dropdown-header">
+                    <strong>Selecione um ODS para adicionar:</strong>
                   </div>
-                  
-                  {selecionado && isExpanded && (
-                    <div className="ods-descricao" onClick={(e) => e.stopPropagation()}>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem' }}>
+                  <div className="ods-dropdown-list">
+                    {odsDisponiveis.map(ods => (
+                      <div
+                        key={ods.numero}
+                        className="ods-dropdown-item"
+                        onClick={() => adicionarODS(ods)}
+                      >
+                        <div 
+                          className="ods-dropdown-icon"
+                          style={{ background: ods.cor, position: 'relative' }}
+                        >
+                          <img 
+                            src={`https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`}
+                            alt={`ODS ${ods.numero}`}
+                            className="ods-icon-img"
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'contain',
+                              filter: 'brightness(0) invert(1)',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0
+                            }}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
+                              if (numberSpan) {
+                                numberSpan.style.display = 'flex';
+                              }
+                            }}
+                          />
+                          <span 
+                            className="ods-icon-number"
+                            style={{ 
+                              display: 'none',
+                              width: '100%', 
+                              height: '100%', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              fontWeight: '700',
+                              fontSize: '0.9rem',
+                              color: 'white',
+                              position: 'relative',
+                              zIndex: 1
+                            }}
+                          >
+                            {ods.numero}
+                          </span>
+                        </div>
+                        <div className="ods-dropdown-info">
+                          <div className="ods-dropdown-number">ODS {ods.numero}</div>
+                          <div className="ods-dropdown-name">{ods.nome}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {odsSelecionados.length > 0 && (
+              <span style={{ color: '#666', fontSize: '0.9rem' }}>
+                {odsSelecionados.length} ODS selecionado{odsSelecionados.length > 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+
+          {odsSelecionados.length === 0 ? (
+            <div className="ods-empty-state">
+              <p>Nenhum ODS selecionado ainda.</p>
+              <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+                Clique em "Adicionar ODS" para começar.
+              </p>
+            </div>
+          ) : (
+            <div className="ods-selecionados-list">
+              {odsSelecionados.map(ods => {
+                const odsInfo = ODS_LIST.find(o => o.numero === ods.numero);
+                return (
+                  <div
+                    key={ods.numero}
+                    className="ods-selecionado-card"
+                    style={{
+                      borderLeft: `4px solid ${odsInfo.cor}`,
+                      background: `${odsInfo.cor}08`
+                    }}
+                  >
+                    <div className="ods-selecionado-header">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+                        <div 
+                          className="ods-selecionado-icon"
+                          style={{ background: odsInfo.cor, position: 'relative' }}
+                        >
+                          <img 
+                            src={`https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`}
+                            alt={`ODS ${ods.numero}`}
+                            className="ods-icon-img"
+                            style={{ 
+                              width: '100%', 
+                              height: '100%', 
+                              objectFit: 'contain',
+                              filter: 'brightness(0) invert(1)',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0
+                            }}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
+                              if (numberSpan) {
+                                numberSpan.style.display = 'flex';
+                              }
+                            }}
+                          />
+                          <span 
+                            className="ods-icon-number"
+                            style={{ 
+                              display: 'none',
+                              width: '100%', 
+                              height: '100%', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              fontWeight: '700',
+                              fontSize: '1.1rem',
+                              color: 'white',
+                              position: 'relative',
+                              zIndex: 1
+                            }}
+                          >
+                            {ods.numero}
+                          </span>
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: '600', color: '#235795', fontSize: '1rem' }}>
+                            ODS {ods.numero}: {ods.nome}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-remover-ods"
+                        onClick={() => removerODS(ods.numero)}
+                        title="Remover ODS"
+                      >
+                        <FaTimes size={14} />
+                      </button>
+                    </div>
+                    
+                    <div className="ods-selecionado-descricao">
+                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', fontSize: '0.9rem', color: '#666' }}>
                         Como esta disciplina aborda este ODS:
                       </label>
                       <TiptapEditor
@@ -297,35 +401,9 @@ const ODSManager = ({ content, onChange }) => {
                         showCharCount={true}
                       />
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {odsSelecionados.length > 0 && (
-            <div className="ods-resumo" style={{ marginTop: '2rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px' }}>
-              <strong>ODS Selecionados ({odsSelecionados.length}):</strong>
-              <div style={{ marginTop: '0.5rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                {odsSelecionados.map(ods => {
-                  const odsInfo = ODS_LIST.find(o => o.numero === ods.numero);
-                  return (
-                    <span
-                      key={ods.numero}
-                      style={{
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '20px',
-                        background: odsInfo.cor,
-                        color: 'white',
-                        fontSize: '0.85rem',
-                        fontWeight: '600'
-                      }}
-                    >
-                      ODS {ods.numero}
-                    </span>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -346,4 +424,3 @@ const ODSManager = ({ content, onChange }) => {
 };
 
 export default ODSManager;
-
