@@ -614,58 +614,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 7. Metodologia
     if (formData.metodologia) {
-      const metodologiaComponent = (() => {
-        try {
-          const parsed = JSON.parse(formData.metodologia);
-          if (parsed.layout === 'estruturado' && parsed.data) {
-            const data = parsed.data;
-            let html = '<div style="font-size: 11px; line-height: 1.5;">';
-            
-            // Modalidade
-            if (data.modalidade) {
-              html += `<p style="margin: 4px 0;"><strong>Modalidade:</strong> ${data.modalidade}</p>`;
-            }
-            
-            // Recursos em linha compacta
-            if (data.recursos && data.recursos.length > 0) {
-              html += '<p style="margin: 4px 0;"><strong>Recursos:</strong> ';
-              html += data.recursos.join(', ');
-              html += '</p>';
-            }
-            
-            // Atividades Práticas em tabela compacta
-            if (data.atividades_praticas && data.atividades_praticas.length > 0) {
-              html += '<p style="margin: 6px 0 4px 0; font-weight: 600;">Atividades Práticas:</p>';
-              html += '<table style="width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 8px;">';
-              html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 3px 6px; text-align: left; border: 1px solid #1a4270; width: 30%;">Atividade</th><th style="padding: 3px 6px; text-align: left; border: 1px solid #1a4270;">Descrição</th></tr></thead>';
-              html += '<tbody>';
-              data.atividades_praticas.forEach((atividade, index) => {
-                if (atividade.nome) {
-                  html += `<tr>
-                    <td style="padding: 3px 6px; border: 1px solid #e0e0e0; font-weight: 600; background: #f8f9fa;">${atividade.nome}</td>
-                    <td style="padding: 3px 6px; border: 1px solid #e0e0e0;">${atividade.descricao || '-'}</td>
-                  </tr>`;
-                }
-              });
-              html += '</tbody></table>';
-            }
-            
-            // Avaliação Contínua
-            if (data.avaliacao_continua && data.avaliacao_continua.ativa) {
-              html += '<p style="margin: 4px 0;"><strong>✓ Avaliação Contínua:</strong> Ativa</p>';
-              if (data.avaliacao_continua.descricao) {
-                html += `<div style="margin-top: 4px; padding: 4px; background: #fff3cd; border-left: 3px solid #ffc107; font-size: 10px;">${data.avaliacao_continua.descricao}</div>`;
-              }
-            }
-            
-            html += '</div>';
-            return html;
-          }
-        } catch (e) {
-          // Não é JSON, retornar como texto livre
-        }
-        return formData.metodologia;
-      })();
+      const metodologiaComponent = formData.metodologia;
 
       const hasTableOrImg = hasTablesOrImages(metodologiaComponent);
       sections.push({
@@ -771,55 +720,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
 
     // 8. O que é esperado do aluno (se não for curso restrito)
     if (formData.o_que_e_esperado && !isRestrictedCourse(formData.curso)) {
-      const esperadoComponent = (() => {
-        try {
-          const parsed = JSON.parse(formData.o_que_e_esperado);
-          if (parsed.layout === 'checklist' && parsed.categorias) {
-            const CATEGORIAS = {
-              participacao: { nome: 'Participação', cor: '#235795' },
-              trabalhos: { nome: 'Trabalhos', cor: '#28a745' },
-              estudos: { nome: 'Estudos', cor: '#17a2b8' },
-              comportamento: { nome: 'Comportamento', cor: '#ffc107' }
-            };
-            
-            let html = '<div style="font-size: 11px; line-height: 1.5;">';
-            html += '<table style="width: 100%; border-collapse: collapse; font-size: 10px;">';
-            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270; width: 25%;">Categoria</th><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270;">Expectativas</th></tr></thead>';
-            html += '<tbody>';
-            
-            Object.keys(CATEGORIAS).forEach(catKey => {
-              const catInfo = CATEGORIAS[catKey];
-              const categoria = parsed.categorias[catKey];
-              if (categoria) {
-                const itensSelecionados = categoria.itens.filter(item => item.selecionado);
-                if (itensSelecionados.length > 0 || categoria.outros) {
-                  let expectativas = '';
-                  itensSelecionados.forEach((item, idx) => {
-                    expectativas += `${idx + 1}. ${item.texto}`;
-                    if (idx < itensSelecionados.length - 1 || categoria.outros) {
-                      expectativas += ' | ';
-                    }
-                  });
-                  if (categoria.outros) {
-                    expectativas += `${itensSelecionados.length > 0 ? itensSelecionados.length + 1 + '. ' : ''}${categoria.outros}`;
-                  }
-                  
-                  html += `<tr>
-                    <td style="padding: 4px 6px; font-weight: 600; color: ${catInfo.cor}; background: ${catInfo.cor}15; border: 1px solid #e0e0e0; vertical-align: top;">${catInfo.nome}</td>
-                    <td style="padding: 4px 6px; border: 1px solid #e0e0e0; vertical-align: top;">${expectativas || '-'}</td>
-                  </tr>`;
-                }
-              }
-            });
-            
-            html += '</tbody></table></div>';
-            return html;
-          }
-        } catch (e) {
-          // Não é JSON, retornar como texto livre
-        }
-        return formData.o_que_e_esperado;
-      })();
+      const esperadoComponent = formData.o_que_e_esperado;
 
       const hasTableOrImg = hasTablesOrImages(esperadoComponent);
       sections.push({

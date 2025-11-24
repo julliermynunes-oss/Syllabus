@@ -478,66 +478,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.metodologia) {
-      const metodologiaComponent = (() => {
-        try {
-          const parsed = JSON.parse(formData.metodologia);
-          if (parsed.layout === 'estruturado' && parsed.data) {
-            const data = parsed.data;
-            let html = '<div style="font-size: 14px; line-height: 1.6;">';
-            
-            // Modalidade em card destacado
-            if (data.modalidade) {
-              html += `<div style="margin-bottom: 1.5rem; padding: 1rem; background: #e8f4f8; border-left: 4px solid #235795; border-radius: 4px;">
-                <strong style="color: #235795; display: block; margin-bottom: 0.25rem;">Modalidade de Ensino:</strong>
-                <span style="font-size: 1.1rem; font-weight: 600;">${data.modalidade}</span>
-              </div>`;
-            }
-            
-            // Recursos em badges
-            if (data.recursos && data.recursos.length > 0) {
-              html += '<div style="margin-bottom: 1.5rem;"><strong style="display: block; margin-bottom: 0.75rem; color: #235795;">Recursos Utilizados:</strong>';
-              html += '<div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">';
-              data.recursos.forEach(recurso => {
-                html += `<span style="display: inline-block; padding: 0.5rem 1rem; background: #235795; color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 500;">${recurso}</span>`;
-              });
-              html += '</div></div>';
-            }
-            
-            // Atividades Práticas em tabela
-            if (data.atividades_praticas && data.atividades_praticas.length > 0) {
-              html += '<div style="margin-bottom: 1.5rem;"><strong style="display: block; margin-bottom: 0.75rem; color: #235795;">Atividades Práticas:</strong>';
-              html += '<table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">';
-              html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 12px 16px; text-align: left; font-weight: 600; width: 30%;">Atividade</th><th style="padding: 12px 16px; text-align: left; font-weight: 600;">Descrição</th></tr></thead>';
-              html += '<tbody>';
-              data.atividades_praticas.forEach((atividade, index) => {
-                if (atividade.nome) {
-                  html += `<tr style="border-bottom: 1px solid #f0f0f0;">
-                    <td style="padding: 12px 16px; font-weight: 600; color: #235795; background: #f8f9fa; border-right: 1px solid #e0e0e0;">${atividade.nome}</td>
-                    <td style="padding: 12px 16px;">${atividade.descricao || '-'}</td>
-                  </tr>`;
-                }
-              });
-              html += '</tbody></table></div>';
-            }
-            
-            // Avaliação Contínua em card
-            if (data.avaliacao_continua && data.avaliacao_continua.ativa) {
-              html += '<div style="padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">';
-              html += '<strong style="color: #856404; display: block; margin-bottom: 0.5rem;">✓ Avaliação Contínua: Ativa</strong>';
-              if (data.avaliacao_continua.descricao) {
-                html += `<div style="margin-top: 0.5rem;">${data.avaliacao_continua.descricao}</div>`;
-              }
-              html += '</div>';
-            }
-            
-            html += '</div>';
-            return html;
-          }
-        } catch (e) {
-          // Não é JSON, retornar como texto livre
-        }
-        return formData.metodologia;
-      })();
+      const metodologiaComponent = formData.metodologia;
 
       sections.push({
         id: 'metodologia',
@@ -636,55 +577,7 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
     }
 
     if (formData.o_que_e_esperado && !isRestrictedCourse(formData.curso)) {
-      const esperadoComponent = (() => {
-        try {
-          const parsed = JSON.parse(formData.o_que_e_esperado);
-          if (parsed.layout === 'checklist' && parsed.categorias) {
-            const CATEGORIAS = {
-              participacao: { nome: 'Participação', cor: '#235795' },
-              trabalhos: { nome: 'Trabalhos', cor: '#28a745' },
-              estudos: { nome: 'Estudos', cor: '#17a2b8' },
-              comportamento: { nome: 'Comportamento', cor: '#ffc107' }
-            };
-            
-            let html = '<div style="font-size: 14px; line-height: 1.6;">';
-            html += '<table style="width: 100%; border-collapse: collapse; background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">';
-            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 12px 16px; text-align: left; font-weight: 600; width: 25%;">Categoria</th><th style="padding: 12px 16px; text-align: left; font-weight: 600;">Expectativas</th></tr></thead>';
-            html += '<tbody>';
-            
-            Object.keys(CATEGORIAS).forEach(catKey => {
-              const catInfo = CATEGORIAS[catKey];
-              const categoria = parsed.categorias[catKey];
-              if (categoria) {
-                const itensSelecionados = categoria.itens.filter(item => item.selecionado);
-                if (itensSelecionados.length > 0 || categoria.outros) {
-                  let expectativas = '';
-                  itensSelecionados.forEach((item, idx) => {
-                    expectativas += `${idx + 1}. ${item.texto}`;
-                    if (idx < itensSelecionados.length - 1 || categoria.outros) {
-                      expectativas += '<br/>';
-                    }
-                  });
-                  if (categoria.outros) {
-                    expectativas += `${itensSelecionados.length > 0 ? itensSelecionados.length + 1 + '. ' : ''}${categoria.outros}`;
-                  }
-                  
-                  html += `<tr style="border-bottom: 1px solid #f0f0f0;">
-                    <td style="padding: 12px 16px; font-weight: 600; color: ${catInfo.cor}; background: ${catInfo.cor}15; border-right: 1px solid #e0e0e0; vertical-align: top;">${catInfo.nome}</td>
-                    <td style="padding: 12px 16px; vertical-align: top;">${expectativas || '-'}</td>
-                  </tr>`;
-                }
-              }
-            });
-            
-            html += '</tbody></table></div>';
-            return html;
-          }
-        } catch (e) {
-          // Não é JSON, retornar como texto livre
-        }
-        return formData.o_que_e_esperado;
-      })();
+      const esperadoComponent = formData.o_que_e_esperado;
 
       sections.push({
         id: 'o_que_e_esperado',
