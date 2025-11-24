@@ -526,18 +526,18 @@ function SyllabusPDFContent({ formData, professoresList }) {
             let html = '<div style="font-size: 11px; line-height: 1.5;">';
             html += '<p style="margin-bottom: 8px; font-weight: 600;">Objetivos de Desenvolvimento Sustentável abordados:</p>';
             
-            // Tabela compacta para PDF
-            html += '<table style="width: 100%; border-collapse: collapse; font-size: 10px;">';
-            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 4px 6px; text-align: center; border: 1px solid #1a4270; width: 10%;">ODS</th><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270;">Nome</th><th style="padding: 4px 6px; text-align: left; border: 1px solid #1a4270;">Descrição</th></tr></thead>';
+            // Tabela compacta para PDF (com número destacado)
+            html += '<table style="width: 100%; border-collapse: collapse; font-size: 9px;">';
+            html += '<thead><tr style="background: #235795; color: white;"><th style="padding: 3px 5px; text-align: center; border: 1px solid #1a4270; width: 8%;">ODS</th><th style="padding: 3px 5px; text-align: left; border: 1px solid #1a4270; width: 25%;">Nome</th><th style="padding: 3px 5px; text-align: left; border: 1px solid #1a4270;">Descrição</th></tr></thead>';
             html += '<tbody>';
             parsed.ods_selecionados.forEach(ods => {
               const cor = ODS_COLORS[ods.numero] || '#235795';
               html += `<tr>
-                <td style="padding: 4px 6px; text-align: center; border: 1px solid #e0e0e0;">
-                  <span style="display: inline-block; min-width: 28px; padding: 2px 6px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">${ods.numero}</span>
+                <td style="padding: 3px 5px; text-align: center; border: 1px solid #e0e0e0; vertical-align: middle;">
+                  <span style="display: inline-block; width: 24px; height: 24px; line-height: 24px; background: ${cor}; color: white; border-radius: 3px; font-weight: 700; font-size: 0.75rem;">${ods.numero}</span>
                 </td>
-                <td style="padding: 4px 6px; font-weight: 600; border: 1px solid #e0e0e0;">${ods.nome}</td>
-                <td style="padding: 4px 6px; border: 1px solid #e0e0e0;">${ods.descricao || '-'}</td>
+                <td style="padding: 3px 5px; font-weight: 600; border: 1px solid #e0e0e0; font-size: 0.85rem;">${ods.nome}</td>
+                <td style="padding: 3px 5px; border: 1px solid #e0e0e0; font-size: 0.8rem;">${ods.descricao || '-'}</td>
               </tr>`;
             });
             html += '</tbody></table></div>';

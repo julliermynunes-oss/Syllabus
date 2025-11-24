@@ -383,20 +383,26 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             let html = '<div style="font-size: 14px; line-height: 1.6;">';
             html += '<p style="margin-bottom: 1rem;"><strong>Objetivos de Desenvolvimento Sustentável abordados nesta disciplina:</strong></p>';
             
-            // Grid de cards ODS (mais compacto, estilo header + corpo)
-            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">';
+            // Grid de cards ODS (compacto com ícones)
+            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem;">';
             parsed.ods_selecionados.forEach(ods => {
               const cor = ODS_COLORS[ods.numero] || '#235795';
-              html += `<div style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.05); background: #fff; display: flex; flex-direction: column; min-height: 150px;">
-                <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.9rem; background: ${cor}; color: white;">
-                  <div style="width: 42px; height: 42px; border-radius: 6px; background: rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px;">${ods.numero}</div>
-                  <div style="flex: 1;">
-                    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.85;">ODS</div>
-                    <div style="font-weight: 600; font-size: 0.95rem; line-height: 1.2;">${ods.nome}</div>
+              // URL do ícone oficial dos ODS (múltiplas opções como fallback)
+              const iconUrl1 = `https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
+              const iconUrl2 = `https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`;
+              html += `<div style="border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); background: #fff; display: flex; flex-direction: column; min-height: 110px;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.65rem; background: ${cor}; color: white;">
+                  <div style="position: relative; width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                    <img src="${iconUrl1}" alt="ODS ${ods.numero}" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.onerror=null; this.src='${iconUrl2}'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='flex';};" />
+                    <div style="display: none; width: 100%; height: 100%; border-radius: 4px; background: rgba(255,255,255,0.2); align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px;">${ods.numero}</div>
+                  </div>
+                  <div style="flex: 1; min-width: 0;">
+                    <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9; line-height: 1;">ODS</div>
+                    <div style="font-weight: 600; font-size: 0.8rem; line-height: 1.1; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${ods.nome}</div>
                   </div>
                 </div>
-                <div style="flex: 1; padding: 0.85rem 0.9rem; background: ${cor}12; font-size: 0.92rem; color: #2f2f2f;">
-                  ${ods.descricao || '<span style="color:#777;">Sem descrição informada</span>'}
+                <div style="flex: 1; padding: 0.6rem 0.65rem; background: ${cor}08; font-size: 0.8rem; color: #2f2f2f; line-height: 1.4;">
+                  ${ods.descricao || '<span style="color:#999; font-size: 0.75rem;">Sem descrição</span>'}
                 </div>
               </div>`;
             });
