@@ -163,16 +163,13 @@ const ODSManager = ({ content, onChange }) => {
     return odsSelecionados.some(o => o.numero === numero);
   };
 
-  // Função para obter URL da imagem do ODS
+  // Função para obter URL da imagem do ODS (usando imagens locais)
   const getODSImageUrl = (numero) => {
-    // Tentar múltiplas URLs possíveis para as imagens oficiais da ONU Brasil
-    const urls = [
-      `https://brasil.un.org/sites/default/files/2021-04/ODS-${numero}.png`,
-      `https://brasil.un.org/sites/default/files/2021-04/E_SDG_Icons-${String(numero).padStart(2, '0')}.jpg`,
-      `https://www.un.org/sustainabledevelopment/wp-content/uploads/2019/07/E_SDG_Icons-${String(numero).padStart(2, '0')}.jpg`,
-      `https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${numero}.svg`
-    ];
-    return urls[0]; // Retornar primeira URL, o onError tentará as outras
+    // Usar imagens locais da pasta ODS Icons
+    const numeroFormatado = String(numero).padStart(2, '0');
+    // ODS 1 tem nome diferente (01_1.png), os outros são XX_0.png
+    const nomeArquivo = numero === 1 ? '01_1.png' : `${numeroFormatado}_0.png`;
+    return `/ODS Icons/${nomeArquivo}`;
   };
 
   return (
@@ -243,25 +240,19 @@ const ODSManager = ({ content, onChange }) => {
                   <div className="ods-card-content">
                     <div 
                       className="ods-card-icon"
-                      style={{ background: ods.cor }}
+                      style={{ background: 'transparent' }}
                     >
                       <img 
                         src={getODSImageUrl(ods.numero)}
                         alt={`ODS ${ods.numero}`}
                         onError={(e) => {
-                          // Tentar URLs alternativas
-                          const currentSrc = e.target.src;
-                          if (currentSrc.includes('ODS-')) {
-                            e.target.src = `https://www.un.org/sustainabledevelopment/wp-content/uploads/2019/07/E_SDG_Icons-${String(ods.numero).padStart(2, '0')}.jpg`;
-                          } else if (currentSrc.includes('E_SDG_Icons')) {
-                            e.target.src = `https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`;
-                          } else {
-                            // Se todas falharem, mostrar número
-                            e.target.style.display = 'none';
-                            const numberSpan = e.target.parentElement.querySelector('.ods-icon-number');
-                            if (numberSpan) {
-                              numberSpan.style.display = 'flex';
-                            }
+                          // Se a imagem local falhar, mostrar número com cor de fundo
+                          e.target.style.display = 'none';
+                          const iconDiv = e.target.parentElement;
+                          iconDiv.style.background = ods.cor;
+                          const numberSpan = iconDiv.querySelector('.ods-icon-number');
+                          if (numberSpan) {
+                            numberSpan.style.display = 'flex';
                           }
                         }}
                       />

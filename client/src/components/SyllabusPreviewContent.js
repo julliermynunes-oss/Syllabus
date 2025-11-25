@@ -387,14 +387,15 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
             html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.6rem; margin-bottom: 1.25rem;">';
             parsed.ods_selecionados.forEach(ods => {
               const cor = ODS_COLORS[ods.numero] || '#235795';
-              // URL do ícone oficial dos ODS (múltiplas opções como fallback)
-              const iconUrl1 = `https://www.globalgoals.org/cdn-cgi/image/width=200,quality=75,format=auto/https://www.globalgoals.org/resources/icons/goal-${ods.numero}.svg`;
-              const iconUrl2 = `https://sdgs.un.org/themes/custom/porto/assets/images/goals/goal-${ods.numero}.svg`;
+              // Usar imagens locais dos ODS
+              const numeroFormatado = String(ods.numero).padStart(2, '0');
+              const nomeArquivo = ods.numero === 1 ? '01_1.png' : `${numeroFormatado}_0.png`;
+              const iconUrl = `/ODS Icons/${nomeArquivo}`;
               html += `<div style="border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.08); background: #fff; display: flex; flex-direction: column; min-height: 110px;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.65rem; background: ${cor}; color: white;">
-                  <div style="position: relative; width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                    <img src="${iconUrl1}" alt="ODS ${ods.numero}" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(0) invert(1);" onerror="this.onerror=null; this.src='${iconUrl2}'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='flex';};" />
-                    <div style="display: none; width: 100%; height: 100%; border-radius: 4px; background: rgba(255,255,255,0.2); align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px;">${ods.numero}</div>
+                  <div style="position: relative; width: 36px; height: 36px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px;">
+                    <img src="${iconUrl}" alt="ODS ${ods.numero}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div style="display: none; width: 100%; height: 100%; border-radius: 4px; background: rgba(255,255,255,0.2); align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px; color: white;">${ods.numero}</div>
                   </div>
                   <div style="flex: 1; min-width: 0;">
                     <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9; line-height: 1;">ODS</div>
