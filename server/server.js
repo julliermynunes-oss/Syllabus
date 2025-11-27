@@ -1366,7 +1366,7 @@ app.post(
 );
 
 // ===== AoLSyllabus (gerenciamento de usuários) =====
-const AOLSYLLABUS_PASSWORD = process.env.AOLSYLLABUS_PASSWORD || 'AolSyllabus';
+const AOLSYLLABUS_PASSWORD = process.env.AOLSYLLABUS_PASSWORD || 'FGVAOL';
 
 app.post(
   '/api/aolsyllabus/authenticate',
