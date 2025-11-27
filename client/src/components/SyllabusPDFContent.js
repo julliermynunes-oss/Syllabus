@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
@@ -86,6 +86,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
   const { t } = useTranslation();
   const [linkInfo, setLinkInfo] = useState(null);
   const { layoutModel } = useCourseLayoutModel(formData.curso);
+  const logoSrc = useMemo(() => `${process.env.PUBLIC_URL || ''}/FGV%20LOGO%20NOVO.png`, []);
   
   // Carregar linkInfo quando o curso mudar
   useEffect(() => {
@@ -862,16 +863,77 @@ function SyllabusPDFContent({ formData, professoresList }) {
       const contatosComponent = (() => {
         try {
           const parsed = JSON.parse(formData.contatos);
+
+          if (parsed.layout === 'professores' && Array.isArray(parsed.contatos)) {
+            const contatos = parsed.contatos;
+            if (contatos.length === 0) {
+              return '<p style="font-size: 10px;">Nenhum contato cadastrado.</p>';
+            }
+
+            let html = '<div style="font-size: 11px; line-height: 1.5;">';
+            contatos.forEach((contato, index) => {
+              const displayName = contato.nome?.trim() || contato.linkedProfessorName || contato.professorName || `Contato ${index + 1}`;
+              const links = Array.isArray(contato.links) ? contato.links : [];
+              html += '<div style="border: 1px solid #dcdcdc; border-radius: 6px; padding: 6px 8px; margin-bottom: 8px;">';
+              html += `<p style="margin: 0 0 4px 0; font-weight: 700; color: #235795;">${displayName}</p>`;
+
+              let tableRows = '';
+              if (contato.email) {
+                tableRows += `<tr>
+                  <td style="padding: 3px 5px; width: 110px; background: #f8f9fa; border: 1px solid #e0e0e0; font-weight: 600;">Email</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e0e0e0;">${contato.email}</td>
+                </tr>`;
+              }
+              if (contato.telefone) {
+                tableRows += `<tr>
+                  <td style="padding: 3px 5px; background: #f8f9fa; border: 1px solid #e0e0e0; font-weight: 600;">Telefone</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e0e0e0;">${contato.telefone}</td>
+                </tr>`;
+              }
+              if (contato.horario_atendimento) {
+                tableRows += `<tr>
+                  <td style="padding: 3px 5px; background: #f8f9fa; border: 1px solid #e0e0e0; font-weight: 600;">Horário</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e0e0e0;">${contato.horario_atendimento}</td>
+                </tr>`;
+              }
+              if (contato.sala) {
+                tableRows += `<tr>
+                  <td style="padding: 3px 5px; background: #f8f9fa; border: 1px solid #e0e0e0; font-weight: 600;">Sala</td>
+                  <td style="padding: 3px 5px; border: 1px solid #e0e0e0;">${contato.sala}</td>
+                </tr>`;
+              }
+
+              if (tableRows) {
+                html += `<table style="width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 10px;">${tableRows}</table>`;
+              }
+
+              if (links.length > 0) {
+                html += '<p style="margin: 2px 0; font-weight: 600;">Links:</p>';
+                links.forEach(link => {
+                  if (link.url) {
+                    html += `<p style="margin: 0 0 2px 0; font-size: 10px;">• ${link.label || link.url}</p>`;
+                  }
+                });
+              }
+
+              if (contato.notas) {
+                html += `<div style="margin-top: 4px; padding: 4px; background: #f8f9fa; border-left: 3px solid #235795; font-size: 10px;">${contato.notas}</div>`;
+              }
+
+              html += '</div>';
+            });
+
+            html += '</div>';
+            return html;
+          }
+
           if (parsed.layout === 'estruturado' && parsed.data) {
             const data = parsed.data;
             let html = '<div style="font-size: 11px; line-height: 1.5;">';
-            
-            // Tabela para PDF (mais compacta)
             const hasMainInfo = data.email || data.telefone || data.horario_atendimento || data.sala;
             if (hasMainInfo) {
               html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 10px;">';
               html += '<tbody>';
-              
               if (data.email) {
                 html += `<tr>
                   <td style="padding: 4px 8px; font-weight: 600; color: #235795; width: 120px; background: #f8f9fa; border: 1px solid #e0e0e0;">Email:</td>
@@ -896,10 +958,9 @@ function SyllabusPDFContent({ formData, professoresList }) {
                   <td style="padding: 4px 8px; border: 1px solid #e0e0e0;">${data.sala}</td>
                 </tr>`;
               }
-              
               html += '</tbody></table>';
             }
-            
+
             if (data.links && data.links.length > 0) {
               html += '<p style="margin: 4px 0; font-weight: 600; color: #235795;">Links:</p>';
               data.links.forEach(link => {
@@ -908,11 +969,11 @@ function SyllabusPDFContent({ formData, professoresList }) {
                 }
               });
             }
-            
+
             if (data.outras_informacoes) {
               html += `<div style="margin-top: 8px; padding: 6px; background: #f8f9fa; border-left: 3px solid #235795; font-size: 10px;">${data.outras_informacoes}</div>`;
             }
-            
+
             html += '</div>';
             return html;
           }
@@ -961,7 +1022,7 @@ function SyllabusPDFContent({ formData, professoresList }) {
       {sections.length > 0 && (
         <div className="pdf-logo-first-page" style={{ marginTop: '0', marginBottom: '10px' }}>
           <img 
-            src="/FGV LOGO NOVO.png" 
+            src={logoSrc} 
             alt="FGV Logo" 
             style={{ 
               maxHeight: '75px', 

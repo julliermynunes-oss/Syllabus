@@ -713,16 +713,82 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
       const contatosComponent = (() => {
         try {
           const parsed = JSON.parse(formData.contatos);
+
+          if (parsed.layout === 'professores' && Array.isArray(parsed.contatos)) {
+            const contatos = parsed.contatos;
+            if (contatos.length === 0) {
+              return '<p style="font-size: 14px;">Nenhum contato cadastrado.</p>';
+            }
+
+            let html = '<div style="display: flex; flex-direction: column; gap: 1rem; font-size: 14px; line-height: 1.6;">';
+            contatos.forEach((contato, index) => {
+              const displayName = contato.nome?.trim() || contato.linkedProfessorName || contato.professorName || `Contato ${index + 1}`;
+              const links = Array.isArray(contato.links) ? contato.links : [];
+              html += '<div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 1rem; background: #fff;">';
+              html += `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h4 style="margin: 0; font-size: 1rem; color: #235795;">${displayName}</h4>
+                <span style="font-size: 0.85rem; color: #7a7f87;">Contato ${index + 1}</span>
+              </div>`;
+
+              let tableRows = '';
+              if (contato.email) {
+                tableRows += `<tr>
+                  <td style="padding: 8px 10px; width: 160px; background: #f8f9fa; border-right: 1px solid #e0e0e0; font-weight: 600; color: #235795;">Email</td>
+                  <td style="padding: 8px 10px;"><a href="mailto:${contato.email}" style="color: #235795; text-decoration: none;">${contato.email}</a></td>
+                </tr>`;
+              }
+              if (contato.telefone) {
+                tableRows += `<tr>
+                  <td style="padding: 8px 10px; background: #f8f9fa; border-right: 1px solid #e0e0e0; font-weight: 600; color: #235795;">Telefone</td>
+                  <td style="padding: 8px 10px;">${contato.telefone}</td>
+                </tr>`;
+              }
+              if (contato.horario_atendimento) {
+                tableRows += `<tr>
+                  <td style="padding: 8px 10px; background: #f8f9fa; border-right: 1px solid #e0e0e0; font-weight: 600; color: #235795;">Horário</td>
+                  <td style="padding: 8px 10px;">${contato.horario_atendimento}</td>
+                </tr>`;
+              }
+              if (contato.sala) {
+                tableRows += `<tr>
+                  <td style="padding: 8px 10px; background: #f8f9fa; border-right: 1px solid #e0e0e0; font-weight: 600; color: #235795;">Sala/Office</td>
+                  <td style="padding: 8px 10px;">${contato.sala}</td>
+                </tr>`;
+              }
+
+              if (tableRows) {
+                html += `<table style="width: 100%; border-collapse: collapse; margin-bottom: 0.75rem; border: 1px solid #e0e0e0;">${tableRows}</table>`;
+              }
+
+              if (links.length > 0) {
+                html += '<div style="margin-bottom: 0.75rem;"><strong style="display: block; margin-bottom: 0.35rem; color: #235795;">Links:</strong>';
+                html += '<div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">';
+                links.forEach(link => {
+                  if (link.url) {
+                    html += `<a href="${link.url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 0.4rem 0.8rem; background: #235795; color: white; text-decoration: none; border-radius: 4px; font-size: 0.85rem; font-weight: 500;">${link.label || link.url}</a>`;
+                  }
+                });
+                html += '</div></div>';
+              }
+
+              if (contato.notas) {
+                html += `<div style="padding: 0.85rem; background: #f8f9fa; border-left: 4px solid #235795; border-radius: 4px;">${contato.notas}</div>`;
+              }
+
+              html += '</div>';
+            });
+
+            html += '</div>';
+            return html;
+          }
+
           if (parsed.layout === 'estruturado' && parsed.data) {
             const data = parsed.data;
             let html = '<div style="font-size: 14px; line-height: 1.6;">';
-            
-            // Criar tabela para contatos principais
             const hasMainInfo = data.email || data.telefone || data.horario_atendimento || data.sala;
             if (hasMainInfo) {
               html += '<table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem; background: white; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden;">';
               html += '<tbody>';
-              
               if (data.email) {
                 html += `<tr style="border-bottom: 1px solid #f0f0f0;">
                   <td style="padding: 12px 16px; font-weight: 600; color: #235795; width: 180px; background: #f8f9fa; border-right: 1px solid #e0e0e0;">Email:</td>
@@ -747,11 +813,9 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
                   <td style="padding: 12px 16px;">${data.sala}</td>
                 </tr>`;
               }
-              
               html += '</tbody></table>';
             }
-            
-            // Links em cards/badges
+
             if (data.links && data.links.length > 0) {
               html += '<div style="margin-bottom: 1rem;"><strong style="display: block; margin-bottom: 0.5rem; color: #235795;">Links:</strong>';
               html += '<div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">';
@@ -762,11 +826,11 @@ const SyllabusPreviewContent = ({ formData, professoresList }) => {
               });
               html += '</div></div>';
             }
-            
+
             if (data.outras_informacoes) {
               html += `<div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-left: 4px solid #235795; border-radius: 4px;">${data.outras_informacoes}</div>`;
             }
-            
+
             html += '</div>';
             return html;
           }

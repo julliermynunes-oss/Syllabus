@@ -206,11 +206,18 @@ const LayoutModelsTab = () => {
 
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/competencias/cursos`);
-        setCourses(response.data || []);
+        const config = token ? { headers: authHeaders } : {};
+        const response = await axios.get(`${API_URL}/api/competencias/cursos`, config);
+        console.log('Cursos recebidos:', response.data);
+        const cursos = Array.isArray(response.data) ? response.data : [];
+        if (cursos.length === 0) {
+          console.warn('Nenhum curso retornado pelo endpoint');
+        }
+        setCourses(cursos);
       } catch (error) {
         console.error('Erro ao carregar cursos', error);
-        // Não mostrar alert, apenas logar o erro
+        console.error('Detalhes do erro:', error.response?.data || error.message);
+        setCourses([]);
       }
     };
 
@@ -718,14 +725,22 @@ const GeneralSettingsTab = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/competencias/cursos`);
-        setCourses(response.data || []);
+        const config = token ? { headers: authHeaders } : {};
+        const response = await axios.get(`${API_URL}/api/competencias/cursos`, config);
+        console.log('Cursos recebidos (GeneralSettings):', response.data);
+        const cursos = Array.isArray(response.data) ? response.data : [];
+        if (cursos.length === 0) {
+          console.warn('Nenhum curso retornado pelo endpoint (GeneralSettings)');
+        }
+        setCourses(cursos);
       } catch (error) {
-        console.error('Erro ao carregar cursos', error);
+        console.error('Erro ao carregar cursos (GeneralSettings)', error);
+        console.error('Detalhes do erro:', error.response?.data || error.message);
+        setCourses([]);
       }
     };
     fetchCourses();
-  }, []);
+  }, [authHeaders, token]);
 
   useEffect(() => {
     if (selectedCourse) {

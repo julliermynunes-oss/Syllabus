@@ -1,415 +1,360 @@
-import React, { useState, useEffect } from 'react';
-import { FaPlus, FaTrash, FaLink, FaEnvelope, FaPhone, FaClock, FaDoorOpen } from 'react-icons/fa';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { FaUser, FaFileAlt, FaPlus, FaTrash, FaCaretDown, FaCaretUp, FaLink } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import './ContactsManager.css';
 
-const ContactsManager = ({ content, onChange }) => {
-  const [layout, setLayout] = useState('texto'); // 'estruturado' ou 'texto'
-  const [structuredData, setStructuredData] = useState({
-    email: '',
-    telefone: '',
-    horario_atendimento: '',
-    sala: '',
-    links: [],
-    outras_informacoes: ''
-  });
-  const [textContent, setTextContent] = useState('');
+const createContact = (overrides = {}) => ({
+  id: overrides.id || `${Date.now()}-${Math.random()}`,
+  nome: overrides.nome || '',
+  email: overrides.email || '',
+  telefone: overrides.telefone || '',
+  horario_atendimento: overrides.horario_atendimento || '',
+  sala: overrides.sala || '',
+  links: Array.isArray(overrides.links)
+    ? overrides.links.map((link) => ({ label: link.label || '', url: link.url || '' }))
+    : [],
+  notas: overrides.notas || '',
+  linkedToProfessor: overrides.linkedToProfessor || false,
+  linkedProfessorName: overrides.linkedProfessorName || ''
+});
 
-  // Inicializar dados quando receber content
+const ContactsManager = ({ content, onChange, professoresList = [] }) => {
+  const normalizedProfessores = useMemo(
+    () => (professoresList || []).map((prof) => (prof || '').trim()).filter(Boolean),
+    [professoresList]
+  );
+
+  const [layout, setLayout] = useState('professores');
+  const [structuredData, setStructuredData] = useState({ contatos: [createContact()] });
+  const [textContent, setTextContent] = useState('');
+  const [expandedRow, setExpandedRow] = useState(null);
+
+  const saveStructuredData = useCallback(
+    (contatos) => {
+      const sanitized = contatos.length > 0 ? contatos : [createContact()];
+      setStructuredData({ contatos: sanitized });
+      onChange(
+        JSON.stringify({
+          layout: 'professores',
+          contatos: sanitized
+        })
+      );
+    },
+    [onChange]
+  );
+
   useEffect(() => {
     if (!content || content.trim() === '') {
-      setLayout('texto');
+      setLayout('professores');
+      setStructuredData({ contatos: [createContact()] });
       setTextContent('');
-      setStructuredData({
-        email: '',
-        telefone: '',
-        horario_atendimento: '',
-        sala: '',
-        links: [],
-        outras_informacoes: ''
-      });
       return;
     }
 
-    // Tentar parsear como JSON (layout estruturado)
     try {
       const parsed = JSON.parse(content);
-      if (parsed.layout === 'estruturado' && parsed.data) {
-        setLayout('estruturado');
+      if (parsed.layout === 'professores' && Array.isArray(parsed.contatos)) {
         setStructuredData({
-          email: parsed.data.email || '',
-          telefone: parsed.data.telefone || '',
-          horario_atendimento: parsed.data.horario_atendimento || '',
-          sala: parsed.data.sala || '',
-          links: parsed.data.links || [],
-          outras_informacoes: parsed.data.outras_informacoes || ''
+          contatos: parsed.contatos.map((contato) =>
+            createContact({
+              ...contato,
+              linkedProfessorName: contato.linkedProfessorName || contato.professorName || contato.nome
+            })
+          )
         });
+        setLayout('professores');
         return;
       }
-    } catch (e) {
-      // Não é JSON, então é texto livre
+      if (parsed.layout === 'estruturado' && parsed.data) {
+        setStructuredData({ contatos: [createContact(parsed.data)] });
+        setLayout('professores');
+        return;
+      }
+    } catch (err) {
+      // conteúdo antigo em texto livre
     }
 
-    // Se chegou aqui, é texto livre
     setLayout('texto');
     setTextContent(content);
   }, [content]);
 
-  // Salvar dados estruturados
-  const saveStructuredData = (newData) => {
-    setStructuredData(newData);
-    const jsonData = JSON.stringify({
-      layout: 'estruturado',
-      data: newData
+  useEffect(() => {
+    if (layout !== 'professores') return;
+    const current = structuredData?.contatos || [];
+    const professorsSet = new Set(normalizedProfessores);
+    let changed = false;
+
+    const synced = current.map((contato) => {
+      const updated = { ...contato };
+      if (updated.linkedToProfessor && updated.linkedProfessorName && !professorsSet.has(updated.linkedProfessorName)) {
+        updated.linkedToProfessor = false;
+        updated.linkedProfessorName = '';
+        changed = true;
+      }
+      if (!updated.linkedToProfessor && professorsSet.has((updated.nome || '').trim())) {
+        updated.linkedToProfessor = true;
+        updated.linkedProfessorName = (updated.nome || '').trim();
+        changed = true;
+      }
+      return createContact(updated);
     });
-    onChange(jsonData);
-  };
 
-  // Salvar texto livre
-  const saveTextContent = (newContent) => {
-    setTextContent(newContent);
-    onChange(newContent);
-  };
-
-  // Converter texto livre para estruturado
-  const convertTextToStructured = () => {
-    if (!textContent || textContent.trim() === '') {
-      setLayout('estruturado');
-      return;
-    }
-
-    // Tentar extrair informações do HTML/texto
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = textContent;
-    const text = tempDiv.textContent || tempDiv.innerText || '';
-
-    // Tentar extrair email
-    const emailMatch = text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/);
-    const email = emailMatch ? emailMatch[0] : '';
-
-    // Tentar extrair telefone
-    const phoneMatch = text.match(/(\(?\d{2}\)?\s?)?(\d{4,5}[-.\s]?\d{4})/);
-    const telefone = phoneMatch ? phoneMatch[0] : '';
-
-    // Extrair links
-    const links = [];
-    tempDiv.querySelectorAll('a').forEach(link => {
-      const href = link.getAttribute('href');
-      const text = link.textContent;
-      if (href) {
-        links.push({
-          tipo: 'Outro',
-          url: href,
-          label: text || href
-        });
+    professorsSet.forEach((profName) => {
+      const exists = synced.some((c) => c.linkedToProfessor && c.linkedProfessorName === profName);
+      if (!exists) {
+        synced.push(
+          createContact({
+            nome: profName,
+            linkedToProfessor: true,
+            linkedProfessorName: profName
+          })
+        );
+        changed = true;
       }
     });
 
-    const newData = {
-      email,
-      telefone,
-      horario_atendimento: '',
-      sala: '',
-      links,
-      outras_informacoes: textContent
-    };
+    if (changed) {
+      saveStructuredData(synced);
+    }
+  }, [layout, normalizedProfessores, structuredData, saveStructuredData]);
 
-    setStructuredData(newData);
-    setLayout('estruturado');
-    saveStructuredData(newData);
+  const handleFieldChange = (id, field, value) => {
+    const contatos = structuredData.contatos.map((contato) =>
+      contato.id === id ? { ...contato, [field]: value } : contato
+    );
+    saveStructuredData(contatos);
   };
 
-  // Converter estruturado para texto livre
-  const convertStructuredToText = () => {
-    let html = '';
-    
-    if (structuredData.email) {
-      html += `<p><strong>Email:</strong> <a href="mailto:${structuredData.email}">${structuredData.email}</a></p>`;
-    }
-    if (structuredData.telefone) {
-      html += `<p><strong>Telefone:</strong> ${structuredData.telefone}</p>`;
-    }
-    if (structuredData.horario_atendimento) {
-      html += `<p><strong>Horário de Atendimento:</strong> ${structuredData.horario_atendimento}</p>`;
-    }
-    if (structuredData.sala) {
-      html += `<p><strong>Sala:</strong> ${structuredData.sala}</p>`;
-    }
-    if (structuredData.links && structuredData.links.length > 0) {
-      html += '<p><strong>Links:</strong></p><ul>';
-      structuredData.links.forEach(link => {
-        html += `<li><a href="${link.url}">${link.label || link.url}</a></li>`;
-      });
-      html += '</ul>';
-    }
-    if (structuredData.outras_informacoes) {
-      html += `<p>${structuredData.outras_informacoes}</p>`;
-    }
-
-    setTextContent(html);
-    setLayout('texto');
-    saveTextContent(html);
+  const handleLinkChange = (id, index, field, value) => {
+    const contatos = structuredData.contatos.map((contato) => {
+      if (contato.id !== id) return contato;
+      const links = contato.links.map((link, i) => (i === index ? { ...link, [field]: value } : link));
+      return { ...contato, links };
+    });
+    saveStructuredData(contatos);
   };
 
-  const handleLayoutChange = (newLayout) => {
-    if (newLayout === 'estruturado' && layout === 'texto') {
-      convertTextToStructured();
-    } else if (newLayout === 'texto' && layout === 'estruturado') {
-      convertStructuredToText();
-    } else {
-      setLayout(newLayout);
-    }
+  const addLink = (id) => {
+    const contatos = structuredData.contatos.map((contato) =>
+      contato.id === id
+        ? { ...contato, links: [...contato.links, { label: '', url: '' }] }
+        : contato
+    );
+    saveStructuredData(contatos);
   };
 
-  const addLink = () => {
-    const newLinks = [...structuredData.links, { tipo: 'Outro', url: '', label: '' }];
-    saveStructuredData({ ...structuredData, links: newLinks });
+  const removeLink = (id, index) => {
+    const contatos = structuredData.contatos.map((contato) =>
+      contato.id === id
+        ? { ...contato, links: contato.links.filter((_, i) => i !== index) }
+        : contato
+    );
+    saveStructuredData(contatos);
   };
 
-  const removeLink = (index) => {
-    const newLinks = structuredData.links.filter((_, i) => i !== index);
-    saveStructuredData({ ...structuredData, links: newLinks });
+  const addExtraContact = () => {
+    saveStructuredData([...structuredData.contatos, createContact({ linkedToProfessor: false })]);
   };
 
-  const updateLink = (index, field, value) => {
-    const newLinks = [...structuredData.links];
-    newLinks[index] = { ...newLinks[index], [field]: value };
-    saveStructuredData({ ...structuredData, links: newLinks });
+  const removeContact = (id) => {
+    const target = structuredData.contatos.find((c) => c.id === id);
+    if (target?.linkedToProfessor) return;
+    const remaining = structuredData.contatos.filter((contato) => contato.id !== id);
+    saveStructuredData(remaining.length ? remaining : [createContact()]);
   };
 
-  const updateField = (field, value) => {
-    saveStructuredData({ ...structuredData, [field]: value });
+  const toggleRow = (id) => {
+    setExpandedRow((prev) => (prev === id ? null : id));
   };
+
+  const renderContactsTable = () => (
+    <div className="contacts-table-wrapper">
+      <div className="contacts-table-actions">
+        <p>
+          Professores do cabeçalho aparecem automaticamente. Utilize “Contato extra” para incluir outras pessoas.
+        </p>
+        <button type="button" onClick={addExtraContact}>
+          <FaPlus /> Contato extra
+        </button>
+      </div>
+      <table className="contacts-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Horário</th>
+            <th>Sala/Office</th>
+            <th>Detalhes</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {structuredData.contatos.map((contato, index) => {
+            const displayName = contato.nome || contato.linkedProfessorName || `Contato ${index + 1}`;
+            const isExpanded = expandedRow === contato.id;
+            return (
+              <React.Fragment key={contato.id}>
+                <tr className={contato.linkedToProfessor ? 'linked-row' : ''}>
+                  <td>
+                    <div className="name-cell">
+                      <input
+                        type="text"
+                        value={displayName}
+                        disabled={contato.linkedToProfessor}
+                        onChange={(e) => handleFieldChange(contato.id, 'nome', e.target.value)}
+                        placeholder="Nome do contato"
+                      />
+                      {contato.linkedToProfessor && (
+                        <span className="linked-badge">Professor</span>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      type="email"
+                      value={contato.email}
+                      onChange={(e) => handleFieldChange(contato.id, 'email', e.target.value)}
+                      placeholder="email@exemplo.com"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={contato.telefone}
+                      onChange={(e) => handleFieldChange(contato.id, 'telefone', e.target.value)}
+                      placeholder="(11) 99999-9999"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={contato.horario_atendimento}
+                      onChange={(e) => handleFieldChange(contato.id, 'horario_atendimento', e.target.value)}
+                      placeholder="Ex: seg 14h-16h"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      value={contato.sala}
+                      onChange={(e) => handleFieldChange(contato.id, 'sala', e.target.value)}
+                      placeholder="Sala 101"
+                    />
+                  </td>
+                  <td className="details-cell">
+                    <button type="button" onClick={() => toggleRow(contato.id)}>
+                      {isExpanded ? <FaCaretUp /> : <FaCaretDown />} Detalhes
+                    </button>
+                  </td>
+                  <td className="actions-cell">
+                    {!contato.linkedToProfessor && (
+                      <button type="button" onClick={() => removeContact(contato.id)}>
+                        <FaTrash />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+                {isExpanded && (
+                  <tr className="details-row">
+                    <td colSpan={7}>
+                      <div className="details-grid">
+                        <div>
+                          <div className="links-header">
+                            <strong>
+                              <FaLink /> Links
+                            </strong>
+                            <button type="button" onClick={() => addLink(contato.id)}>
+                              + Link
+                            </button>
+                          </div>
+                          {contato.links.length === 0 && (
+                            <p className="links-empty">Nenhum link cadastrado.</p>
+                          )}
+                          {contato.links.map((link, idx) => (
+                            <div key={idx} className="link-row">
+                              <input
+                                type="text"
+                                placeholder="Rótulo"
+                                value={link.label}
+                                onChange={(e) => handleLinkChange(contato.id, idx, 'label', e.target.value)}
+                              />
+                              <input
+                                type="url"
+                                placeholder="https://..."
+                                value={link.url}
+                                onChange={(e) => handleLinkChange(contato.id, idx, 'url', e.target.value)}
+                              />
+                              <button type="button" onClick={() => removeLink(contato.id, idx)}>
+                                <FaTrash />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div>
+                          <label>Notas / Observações</label>
+                          <TiptapEditor
+                            content={contato.notas}
+                            onChange={(value) => handleFieldChange(contato.id, 'notas', value)}
+                            showCharCount={true}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const renderTextEditor = () => (
+    <div className="contacts-text">
+      <TiptapEditor content={textContent} onChange={setTextContent} showCharCount={true} />
+      <p className="editor-note">
+        💡 Use o editor livre apenas se não quiser os campos estruturados. O conteúdo salvo aqui não sincroniza
+        com os dados dos professores.
+      </p>
+    </div>
+  );
 
   return (
     <div className="contacts-manager">
-      <div style={{ marginBottom: '1.5rem' }}>
-        <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: 'bold', color: '#235795' }}>
-          Layout de Contatos:
-        </label>
+      <div className="contacts-layout-selector">
+        <label>Layout de Contatos:</label>
         <div className="layout-selector-buttons">
           <button
             type="button"
-            className={`layout-option-btn ${layout === 'estruturado' ? 'active' : ''}`}
-            onClick={() => handleLayoutChange('estruturado')}
+            className={`layout-option-btn ${layout === 'professores' ? 'active' : ''}`}
+            onClick={() => setLayout('professores')}
           >
             <div className="layout-icon">
-              <FaEnvelope size={24} />
+              <FaUser size={22} />
             </div>
             <div className="layout-label">
-              <strong>Campos Estruturados</strong>
+              <strong>Professores (Tabela)</strong>
             </div>
           </button>
           <button
             type="button"
             className={`layout-option-btn ${layout === 'texto' ? 'active' : ''}`}
-            onClick={() => handleLayoutChange('texto')}
+            onClick={() => setLayout('texto')}
           >
             <div className="layout-icon">
-              <FaLink size={24} />
+              <FaFileAlt size={22} />
             </div>
             <div className="layout-label">
-              <strong>Texto Livre</strong>
+              <strong>Texto livre</strong>
             </div>
           </button>
         </div>
       </div>
-
-      {layout === 'estruturado' ? (
-        <div className="contacts-structured">
-          <div className="form-row">
-            <div className="form-field">
-              <label>
-                <FaEnvelope style={{ marginRight: '0.5rem' }} />
-                Email:
-              </label>
-              <input
-                type="email"
-                value={structuredData.email}
-                onChange={(e) => updateField('email', e.target.value)}
-                placeholder="professor@email.com"
-                style={{ marginTop: '0.25rem' }}
-              />
-            </div>
-            <div className="form-field">
-              <label>
-                <FaPhone style={{ marginRight: '0.5rem' }} />
-                Telefone:
-              </label>
-              <input
-                type="text"
-                value={structuredData.telefone}
-                onChange={(e) => updateField('telefone', e.target.value)}
-                placeholder="(11) 99999-9999"
-                style={{ marginTop: '0.25rem' }}
-              />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-field">
-              <label>
-                <FaClock style={{ marginRight: '0.5rem' }} />
-                Horário de Atendimento:
-              </label>
-              <input
-                type="text"
-                value={structuredData.horario_atendimento}
-                onChange={(e) => updateField('horario_atendimento', e.target.value)}
-                placeholder="Ex: Segundas, 14h-16h"
-                style={{ marginTop: '0.25rem' }}
-              />
-            </div>
-            <div className="form-field">
-              <label>
-                <FaDoorOpen style={{ marginRight: '0.5rem' }} />
-                Sala/Office:
-              </label>
-              <input
-                type="text"
-                value={structuredData.sala}
-                onChange={(e) => updateField('sala', e.target.value)}
-                placeholder="Ex: Sala 101"
-                style={{ marginTop: '0.25rem' }}
-              />
-            </div>
-          </div>
-
-          <div className="form-row full-width">
-            <div className="form-field">
-              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span>
-                  <FaLink style={{ marginRight: '0.5rem' }} />
-                  Links:
-                </span>
-                <button
-                  type="button"
-                  onClick={addLink}
-                  className="add-link-btn"
-                  style={{
-                    padding: '0.5rem 1rem',
-                    background: '#235795',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '0.85rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                >
-                  <FaPlus /> Adicionar Link
-                </button>
-              </label>
-              {structuredData.links.length === 0 ? (
-                <p style={{ color: '#666', fontStyle: 'italic', marginTop: '0.5rem' }}>
-                  Nenhum link adicionado. Clique em "Adicionar Link" para começar.
-                </p>
-              ) : (
-                <div className="links-list" style={{ marginTop: '0.5rem' }}>
-                  {structuredData.links.map((link, index) => (
-                    <div key={index} className="link-item" style={{
-                      display: 'flex',
-                      gap: '0.5rem',
-                      marginBottom: '0.75rem',
-                      padding: '0.75rem',
-                      background: '#f8f9fa',
-                      borderRadius: '8px',
-                      border: '1px solid #e0e0e0'
-                    }}>
-                      <select
-                        value={link.tipo}
-                        onChange={(e) => updateLink(index, 'tipo', e.target.value)}
-                        style={{
-                          padding: '0.5rem',
-                          borderRadius: '6px',
-                          border: '1px solid #d5dbea',
-                          fontSize: '0.9rem',
-                          width: '150px'
-                        }}
-                      >
-                        <option value="Website">Website</option>
-                        <option value="LinkedIn">LinkedIn</option>
-                        <option value="Lattes">Lattes</option>
-                        <option value="Outro">Outro</option>
-                      </select>
-                      <input
-                        type="text"
-                        value={link.label}
-                        onChange={(e) => updateLink(index, 'label', e.target.value)}
-                        placeholder="Label do link"
-                        style={{
-                          flex: 1,
-                          padding: '0.5rem',
-                          borderRadius: '6px',
-                          border: '1px solid #d5dbea',
-                          fontSize: '0.9rem'
-                        }}
-                      />
-                      <input
-                        type="url"
-                        value={link.url}
-                        onChange={(e) => updateLink(index, 'url', e.target.value)}
-                        placeholder="https://..."
-                        style={{
-                          flex: 2,
-                          padding: '0.5rem',
-                          borderRadius: '6px',
-                          border: '1px solid #d5dbea',
-                          fontSize: '0.9rem'
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeLink(index)}
-                        style={{
-                          padding: '0.5rem',
-                          background: '#dc3545',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="form-row full-width">
-            <div className="form-field">
-              <label>Outras Informações:</label>
-              <TiptapEditor
-                content={structuredData.outras_informacoes}
-                onChange={(content) => updateField('outras_informacoes', content)}
-                showCharCount={true}
-              />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="contacts-text">
-          <TiptapEditor
-            content={textContent}
-            onChange={saveTextContent}
-            showCharCount={true}
-          />
-          <p className="editor-note">
-            💡 Nota: Use a barra de ferramentas para formatar texto, criar listas e inserir tabelas.
-          </p>
-        </div>
-      )}
+      {layout === 'professores' ? renderContactsTable() : renderTextEditor()}
     </div>
   );
 };
 
 export default ContactsManager;
-

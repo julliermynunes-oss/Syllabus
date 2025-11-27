@@ -6,8 +6,9 @@ import { useTranslation } from '../hooks/useTranslation';
 import axios from 'axios';
 import { API_URL } from '../config';
 import useCourseLayoutModel from '../hooks/useCourseLayoutModel';
-import { FaPlus, FaSignOutAlt, FaEdit, FaTrash, FaCopy, FaEye, FaCog } from 'react-icons/fa';
+import { FaPlus, FaSignOutAlt, FaEdit, FaTrash, FaCopy, FaEye, FaCog, FaFilePdf } from 'react-icons/fa';
 import SyllabusPreviewContent from './SyllabusPreviewContent';
+import SyllabusPDFContent from './SyllabusPDFContent';
 import './SyllabusList.css';
 
 const SyllabusList = () => {
@@ -30,6 +31,9 @@ const SyllabusList = () => {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [previewSyllabus, setPreviewSyllabus] = useState(null);
   const [professoresList, setProfessoresList] = useState([]);
+  const [pdfSyllabus, setPdfSyllabus] = useState(null);
+  const [pdfProfessoresList, setPdfProfessoresList] = useState([]);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const { logout, token, user } = useAuth();
   const navigate = useNavigate();
 
@@ -213,16 +217,21 @@ const SyllabusList = () => {
   };
 
 
+  const parseProfessores = (professoresRaw) => {
+    if (!professoresRaw) return [];
+    return professoresRaw
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
+  };
+
   const handleView = async (id) => {
     try {
       const response = await axios.get(`${API_URL}/api/syllabi/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const syllabus = response.data;
-      
-      // Parse professores string into array
-      const professoresArray = syllabus.professores ? syllabus.professores.split(',').map(p => p.trim()) : [];
-      
+      const professoresArray = parseProfessores(syllabus.professores);
       setPreviewSyllabus(syllabus);
       setProfessoresList(professoresArray);
     } catch (err) {
@@ -230,6 +239,118 @@ const SyllabusList = () => {
       alert('Erro ao carregar preview');
     }
   };
+
+  const handleGeneratePDF = async (id) => {
+    try {
+      setIsGeneratingPdf(true);
+      const response = await axios.get(`${API_URL}/api/syllabi/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const syllabus = response.data;
+      const professoresArray = parseProfessores(syllabus.professores);
+      setPdfSyllabus(syllabus);
+      setPdfProfessoresList(professoresArray);
+    } catch (err) {
+      console.error('Erro ao preparar PDF:', err);
+      alert('Erro ao gerar PDF. Tente novamente.');
+      setIsGeneratingPdf(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!pdfSyllabus || !isGeneratingPdf) return;
+
+    const element = document.getElementById('pdf-content');
+    if (!element) return;
+
+    const originalStyles = {
+      display: element.style.display,
+      position: element.style.position,
+      top: element.style.top,
+      left: element.style.left,
+      width: element.style.width,
+      maxWidth: element.style.maxWidth,
+      background: element.style.background,
+    };
+
+    const noPrintElements = document.querySelectorAll('.no-print');
+    const originalNoPrintStyles = Array.from(noPrintElements).map((el) => el.style.display);
+
+    let contentCheckTimeout = null;
+    let printTimeout = null;
+
+    const waitForImages = () => {
+      const images = element.querySelectorAll('img');
+      if (images.length === 0) return Promise.resolve();
+      const promises = Array.from(images).map((img) => {
+        if (img.complete && img.naturalWidth !== 0) return Promise.resolve();
+        return new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      });
+      return Promise.all(promises);
+    };
+
+    const restoreStyles = () => {
+      element.style.display = originalStyles.display || 'none';
+      element.style.position = originalStyles.position || 'absolute';
+      element.style.top = originalStyles.top || '';
+      element.style.left = originalStyles.left || '-9999px';
+      element.style.width = originalStyles.width || '';
+      element.style.maxWidth = originalStyles.maxWidth || '';
+      element.style.background = originalStyles.background || '';
+      noPrintElements.forEach((el, index) => {
+        el.style.display = originalNoPrintStyles[index];
+      });
+      document.body.classList.remove('print-mode');
+    };
+
+    const prepareAndPrint = () => {
+      const hasContent = element.innerText.trim().length > 0 || element.querySelector('img, table, div');
+      if (!hasContent) {
+        contentCheckTimeout = setTimeout(prepareAndPrint, 200);
+        return;
+      }
+
+      document.body.classList.add('print-mode');
+      element.style.display = 'block';
+      element.style.position = 'absolute';
+      element.style.top = '0';
+      element.style.left = '0';
+      element.style.width = '210mm';
+      element.style.maxWidth = '210mm';
+      element.style.background = '#fff';
+      element.style.boxSizing = 'border-box';
+
+      noPrintElements.forEach((el) => {
+        el.style.display = 'none';
+      });
+
+      waitForImages().then(() => {
+        printTimeout = setTimeout(() => {
+          try {
+            window.print();
+          } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            alert('Erro ao gerar PDF.');
+          } finally {
+            restoreStyles();
+            setPdfSyllabus(null);
+            setIsGeneratingPdf(false);
+          }
+        }, 100);
+      });
+    };
+
+    prepareAndPrint();
+
+    return () => {
+      if (contentCheckTimeout) clearTimeout(contentCheckTimeout);
+      if (printTimeout) clearTimeout(printTimeout);
+      restoreStyles();
+    };
+  }, [pdfSyllabus, isGeneratingPdf]);
 
   const canAccessConfigurations = user && ['coordenador', 'admin'].includes((user.role || 'professor').toLowerCase());
   
@@ -436,6 +557,14 @@ const SyllabusList = () => {
                   >
                     <FaCopy />
                   </button>
+                  <button
+                    className="action-btn pdf"
+                    onClick={() => handleGeneratePDF(syllabus.id)}
+                    title="Gerar PDF"
+                    disabled={isGeneratingPdf}
+                  >
+                    <FaFilePdf />
+                  </button>
                   {syllabus.usuario_id === user.id && (
                     <>
                       <button
@@ -483,6 +612,21 @@ const SyllabusList = () => {
           </div>
         </div>
       )}
+
+      <div
+        id="pdf-content"
+        style={{
+          display: 'none',
+          position: 'absolute',
+          left: '-9999px',
+          width: '210mm',
+          maxWidth: '210mm'
+        }}
+      >
+        {pdfSyllabus && (
+          <SyllabusPDFContent formData={pdfSyllabus} professoresList={pdfProfessoresList} />
+        )}
+      </div>
     </div>
   );
 };

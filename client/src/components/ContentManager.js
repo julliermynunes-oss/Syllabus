@@ -15,11 +15,11 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { FaPlus, FaTrash, FaGripVertical, FaList, FaFileAlt } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaGripVertical, FaList, FaFileAlt, FaCaretDown, FaCaretUp } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import './ContentManager.css';
 
-const SortableUnidadeRow = ({ unidade, index, onUpdate, onRemove }) => {
+const SortableUnidadeRow = ({ unidade, index, onUpdate, onRemove, expandedRows, toggleRow }) => {
   const {
     attributes,
     listeners,
@@ -35,6 +35,9 @@ const SortableUnidadeRow = ({ unidade, index, onUpdate, onRemove }) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const isExpanded = expandedRows.has(unidade.id);
+  const hasDescription = unidade.descricao && unidade.descricao.trim() !== '';
+
   return (
     <div
       ref={setNodeRef}
@@ -45,44 +48,62 @@ const SortableUnidadeRow = ({ unidade, index, onUpdate, onRemove }) => {
         <FaGripVertical />
       </div>
       <div className="unidade-content">
-        <div className="form-row">
-          <div className="form-field" style={{ flex: 2 }}>
+        <div className="unidade-header">
+          <div className="unidade-main-fields">
             <input
               type="text"
               value={unidade.nome}
               onChange={(e) => onUpdate(index, 'nome', e.target.value)}
-              placeholder="Nome da unidade (ex: Unidade 1: Introdução)"
-              style={{ marginTop: '0.25rem' }}
+              placeholder="Nome do tópico (ex: Tópico 1: Introdução)"
+              className="unidade-nome-input"
             />
-          </div>
-          <div className="form-field" style={{ flex: 1 }}>
             <input
               type="text"
               value={unidade.carga_horaria}
               onChange={(e) => onUpdate(index, 'carga_horaria', e.target.value)}
-              placeholder="Carga horária (ex: 4h)"
-              style={{ marginTop: '0.25rem' }}
+              placeholder="Carga horária"
+              className="unidade-carga-input"
             />
           </div>
-          <div className="form-field" style={{ flex: 0, width: 'auto' }}>
+          <div className="unidade-actions">
+            <button
+              type="button"
+              onClick={() => toggleRow(unidade.id)}
+              className="toggle-desc-btn"
+              title={isExpanded ? 'Ocultar descrição' : 'Mostrar descrição'}
+            >
+              {isExpanded ? <FaCaretUp /> : <FaCaretDown />}
+            </button>
             <button
               type="button"
               onClick={() => onRemove(index)}
               className="remove-unidade-btn"
+              title="Remover tópico"
             >
               <FaTrash />
             </button>
           </div>
         </div>
-        <div className="form-row full-width">
-          <div className="form-field">
+        {isExpanded && (
+          <div className="unidade-descricao">
             <TiptapEditor
               content={unidade.descricao}
               onChange={(content) => onUpdate(index, 'descricao', content)}
               showCharCount={false}
+              minHeight="120px"
             />
           </div>
-        </div>
+        )}
+        {!isExpanded && hasDescription && (
+          <div className="unidade-desc-preview" onClick={() => toggleRow(unidade.id)}>
+            <span className="desc-preview-text" dangerouslySetInnerHTML={{ 
+              __html: unidade.descricao.length > 100 
+                ? unidade.descricao.substring(0, 100).replace(/<[^>]*>/g, '') + '...' 
+                : unidade.descricao.replace(/<[^>]*>/g, '')
+            }} />
+            <span className="desc-preview-hint">Clique para editar</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -92,6 +113,7 @@ const ContentManager = ({ content, onChange }) => {
   const [layout, setLayout] = useState('texto'); // 'lista' ou 'texto'
   const [unidades, setUnidades] = useState([]);
   const [textContent, setTextContent] = useState('');
+  const [expandedRows, setExpandedRows] = useState(new Set());
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -176,7 +198,7 @@ const ContentManager = ({ content, onChange }) => {
             // Tentar extrair nome e carga horária
             const cargaMatch = text.match(/(\d+[hH]?)/);
             const carga = cargaMatch ? cargaMatch[0] : '';
-            const nome = text.replace(/\d+[hH]?/g, '').trim() || `Unidade ${extractedUnidades.length + 1}`;
+            const nome = text.replace(/\d+[hH]?/g, '').trim() || `Tópico ${extractedUnidades.length + 1}`;
             
             extractedUnidades.push({
               id: `unidade-${listIdx}-${itemIdx}-${Date.now()}`,
@@ -277,6 +299,18 @@ const ContentManager = ({ content, onChange }) => {
     saveUnidades(newUnidades);
   };
 
+  const toggleRow = (id) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <div className="content-manager">
       <div style={{ marginBottom: '1.5rem' }}>
@@ -293,7 +327,7 @@ const ContentManager = ({ content, onChange }) => {
               <FaList size={24} />
             </div>
             <div className="layout-label">
-              <strong>Lista de Unidades</strong>
+              <strong>Lista de Tópicos</strong>
             </div>
           </button>
           <button
@@ -318,26 +352,14 @@ const ContentManager = ({ content, onChange }) => {
               type="button"
               onClick={addUnidade}
               className="add-unidade-btn"
-              style={{
-                padding: '0.5rem 1rem',
-                background: '#235795',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
             >
-              <FaPlus /> Adicionar Unidade
+              <FaPlus /> Adicionar Tópico
             </button>
           </div>
 
           {unidades.length === 0 ? (
             <p style={{ color: '#666', fontStyle: 'italic', textAlign: 'center', padding: '2rem' }}>
-              Nenhuma unidade adicionada. Clique em "Adicionar Unidade" para começar.
+              Nenhum tópico adicionado. Clique em "Adicionar Tópico" para começar.
             </p>
           ) : (
             <DndContext
@@ -357,6 +379,8 @@ const ContentManager = ({ content, onChange }) => {
                       index={index}
                       onUpdate={updateUnidade}
                       onRemove={removeUnidade}
+                      expandedRows={expandedRows}
+                      toggleRow={toggleRow}
                     />
                   ))}
                 </div>

@@ -461,12 +461,17 @@ function loadCSVData() {
 // Function to load competências from XLSX
 function loadCompetenciasData() {
   try {
-    const xlsxPath = path.join(__dirname, '..', 'Competências.xlsx');
-    console.log(`Tentando carregar Competências.xlsx de: ${xlsxPath}`);
+    // Tentar primeiro com o nome sem acentos (para compatibilidade com Docker)
+    let xlsxPath = path.join(__dirname, '..', 'Competencias.xlsx');
+    if (!fs.existsSync(xlsxPath)) {
+      // Fallback para o nome com acentos (caso ainda exista)
+      xlsxPath = path.join(__dirname, '..', 'Competências.xlsx');
+    }
+    console.log(`Tentando carregar arquivo de competências de: ${xlsxPath}`);
     
     if (!fs.existsSync(xlsxPath)) {
-      console.warn(`Competências.xlsx não encontrado em: ${xlsxPath}`);
-      console.warn('Verifique se o arquivo existe na raiz do projeto');
+      console.warn(`Arquivo de competências não encontrado em: ${xlsxPath}`);
+      console.warn('Verifique se o arquivo Competencias.xlsx existe na raiz do projeto');
       return;
     }
 
@@ -481,7 +486,7 @@ function loadCompetenciasData() {
     console.log(`Total de linhas lidas: ${data.length}`);
     
     if (data.length === 0) {
-      console.warn('Nenhuma linha de dados encontrada no arquivo Competências.xlsx');
+      console.warn('Nenhuma linha de dados encontrada no arquivo de competências');
       return;
     }
 
@@ -517,7 +522,7 @@ function loadCompetenciasData() {
     console.log(`✓ Carregadas competências para ${cursosCount} cursos:`, Object.keys(competenciasData).join(', '));
     
     if (cursosCount === 0) {
-      console.error('⚠ ATENÇÃO: Nenhum curso foi encontrado no arquivo Competências.xlsx');
+      console.error('⚠ ATENÇÃO: Nenhum curso foi encontrado no arquivo de competências');
       console.error('Verifique se o arquivo tem uma coluna chamada "Curso" (ou variações)');
     }
   } catch (error) {

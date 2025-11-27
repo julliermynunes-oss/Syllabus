@@ -317,6 +317,17 @@
   color: white;
 }
 
+.action-btn.pdf {
+  background: #c62828;
+  color: white;
+}
+
+.action-btn.pdf:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
 .action-btn.delete {
   background: #686868;
   color: white;
@@ -575,5 +586,32 @@
 .preview-content li {
   padding-left: 8px !important;
   margin-bottom: 4px !important;
+}
+
+.print-mode {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #fff !important;
+}
+
+.print-mode * {
+  visibility: hidden !important;
+}
+
+.print-mode #pdf-content,
+.print-mode #pdf-content * {
+  visibility: visible !important;
+}
+
+.print-mode #pdf-content {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 210mm !important;
+  max-width: 210mm !important;
+  margin: 0 auto !important;
+  background: #fff !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
 }
 

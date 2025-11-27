@@ -615,11 +615,26 @@ function SyllabusForm() {
     const originalPosition = element.style.position;
     const originalLeft = element.style.left;
 
+    const waitForImages = () => {
+      const images = element.querySelectorAll('img');
+      if (images.length === 0) return Promise.resolve();
+      const promises = Array.from(images).map((img) => {
+        if (img.complete && img.naturalWidth !== 0) return Promise.resolve();
+        return new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      });
+      return Promise.all(promises);
+    };
+
     try {
+      document.body.classList.add('print-mode');
       // Tornar o elemento visível e posicionado corretamente
       element.style.display = 'block';
-      element.style.position = 'relative';
+      element.style.position = 'absolute';
       element.style.left = '0';
+      element.style.top = '0';
       element.style.width = '210mm';
       element.style.maxWidth = '210mm';
       element.style.background = '#fff';
@@ -632,22 +647,25 @@ function SyllabusForm() {
       });
 
       // Aguardar renderização e então imprimir
-      setTimeout(() => {
-        window.print();
-        
-        // Restaurar estilos após impressão
-        element.style.display = originalDisplay;
-        element.style.position = originalPosition;
-        element.style.left = originalLeft;
-        element.style.width = '';
-        element.style.maxWidth = '';
-        element.style.background = '';
-        
-        // Restaurar elementos ocultos
-        noPrintElements.forEach(el => {
-          el.style.display = '';
-        });
-      }, 100);
+      waitForImages().then(() => {
+        setTimeout(() => {
+          window.print();
+          
+          // Restaurar estilos após impressão
+          element.style.display = originalDisplay;
+          element.style.position = originalPosition;
+          element.style.left = originalLeft;
+          element.style.width = '';
+          element.style.maxWidth = '';
+          element.style.background = '';
+          document.body.classList.remove('print-mode');
+          
+          // Restaurar elementos ocultos
+          noPrintElements.forEach(el => {
+            el.style.display = '';
+          });
+        }, 100);
+      });
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);
       alert(`Erro ao gerar PDF: ${error.message}`);
@@ -660,6 +678,7 @@ function SyllabusForm() {
         element.style.width = '';
         element.style.maxWidth = '';
         element.style.background = '';
+        document.body.classList.remove('print-mode');
       }
     }
   };
@@ -1221,6 +1240,7 @@ function SyllabusForm() {
               <ContactsManager
                 content={formData.contatos}
                 onChange={(content) => setFormData(prev => ({ ...prev, contatos: content }))}
+                professoresList={professoresList}
               />
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaShieldAlt, FaFileAlt, FaCopy } from 'react-icons/fa';
+import { FaShieldAlt, FaFileAlt } from 'react-icons/fa';
 import TiptapEditor from './TiptapEditor';
 import './EthicalCommitmentManager.css';
 
@@ -75,12 +75,8 @@ const EthicalCommitmentManager = ({ content, onChange }) => {
 
   // Converter template para texto livre
   const convertTemplateToText = () => {
-    // Combinar template padrão com conteúdo personalizado
-    let html = TEMPLATE_PADRAO;
-    if (templateContent && templateContent.trim() !== '') {
-      html += templateContent;
-    }
-
+    // Não copiar o template, apenas o conteúdo personalizado se houver
+    const html = templateContent || '';
     setTextContent(html);
     setLayout('texto');
     saveTextContent(html);
@@ -97,13 +93,9 @@ const EthicalCommitmentManager = ({ content, onChange }) => {
   };
 
   const usarTemplatePadrao = () => {
-    setTemplateContent('');
-    saveTemplateContent('');
-  };
-
-  const copiarTemplate = () => {
-    navigator.clipboard.writeText(TEMPLATE_PADRAO);
-    alert('Template copiado para a área de transferência!');
+    // Inserir o template padrão no editor abaixo
+    setTemplateContent(TEMPLATE_PADRAO);
+    saveTemplateContent(TEMPLATE_PADRAO);
   };
 
   return (
@@ -149,26 +141,8 @@ const EthicalCommitmentManager = ({ content, onChange }) => {
             border: '1px solid #e0e0e0',
             marginBottom: '1.5rem'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <div style={{ marginBottom: '0.5rem' }}>
               <strong>Template Padrão (referência):</strong>
-              <button
-                type="button"
-                onClick={copiarTemplate}
-                style={{
-                  padding: '0.25rem 0.75rem',
-                  background: '#235795',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.25rem'
-                }}
-              >
-                <FaCopy /> Copiar
-              </button>
             </div>
             <div
               style={{
@@ -189,29 +163,36 @@ const EthicalCommitmentManager = ({ content, onChange }) => {
               type="button"
               onClick={usarTemplatePadrao}
               style={{
-                padding: '0.5rem 1rem',
-                background: '#6c757d',
+                padding: '0.6rem 1.2rem',
+                background: '#235795',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                fontSize: '0.85rem'
+                fontSize: '0.9rem',
+                fontWeight: '600',
+                transition: 'background 0.2s ease'
               }}
+              onMouseEnter={(e) => e.target.style.background = '#2a6ca8'}
+              onMouseLeave={(e) => e.target.style.background = '#235795'}
             >
-              Usar Template Padrão (limpar edições)
+              Usar Template Padrão
             </button>
+            <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#666' }}>
+              Clique no botão acima para inserir o template padrão no editor abaixo.
+            </p>
           </div>
 
           <div className="form-row full-width">
             <div className="form-field">
-              <label>Conteúdo Adicional/Personalizado:</label>
+              <label>Conteúdo do Compromisso Ético:</label>
               <TiptapEditor
                 content={templateContent}
                 onChange={saveTemplateContent}
                 showCharCount={true}
               />
               <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', color: '#666', fontStyle: 'italic' }}>
-                💡 Adicione aqui qualquer conteúdo adicional ou personalizado ao template padrão.
+                💡 Use o botão "Usar Template Padrão" acima para inserir o template, ou edite livremente o conteúdo aqui.
               </p>
             </div>
           </div>
