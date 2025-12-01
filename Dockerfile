@@ -13,8 +13,8 @@ COPY server ./server
 
 # Copiar arquivos de dados (CSV e XLSX)
 COPY *.csv ./
-# Copiar arquivos XLSX - o padrão deve funcionar se os arquivos estiverem no contexto
-# Se o arquivo não existir, o build falhará, mas o servidor tratará isso graciosamente
+# Copiar arquivos XLSX (Competencias.xlsx e Professores.xlsx)
+# Arquivo renomeado de Competências.xlsx para Competencias.xlsx para evitar problemas com caracteres especiais
 COPY *.xlsx ./
 
 # Copiar código do cliente e fazer build
